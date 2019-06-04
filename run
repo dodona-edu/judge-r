@@ -1,0 +1,79 @@
+#!/usr/bin/env Rscript
+
+library('testthat')
+library('rjson')
+
+expectation_type <- function(exp) {
+  stopifnot(is.expectation(exp))
+  gsub("^expectation_", "", class(exp)[[1]])
+}
+
+lines <- function(s) {
+  strsplit(as.character(s), split='\n')[[1]]
+}
+
+input <- fromJSON(file='stdin')
+
+tests <- paste(input$evaluation$resources, 'tests.R', sep='/')
+
+# NOTE: the test environment inherits from the global environment,
+# so the location of the proposed solution to the exercise
+# will be available to the tests
+exercise <- input$evaluation$source
+report <- ListReporter$new()
+
+test_file(path=tests,
+          reporter=report
+)
+
+cases <- report$results$as_list()
+
+groups <- lapply(cases, function(case) {
+  tests <- lapply(case$results, function(test) {
+    message <- list(
+      format='plain',
+      description=lines(test$message)[-1],
+      permission='student'
+    )
+
+    list(
+      description=lines(test$message)[1],
+      accepted=expectation_type(test) == 'success',
+      generated='<expected>',
+      expected='<actual>',
+      messages=c(message)
+    )
+  })
+
+  list(
+    accepted=TRUE,
+    description=as.character(case$test),
+    messages=c(),
+    tests=tests
+  )
+})
+
+context <- list(
+  accepted=TRUE,
+  description='',
+  messages=c(),
+  groups=groups
+)
+
+tab <- list(
+  description='',
+  badgeCount=0,
+  messages=c(),
+  groups=c(context)
+)
+
+output <- list(
+  accepted=TRUE,
+  status='compilation error|runtime error|time limit exceeded|wrong|correct',
+  description='',
+  messages=c(),
+  groups=c(tab),
+  annotations=c()
+)
+
+write(toJSON(output, indent=2), stdout())
