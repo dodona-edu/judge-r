@@ -1,0 +1,28 @@
+source('reporter-env.R')
+source('context.R')
+source('testcase.R')
+source('test.R')
+
+start_judgement <- function(tests_path, source_path) {
+    get_reporter()$start_reporter()
+    on.exit(get_reporter()$end_reporter())
+
+    # We need the source path when constructing clean contexts
+    student_code <<- source_path
+
+    test_files = list.files(tests_path)
+    for (file in test_files) {
+        start_tab(paste(tests_path, file, sep = '/'), file)
+    }
+}
+
+strip_extension <- function(filename) {
+    gsub("\\.[Rr]$", "", filename)
+}
+
+start_tab <- function(path, filename) {
+    get_reporter()$start_tab(strip_extension(filename))
+    on.exit(get_reporter()$end_tab())
+
+    source(path)
+}
