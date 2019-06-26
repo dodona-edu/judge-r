@@ -1,6 +1,6 @@
 # R judge for Dodona
 
-> Note: this judge makes extensive use of R environments to seperate student code from test code. If you are not familiar with environments, it might be useful to read [this](http://adv-r.had.co.nz/Environments.html)
+> Note: this judge makes extensive use of R environments to separate student code from test code. If you are not familiar with environments, it might be useful to read [this](http://adv-r.had.co.nz/Environments.html).
 
 ## A basic exercise
 
