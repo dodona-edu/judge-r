@@ -24,12 +24,20 @@ DodonaReporter <- R6::R6Class("DodonaReporter",
         write(paste('{"command": "close-test", "generated": ', toJSON(toString(generated), auto_unbox=TRUE) ,', "status": {"enum": "', status, '"}}', sep=''), stdout())
     },
 
-    end_testcase = function() {
-        write('{"command": "close-testcase"}', stdout())
+    end_testcase = function(accepted = NULL) {
+        if(is.null(accepted)) {
+            write('{"command": "close-testcase"}', stdout())
+        } else {
+            write(paste('{"command": "close-testcase", "accepted": ', toJSON(accepted, auto_unbox=TRUE) ,'}', sep=''), stdout())
+        }
     },
 
-    end_context = function() {
-        write('{"command": "close-context"}', stdout())
+    end_context = function(accepted = NULL) {
+        if(is.null(accepted)) {
+            write('{"command": "close-context"}', stdout())
+        } else {
+            write(paste('{"command": "close-context", "accepted": ', toJSON(accepted, auto_unbox=TRUE) ,'}', sep=''), stdout())
+        }
     },
 
     end_tab = function() {

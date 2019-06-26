@@ -1,7 +1,9 @@
-source('reporter-env.R')
-source('context.R')
-source('testcase.R')
-source('test.R')
+source('reporter-env.R', local=TRUE)
+source('context.R', local=TRUE)
+source('testcase.R', local=TRUE)
+source('test.R', local=TRUE)
+
+student_code <- NULL
 
 start_judgement <- function(tests_path, source_path) {
     get_reporter()$start_reporter()
@@ -24,5 +26,5 @@ start_tab <- function(path, filename) {
     get_reporter()$start_tab(strip_extension(filename))
     on.exit(get_reporter()$end_tab())
 
-    source(path)
+    source(path, local=TRUE)
 }

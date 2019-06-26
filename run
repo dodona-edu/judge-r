@@ -2,7 +2,9 @@
 
 library('jsonlite')
 
-input <- fromJSON(file('stdin'))
-source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE)
+invisible(evalq({
+    input <- fromJSON(file('stdin'))
+    source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE, local=TRUE)
 
-start_judgement(input$resources, input$source)
+    start_judgement(input$resources, input$source)
+}, envir = new.env(parent = parent.env(globalenv()))))
