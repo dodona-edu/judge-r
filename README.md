@@ -53,7 +53,7 @@ A test is an actual evaluation of correctness. Multiple `test_*` functions are a
 
  1. A description of the test. Preferably, this is something the student can copy-paste into their local R environment (e.g. `length(x)`, `test$p.value`, etc.).
  2. A function extracting the value to be tested from the student's environment. This function should take one argument (`env`) and return a value.
- 3. The expected value. This is the value that the value extracted by the second parameter is compared to.
+ 3. The expected value. This expected value is compared to the value extracted by the second argument.
 
 #### `test_equal`
 
