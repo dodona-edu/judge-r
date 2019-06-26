@@ -15,7 +15,7 @@ context <- function(testcases={}, preExec={}) {
         }
     })
 
-    test_env$clean_env <- new.env(parent = parent.env(globalenv()))
+    test_env$clean_env <- new.env(parent = globalenv())
     tryCatch(
         withCallingHandlers(
             {
