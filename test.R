@@ -21,16 +21,16 @@ test_equal <- function(description, generated, expected, comparator = NULL, ...)
                 }
             },
             warning = function(w) {
-                get_reporter()$add_message(paste("Warning while evaluating test: ", w, sep = ''))
+                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
             },
             message = function(m) {
-                get_reporter()$add_message(paste("Message while evaluating test: ", m, sep = ''))
+                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
             }
         ),
         error = function(e) {
             get_reporter()$end_test("", "wrong")
             get_reporter()$start_test("", description)
-            get_reporter()$end_test(e, "runtime error")
+            get_reporter()$end_test(conditionMessage(e), "runtime error")
         }
     )
 }
