@@ -1,7 +1,7 @@
 test_env <- new.env()
 
-context <- function(description = NULL, testcases={}, preExec={}) {    
-    get_reporter()$start_context(description)
+context <- function(testcases={}, preExec={}) {    
+    get_reporter()$start_context()
     on.exit(get_reporter()$end_context())
 
     test_env$clean_env <- new.env(parent = parent.env(globalenv()))

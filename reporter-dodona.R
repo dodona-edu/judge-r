@@ -8,8 +8,8 @@ DodonaReporter <- R6::R6Class("DodonaReporter",
         write(paste('{"command": "start-tab", "title": ', toJSON(name, auto_unbox=TRUE), '}', sep=''), stdout())
     },
 
-    start_context = function(context) {
-        write(paste('{"command": "start-context", "description": ', toJSON(context, auto_unbox=TRUE), '}', sep=''), stdout())
+    start_context = function() {
+        write('{"command": "start-context" }', stdout())
     },
 
     start_testcase = function(description) {
