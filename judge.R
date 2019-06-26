@@ -22,8 +22,12 @@ strip_extension <- function(filename) {
     gsub("\\.[Rr]$", "", filename)
 }
 
+strip_leading_digit <- function(filename) {
+    gsub("^\\d*-", "", filename)
+}
+
 start_tab <- function(path, filename) {
-    get_reporter()$start_tab(strip_extension(filename))
+    get_reporter()$start_tab(strip_leading_digit(strip_extension(filename)))
     on.exit(get_reporter()$end_tab())
 
     source(path, local=TRUE)

@@ -30,7 +30,7 @@ Let's unpack what happens here.
 
 ### Tabs
 
-First of all, something you can't see in the example code above. Dodona groups contexts in tabs. These are represented in the R judge by the files containing the test code. The name of the file (without the `.R`) extension is used to name the tab. A file should contain one or more calls to `context`.
+First of all, something you can't see in the example code above. Dodona groups contexts in tabs. These are represented in the R judge by the files containing the test code. The name of the file (without the `.R`) extension is used to name the tab. A file should contain one or more calls to `context`. Tabs are ordered lexicographically by their filename. To make sure that tabs can be in a logical order, leading digits followed by a dash (`-`) are also stripped from the filename.
 
 ### Contexts
 
