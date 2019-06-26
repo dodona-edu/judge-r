@@ -1,4 +1,4 @@
-test_equal <- function(description, generated, expected, ...) {
+test_equal <- function(description, generated, expected, comparator = NULL, ...) {
     get_reporter()$start_test(expected, description)
 
     tryCatch(
@@ -6,7 +6,15 @@ test_equal <- function(description, generated, expected, ...) {
             {
                 expected_val <- expected
                 generated_val <- generated(test_env$clean_env)
-                if (isTRUE(all.equal(generated_val, expected_val, ...))) {
+
+                equal <- FALSE
+                if (is.null(comparator)) {
+                    equal <- isTRUE(all.equal(generated_val, expected_val, ...))
+                } else {
+                    equal <- comparator(generated, expected, ...)
+                }
+
+                if (equal) {
                     get_reporter()$end_test(generated_val, "correct")
                 } else {
                     get_reporter()$end_test(generated_val, "wrong")
