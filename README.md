@@ -55,6 +55,6 @@ A test is an actual evaluation of correctness. Multiple `test_*` functions are a
  2. A function extracting the value to be tested from the student's environment. This function should take one argument (`env`) and return a value.
  3. The expected value. This is the value that the value extracted by the second parameter is compared to.
 
- #### `test_equal`
+#### `test_equal`
 
- TODO
+The `test_equal` function uses the `base::all.equal` function internally to determine whether the two values are equal. Any parameters that can be passed to `all.equal` can be passed to `test_equal` (but the first three arguments need to be as described above).
