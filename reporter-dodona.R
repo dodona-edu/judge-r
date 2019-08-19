@@ -48,8 +48,8 @@ DodonaReporter <- R6::R6Class("DodonaReporter",
         write('{"command": "close-judgement"}', stdout())
     },
 
-    add_message = function(message) {
-        write(paste('{"command": "append-message", "message": ', toJSON(toString(message), auto_unbox=TRUE), '}', sep=''), stdout())
+    add_message = function(message, type="plain") {
+        write(paste('{"command": "append-message", "message": { "description": ', toJSON(toString(message), auto_unbox=TRUE), ', "format": ', toJSON(type, auto_unbox=TRUE), '} }', sep=''), stdout())
     },
 
     escalate = function(status) {
