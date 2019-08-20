@@ -59,7 +59,11 @@ A test is an actual evaluation of correctness. Multiple `test*` functions are av
 
 #### `testEqual`
 
-The `testEqual` function uses the `base::all.equal` function internally to determine whether the two values are equal. Any parameters that can be passed to `all.equal` can be passed to `test_equal` (but the first three arguments need to be as described above). In addition, one can pass a `comparator` argument to `test_equal`. This `comparator` should be a function that takes two arguments (`generated` and `expected`, in that order) and returns `TRUE` or `FALSE`. If this argument is passed, the comparator is used instead of `all.equal`. Any named arguments passed to `test_equal` that are not known by `test_equal` are passed to `all.equal` or `comparator` depending on what is used.
+The `testEqual` function uses the `base::all.equal` function internally to determine whether the two values are equal. Any parameters that can be passed to `all.equal` can be passed to `testEqual` (but the first three arguments need to be as described above). In addition, one can pass a `comparator` argument to `testEqual`. This `comparator` should be a function that takes two arguments (`generated` and `expected`, in that order) and returns `TRUE` or `FALSE`. If this argument is passed, the comparator is used instead of `all.equal`. Any named arguments passed to `test_equal` that are not known by `testEqual` are passed to `all.equal` or `comparator` depending on what is used.
+
+#### `testIdentical`
+
+The `testIdentical` function use the `base::identical` function internally to determine whether the two values are equal. Any parameters that can be passed to `identical` can be passed to `testIdentical` (but the first three arguments need to be as described above).
 
 #### `testImage`
 
