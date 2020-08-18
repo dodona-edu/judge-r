@@ -6,7 +6,7 @@ read_lines <- function(file) {
     lines <- readLines(con, warn = FALSE)
 }
 
-context <- function(testcases={}, preExec={}) {    
+context <- function(testcases={}, preExec={}) {
     get_reporter()$start_context()
     do_exit <- TRUE
     on.exit({
@@ -21,7 +21,9 @@ context <- function(testcases={}, preExec={}) {
             {
                 eval(preExec, envir = test_env$clean_env)
                 # We don't use source, because otherwise syntax errors leak the location of the student code
-                eval(parse(text = read_lines(student_code)), envir = test_env$clean_env)
+                assign(".Last.value",
+                       eval(parse(text = read_lines(student_code)), envir = test_env$clean_env),
+                       envir = test_env$clean_env)
                 eval(testcases)
             },
             warning = function(w) {
