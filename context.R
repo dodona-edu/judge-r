@@ -1,9 +1,9 @@
 test_env <- new.env()
 
-read_lines <- function(file) {
-    con <- file(student_code, "r")
+read_lines <- function(filename) {
+    con <- file(filename, "r")
     on.exit(close(con))
-    lines <- readLines(con, warn = FALSE)
+    readLines(con, warn = FALSE)
 }
 
 context <- function(testcases={}, preExec={}) {
