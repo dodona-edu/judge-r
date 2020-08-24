@@ -1,24 +1,56 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 
+while getopts ":h" option; do
+   case $option in
+      h) # display Help
+         echo "This is a script for running the R-judge local"
+         echo
+         echo "Syntax: test.sh [-h] PATH_TO_EXERCISE_DIR PATH_TO_DUMP_DIR [PATH_TO_SOLUTION_FILE]"
+         echo "Param: \n\
+\tPATH_TO_EXERCISE_DIR    path to the exercise folder \n\
+\tPATH_TO_DUMP_DIR        path to the a folder where the exercise will be solved and stored \n\
+\t[PATH_TO_SOLUTION_FILE] optional path to the solution file default is set to \n\
+\t                        PATH_TO_EXERCISE_DIR/solution/solution.en.R"
+         echo "options:"
+         echo "h     Print this Help."
+         echo ""
+         echo
+         exit;
+   esac
+done
+
 path_to_exercise="$1"
-
-[ -z "$path_to_exercise" ] \
+[ -z "$path_to_exercise" ] || [ ! -d "$path_to_exercise" ] \
     && echo 'Provide a path to an exercise as first argument.' \
     && exit 1
 
-filename="$2"
-
-[ -f "$path_to_exercise/workdir/$filename"] \
-    && echo 'Provide a path to an exercise as first argument.' \
+test_dir="$2"
+[ -z "$test_dir" ] || [ ! -d "$test_dir" ]\
+    && echo 'Provide a path to a testing directory where the exercise will be solved and stored as second argument.' \
     && exit 1
 
-sh "./run" <<HERE
+path_to_solution=${3:-"$path_to_exercise/solution/solution.en.R"}
+[ ! -f "$path_to_solution" ] \
+    && echo "No solution found at $path_to_solution" \
+    && exit 1
+
+#find next available name in the test directory
+number=0
+base_name=$(basename "$path_to_exercise")
+fname=$base_name
+while [ -e "$test_dir/$fname" ]; do
+    printf -v fname '%s-%02d' "$base_name" "$(( ++number ))"
+done
+mkdir "$test_dir/$fname/"
+cp -R "$path_to_exercise/." "$test_dir/$fname/"
+
+Rscript "./run" <<HERE
 {
-    "resources": "$path_to_exercise/evaluation",
+    "resources": "$test_dir/$fname/evaluation",
     "judge": ".",
-    "source": "$path_to_exercise/workdir/$filename"
+    "source": "$path_to_solution"
 }
 HERE
 
