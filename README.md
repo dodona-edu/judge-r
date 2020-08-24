@@ -9,11 +9,11 @@ The test file for a basic exercise can look like this:
 ```r
 context({
   testcase('The correct method was used', {
-    test_equal("test$alternative", function(env) { env$test$alternative }, 'two.sided')
-    test_equal("test$method", function(env) { env$test$method }, ' Two Sample t-test')
+    testEqual("test$alternative", function(env) { env$test$alternative }, 'two.sided')
+    testEqual("test$method", function(env) { env$test$method }, ' Two Sample t-test')
   })
   testcase('p value is correct', {
-    test_equal("test$p.value", function(env) { env$test$p.value }, 0.175)
+    testEqual("test$p.value", function(env) { env$test$p.value }, 0.175)
   })
 }, preExec = {
   set.seed(20190322)
@@ -21,7 +21,7 @@ context({
 
 context({
   testcase('x has the correct length', {
-    test_equal("length(x)", function(env) { length(env$x) }, 100)
+    testEqual("length(x)", function(env) { length(env$x) }, 100)
   })
 })
 ```
