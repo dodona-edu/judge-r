@@ -11,7 +11,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
                 if (is.null(comparator)) {
                     equal <- isTRUE(all.equal(generated_val, expected_val, ...))
                 } else {
-                    equal <- comparator(generated, expected, ...)
+                    equal <- comparator(generated_val, expected_val, ...)
                 }
 
                 if (equal) {
