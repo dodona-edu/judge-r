@@ -10,8 +10,9 @@ while getopts ":h" option; do
          echo "Syntax: test.sh [-h] PATH_TO_EXERCISE_DIR PATH_TO_DUMP_DIR [PATH_TO_SOLUTION_FILE]"
          echo "Param: \n\
 \tPATH_TO_EXERCISE_DIR    path to the exercise folder \n\
-\tPATH_TO_DUMP_DIR        path to the a folder where the exercise will be solved and stored \n\
-\t[PATH_TO_SOLUTION_FILE] optional path to the solution file default is set to \n\
+\t[PATH_TO_DUMP_DIR]      optional path to the a folder where the exercise will be solved and stored, \n\
+\t                        deault is set to \"./tmp\"\n\
+\t[PATH_TO_SOLUTION_FILE] optional path to the solution file, default is set to \n\
 \t                        PATH_TO_EXERCISE_DIR/solution/solution.en.R"
          echo "options:"
          echo "h     Print this Help."
@@ -26,7 +27,7 @@ path_to_exercise="$1"
     && echo 'Provide a path to an exercise as first argument.' \
     && exit 1
 
-test_dir="$2"
+test_dir=${2:-"./tmp"}
 [ -z "$test_dir" ] || [ ! -d "$test_dir" ]\
     && echo 'Provide a path to a testing directory where the exercise will be solved and stored as second argument.' \
     && exit 1
@@ -46,10 +47,10 @@ done
 mkdir "$test_dir/$fname/"
 cp -R "$path_to_exercise/." "$test_dir/$fname/"
 
-Rscript "./run" <<HERE
+Rscript "../run" <<HERE
 {
     "resources": "$test_dir/$fname/evaluation",
-    "judge": ".",
+    "judge": "..",
     "source": "$path_to_solution"
 }
 HERE
