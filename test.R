@@ -35,6 +35,51 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
     )
 }
 
+testDF <- function(description, generated, expected, comparator = NULL, ignore_col_order=TRUE, ignore_row_order=TRUE, ...) {
+    # Convert first 5 lines of dataframe to HTML
+    expected_html <- knitr::kable(head(expected), "html")
+    get_reporter()$start_test("", description)
+
+    tryCatch(
+        withCallingHandlers(
+            {
+                expected_val <- expected
+                generated_val <- generated(test_env$clean_env)
+                # Convert first 5 lines of dataframe to HTML
+                generated_html <- knitr::kable(head(generated_val), "html")
+
+                equal <- FALSE
+                if (is.null(comparator)) {
+                    # use the dplyr all_equal to compare dataframes, ignoring row/col order by default
+                    equal <- isTRUE(dplyr::all_equal(generated_val, expected_val, ignore_col_order=ignore_col_order, ignore_row_order=ignore_row_order, ...))
+                } else {
+                    equal <- comparator(generated_val, expected_val, ...)
+                }
+
+                if (equal) {
+                    get_reporter()$add_message(generated_html, type = "html")
+                    get_reporter()$end_test("", "correct")
+                } else {
+                    get_reporter()$add_message(paste("Generated",generated_html,sep = '\n'), type = "html")
+                    get_reporter()$add_message(paste("Expected",expected_html,sep = '\n'), type = "html")
+                    get_reporter()$end_test("", "wrong")
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+            }
+        ),
+        error = function(e) {
+            get_reporter()$end_test("", "wrong")
+            get_reporter()$start_test("", description)
+            get_reporter()$end_test(conditionMessage(e), "runtime error")
+        }
+    )
+}
+
 testIdentical <- function(description, generated, expected, ...) {
     get_reporter()$start_test(expected, description)
 
