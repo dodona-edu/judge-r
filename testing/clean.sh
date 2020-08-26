@@ -1,3 +1,3 @@
-#!/bin/bash
+#!/bin/sh
 
-find ./tmp/* ! -name '*.keep' -delete
+find ./tmp -mindepth 1 ! -name '*.keep' -delete
