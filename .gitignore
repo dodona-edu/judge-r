@@ -1,0 +1,5 @@
+
+.Rhistory
+
+testing/tmp/*
+!testing/tmp/.keep
