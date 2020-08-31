@@ -1,23 +1,14 @@
-# These functions were adapted from the check_ggplot module of the testwhat package in the Datacamp repository
+# These functions were inspired by the check_ggplot functions of the testwhat package in the Datacamp repository
 
-test_data_layer <- function(sol_data, stud_data, data_fail_msg = NULL) {
-  if (!is.null(data_fail_msg)) {
-    feedback_msg <- data_fail_msg
-  } else {
-    feedback_msg <- "You didn't get the data layer right."
-  }
-  list('equal' = isTRUE(all.equal(sol_data, stud_data, check.attributes = FALSE)), 'feedback' = feedback_msg)
+test_data_layer <- function(sol_data, stud_data) {
+  feedback <- "You did not add the correct data."
+  list('equal' = isTRUE(all.equal(sol_data, stud_data, check.attributes = FALSE)), 'feedback' = feedback)
 }
 
-test_aes_layer <- function(sol_mapping, stud_mapping, aes_fail_msg = NULL) {
+test_aes_layer <- function(sol_mapping, stud_mapping) {
   for (map in names(sol_mapping)) {
-    if (!is.null(aes_fail_msg)) {
-      feedback_msg <- rep_len(aes_fail_msg, 3)
-    } else {
-      feedback_msg <- c(paste0("Have you mapped something on the `", map, "` aesthetic?"),
-                        paste0("Have you mapped `", sol_mapping[map] ,"` on the `", map, "` aesthetic? Instead, you got `", stud_mapping[map], "`."),
-                        paste0("Have you mapped exactly what is asked on the aesthetics layer, no more and no less?"))
-    }
+    feedback_msg <- c(paste0("Have you specified the `", map, "` aesthetic?"),
+                      paste0("Found `", stud_mapping[map], "` for the `", map, "` aesthetic. Expected `", sol_mapping[map], "`."))
     
     if (is.null(stud_mapping[map][[1]])){
         return(list('equal' = FALSE, 'feedback' = feedback_msg[1]))
@@ -30,54 +21,34 @@ test_aes_layer <- function(sol_mapping, stud_mapping, aes_fail_msg = NULL) {
 }
 
 #' @importFrom stats na.omit
-test_geom_layer <- function(sol_layers, stud_layers, geom_fail_msg = NULL, exact_geom = FALSE, check_geom_params = NULL) {
+test_geom_layer <- function(sol_layers, stud_layers) {
   nb_sol_layers <- length(sol_layers)
-  
-  exact_geom <- rep_len(exact_geom, nb_sol_layers)
   
   if (!(nb_sol_layers > 0)) {
     return(list('equal' = TRUE, 'feedback' = ""))
   }
   
-  if (!is.null(geom_fail_msg)) {
-    geom_fail_msg <- rep_len(geom_fail_msg, 5)
-  }
-  
   for (i in 1:nb_sol_layers) {
     sol_layer <- sol_layers[[i]]
     
-    found_geom_name <- FALSE
+    found_geom <- FALSE
     found_geom_with_params <- FALSE
-    found_geom_with_exact_params <- FALSE
-    found_geom_with_correct_position <- FALSE
     
-    sol_params <- get_geom_params(sol_layer)
-    if (!is.null(check_geom_params)) {
-      sol_params <- sol_params[check_geom_params]
-      sol_params <- sol_params[na.omit(names(sol_params))]
-    }
+    sol_params <- get_params(sol_layer)
     
-    sol_position <- extract_type_from_object(sol_layer$position)
-    sol_geom_type <- extract_type_from_object(sol_layer$geom)
+    sol_geom_type <- get_type(sol_layer$geom)
     
     nb_stud_layers <- length(stud_layers)
     if (nb_stud_layers > 0) {
       for (j in 1:nb_stud_layers) {
         stud_layer <- stud_layers[[j]]
         
-        sol_geom_type <- extract_type_from_object(sol_layer$geom)
-        stud_geom_type <- extract_type_from_object(stud_layer$geom)
+        stud_geom_type <- get_type(stud_layer$geom)
         if (sol_geom_type == stud_geom_type) {
-          found_geom_name <- TRUE
+          found_geom <- TRUE
           found_params <- TRUE
           
-          stud_params <- get_geom_params(stud_layer)
-          if (!is.null(check_geom_params)) {
-            stud_params <- stud_params[check_geom_params]
-            stud_params <- stud_params[na.omit(names(stud_params))]
-          }
-          
-          stud_position <- extract_type_from_object(stud_layer$position)
+          stud_params <- get_params(stud_layer)
           
           for (sol_param in names(sol_params)) {
             if (!(sol_param %in% names(stud_params))) {
@@ -98,83 +69,28 @@ test_geom_layer <- function(sol_layers, stud_layers, geom_fail_msg = NULL, exact
             found_geom_with_params <- TRUE
           }
           
-          if (found_geom_with_params && (!exact_geom[i] || length(sol_params) == length(stud_params))) {
-            found_geom_with_exact_params <- TRUE
-          }
-          
-          if (found_geom_with_exact_params && compare_positions(sol_layer, stud_layer)) {
-            found_geom_with_correct_position <- TRUE
-          }
-          
-          if (found_geom_with_correct_position) {
+          if (found_geom_with_params) {
             stud_layers[[j]] <- NULL
             break
           }
         }
-        
       }
     }
-    
-    if (!is.null(geom_fail_msg)) {
-      feedback_msg <- geom_fail_msg
-    } else {
-      geom_base_feedback <- paste0("Have you correctly added a `", as.character(sol_geom_type),"` layer")
-      if (!is.null(check_geom_params)) {
-        filtered_geom_params <- names(sol_params)
-      } else {
-        filtered_geom_params <- names(filter_standard_geom_params(as.character(sol_geom_type), sol_params))
-      }
-      param_strings <- vapply(filtered_geom_params, 
-                              function(x) {
-                                gen_fb <- ""
-                                if (isTRUE(attr(sol_params[[x]], "aes"))) {
-                                  attr(sol_params[[x]], "aes") <- NULL
-                                  gen_fb <- "aesthetic "
-                                }
-                                return(paste0(gen_fb,"`", x, "` set to `", paste0(deparse(sol_params[[x]]), collapse = " "), "`"))
-                              }, character(1))
-      nb_param_strings <- length(param_strings)
-      if (nb_param_strings > 1) {
-        param_feedback <- paste0(paste(param_strings[1:(nb_param_strings - 1)], collapse = ", "), " and ", param_strings[nb_param_strings])
-      } else {
-        param_feedback <- param_strings
-      }
-      feedback_msg <- c(paste0(geom_base_feedback, " with a `+` operator?"),
-                        paste0(geom_base_feedback, " with ", param_feedback, "?"),
-                        paste0(geom_base_feedback, " with ", param_feedback, "?", " It seems like you have defined too much attributes or aesthetics for this geom."),
-                        paste0(geom_base_feedback, " with the `position` set correctly? Have another look at the instructions."))
+    geom_base_feedback <- paste0("Have you added a `", as.character(sol_geom_type),"` layer")
+    feedback_msg <- c(paste0(geom_base_feedback, " with a `+` operator?"),
+                      paste0(geom_base_feedback, " with the correct parameters?"))
       
-    }
-    
-    if (!found_geom_name) {
+    if (!found_geom) {
         return(list('equal' = FALSE, 'feedback' = feedback_msg[1]))
     } 
     if (!found_geom_with_params) {
         return(list('equal' = FALSE, 'feedback' = feedback_msg[2]))
-    } 
-    if (!found_geom_with_exact_params) {
-        return(list('equal' = FALSE, 'feedback' = feedback_msg[3]))
-    } 
-    if (!found_geom_with_correct_position) {
-        return(list('equal' = FALSE, 'feedback' = feedback_msg[4]))
-    } 
-  }
-  
-  if (isTRUE(exact_geom)) {
-    if (!is.null(geom_fail_msg)) {
-      feedback_msg <- geom_fail_msg[5]
-    } else {
-      feedback_msg <- "Have you added only the geom layers that are asked for? Nothing more."
-    }
-    if (length(stud_layers) != 0) {
-        return(list('equal' = FALSE, 'feedback' = feedback_msg))
     }
   }
-
   return(list('equal' = TRUE, 'feedback' = ""))
 }
 
-get_geom_params <- function(geom_layer) {
+get_params <- function(geom_layer) {
   params <- geom_layer$geom_params
   stat_params <- geom_layer$stat_params
   params[names(stat_params)] <- stat_params
@@ -185,24 +101,6 @@ get_geom_params <- function(geom_layer) {
   return(params)
 }
 
-extract_type_from_object <- function(object) {
+get_type <- function(object) {
   return(sub("^_", "", tolower(gsub("([A-Z])", "_\\1", class(object)[1]))))
-}
-
-compare_positions <- function(sol_layer, stud_layer) {
-   sol_position <- sol_layer$position
-   stud_position <- stud_layer$position
-
-   return(isTRUE(all.equal(sol_position, stud_position, check.attributes = FALSE)))
-}
-
-filter_standard_geom_params <- function(geom_call, params) {
-  standard_layer <- eval(call(geom_call))
-  standard_params <- get_geom_params(standard_layer)
-  ov <- base::intersect(names(params), names(standard_params))
-  eq <- mapply(function(x,y) { isTRUE(all.equal(x,y, check.attributes = FALSE))}, standard_params[ov], params[ov])
-  if (any(eq)) {
-    params[names(eq[eq])] <- NULL
-  } 
-  return(params)
 }
