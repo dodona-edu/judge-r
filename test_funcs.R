@@ -1,3 +1,5 @@
+# These functions were adapted from the check_ggplot module of the testwhat package in the Datacamp repository
+
 test_data_layer <- function(sol_data, stud_data, data_fail_msg = NULL) {
   if (!is.null(data_fail_msg)) {
     feedback_msg <- data_fail_msg
