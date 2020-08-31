@@ -1,4 +1,4 @@
-# These functions were inspired by the check_ggplot functions of the testwhat package in the Datacamp repository
+# These functions were inspired by the check_ggplot functions of the testwhat package https://github.com/datacamp/testwhat
 
 test_data_layer <- function(sol_data, stud_data) {
   feedback <- "You did not add the correct data."
