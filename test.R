@@ -47,8 +47,8 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_c
                 generated_val <- generated(test_env$clean_env)
                 # Convert first 5 lines of dataframe to HTML
                 
-                expected_html <- knitr::kable(head(expected), "html", table.attr = "style='border-spacing: 10px 0;'")
-                generated_html <- knitr::kable(head(generated_val), "html", table.attr = "style='border-spacing: 10px 0;'")
+                expected_html <- knitr::kable(head(expected), "html", table.attr = "class=\"table\"")
+                generated_html <- knitr::kable(head(generated_val), "html", table.attr = "class=\"table\"")
 
                 equal <- FALSE
                 if (is.null(comparator)) {
