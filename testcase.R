@@ -9,8 +9,7 @@ testcase <- function(description = NULL, tests={}) {
 
     tryCatch(
         {
-            # Run the tests in the teacherEnvir
-            eval(substitute(tests), envir=teacherEnvir)
+            eval(tests)
         },
         error = function(e) {
             get_reporter()$add_message(paste("Error while evaluating testcase: ", conditionMessage(e), sep = ''))

@@ -5,7 +5,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
         withCallingHandlers(
             {
                 expected_val <- expected
-                generated_val <- generated(studentEnvir)
+                generated_val <- generated(test_env$clean_env)
 
                 equal <- FALSE
                 if (is.null(comparator)) {
@@ -87,7 +87,7 @@ testIdentical <- function(description, generated, expected, ...) {
         withCallingHandlers(
             {
                 expected_val <- expected
-                generated_val <- generated(studentEnvir)
+                generated_val <- generated(test_env$clean_env)
 
                 equal <- isTRUE(identical(generated_val, expected_val, ...))
 
@@ -117,7 +117,7 @@ testImage <- function(generate, failIfAbsent = TRUE) {
     tryCatch(
         withCallingHandlers(
             {
-                generate(studentEnvir)
+                generate(test_env$clean_env)
             },
             warning = function(w) {
                 get_reporter()$add_message(paste("Warning while evaluating image for testcase: ", conditionMessage(w), sep = ''))

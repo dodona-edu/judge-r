@@ -1,3 +1,5 @@
+test_env <- new.env()
+
 read_lines <- function(filename) {
     con <- file(filename, "r")
     on.exit(close(con))
@@ -13,21 +15,16 @@ context <- function(testcases={}, preExec={}) {
         }
     })
 
-    # Create the testEnvir and child envirs
-    # double assignment operator so that these exist outside the context function
-    testEnvir <<- new.env(globalenv())
-    studentEnvir <<- new.env(parent=testEnvir)
-    teacherEnvir <<- new.env(parent=testEnvir)
-
+    test_env$clean_env <- new.env(parent = globalenv())
     tryCatch(
         withCallingHandlers(
             {
-                eval(substitute(preExec), envir = testEnvir)
+                eval(preExec, envir = test_env$clean_env)
                 # We don't use source, because otherwise syntax errors leak the location of the student code
                 assign(".Last.value",
-                       eval(parse(text = read_lines(student_code)), envir = studentEnvir),
-                       envir = studentEnvir)
-                eval(testcases, envir = teacherEnvir)
+                       eval(parse(text = read_lines(student_code)), envir = test_env$clean_env),
+                       envir = test_env$clean_env)
+                eval(testcases)
             },
             warning = function(w) {
                 get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
