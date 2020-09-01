@@ -37,7 +37,6 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
 
 testDF <- function(description, generated, expected, comparator = NULL, ignore_col_order=TRUE, ignore_row_order=TRUE, ...) {
     # Convert first 5 lines of dataframe to HTML
-    expected_html <- knitr::kable(head(expected), "html")
     get_reporter()$start_test("", description)
 
     tryCatch(
@@ -46,7 +45,9 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_c
                 expected_val <- expected
                 generated_val <- generated(test_env$clean_env)
                 # Convert first 5 lines of dataframe to HTML
-                generated_html <- knitr::kable(head(generated_val), "html")
+                
+                expected_html <- knitr::kable(head(expected), "html", table.attr = "style='border-spacing: 10px 0;'")
+                generated_html <- knitr::kable(head(generated_val), "html", table.attr = "style='border-spacing: 10px 0;'")
 
                 equal <- FALSE
                 if (is.null(comparator)) {
