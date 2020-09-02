@@ -72,3 +72,10 @@ The `testIdentical` function use the `base::identical` function internally to de
 
 The `testImage` function is a special case, since it won't actually add a test to the output. Instead, it only expects one argument: a function taking the environment, that will generate an image when called. By default, this function will make the output wrong if the expected image wasn't generated. This behaviour can be changed by setting the optional `failIfAbsent` parameter to `FALSE`.
 
+#### `testFunctionUsedInVar`
+
+The `testFunctionUsedInVar` function is testfunction to test if a certain function is used in the assignation of a certain variable in the student code. It can also detect indirect assignations (e.g. `a <- b <- mean(1)` will return correct if the testfunction `testFunctionUsedInVar("mean", "a")` is used). As you can see in the example the function takes 2 parameters (1. The name of the function you want to test for (string), 2. The name of the variable for which the function is used in it's assignment (string))
+
+#### `testFunctionUsed`
+
+The `testFunctionUsed` function is a testfunction to test if a certain function is used in the student code. the function takes 1 parameters (1. The name of the function you want to test for (string)) (e.g. `testFunctionUsed("mean")`)
