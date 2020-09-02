@@ -3,6 +3,7 @@ source('context.R', local=TRUE)
 source('testcase.R', local=TRUE)
 source('test.R', local=TRUE)
 source('test_funcs.R', local=TRUE)
+source('ast-utils.R', local=TRUE)
 
 student_code <- NULL
 
