@@ -1,9 +1,3 @@
-#test_fun <- function(code){
-#  assignment_paths <- find_assign(substitute(code))
-#  #print(assignment_paths)
-#  is_function_used_in_var("mean", assignment_paths, "a", substitute(code))
-#}
-
 is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
   var_paths_c <- var_paths
   var_paths_c[[var]] <- NULL
@@ -17,11 +11,9 @@ is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
 is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
     switch(expr_type(sub_tree_root),
       constant = {
-        #print("is_function_used -- constant")
         FALSE
       },
       symbol = {
-        #print("is_function_used -- symbol")
         var_paths_c <- var_paths
         var_paths_c[[sub_tree_root]] <- NULL
         any(
@@ -31,7 +23,6 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
         )
       },
       call = {
-        #print("is_function_used -- call")
         if (is_call(sub_tree_root, func_name)) {
           return(TRUE)
         } 
@@ -53,7 +44,6 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
         )
       },
       pairlist = {
-        #print("is_function_used -- pairlist")
         any(
           lapply(as.list(sub_tree_root), 
                  function(x) is_function_used(func_name, var_paths_c, x, main_code)
@@ -111,15 +101,12 @@ find_assign <- function(x, start_path=c()) {
   assignation_paths <- list()
   switch(expr_type(x),
          constant = {
-           #print("-----------constant-------------")
            list()
          },
          symbol = {
-           #print("-----------symbol-------------")
            list()
          },
          call = {
-           #print("-----------call-------------")
            if (is_call(x, "<-") && is_symbol(x[[2]])) {
              lhs <- as_string(x[[2]])
              assignation_paths[[lhs]] <- list(start_path)
@@ -132,7 +119,6 @@ find_assign <- function(x, start_path=c()) {
            return(concat_lists1(res))
          },
          pairlist = {
-           #print("-----------pairlist-------------")
            res <- c()
            for (index in seq_along(x)){
              path <- c(start_path, index)
@@ -151,5 +137,3 @@ find_assign <- function(x, start_path=c()) {
          stop("Don't know how to handle type ", typeof(x), call. = FALSE)
   )
 }
-
-#pryr::ast({a<-mean(c(5,6))})
