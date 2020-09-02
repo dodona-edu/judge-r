@@ -124,13 +124,13 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
 
                 if (equal) {
                     image_generated <- base64enc::base64encode(tf_generated)
-                    get_reporter()$add_message(paste("<img src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
+                    get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
                     get_reporter()$end_test("", "correct")
                 } else {
                     image_generated <- base64enc::base64encode(tf_generated)
-                    get_reporter()$add_message(paste("<img src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
+                    get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
                     image_expected <- base64enc::base64encode(tf_expected)
-                    get_reporter()$add_message(paste("<img src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
+                    get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                     get_reporter()$add_message(feedback)
                     get_reporter()$end_test("", "wrong")
                 }
