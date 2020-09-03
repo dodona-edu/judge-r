@@ -27,7 +27,7 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
           return(TRUE)
         } 
         children <- as.list(sub_tree_root)
-        if(is_call(sub_tree_root, "<-")){
+        if(is_call(sub_tree_root, "<-") && is_symbol(children[[2]])){
           children[[2]] <- NULL
         } 
         any(
@@ -37,16 +37,16 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
         )
       },
       expression = {
-          any(
+        any(
           lapply(as.list(sub_tree_root), 
-                 function(x) is_function_used(func_name, var_paths_c, x, main_code)
+                function(x) is_function_used(func_name, var_paths, x, main_code)
           ) == TRUE
         )
       },
       pairlist = {
         any(
           lapply(as.list(sub_tree_root), 
-                 function(x) is_function_used(func_name, var_paths_c, x, main_code)
+                 function(x) is_function_used(func_name, var_paths, x, main_code)
           ) == TRUE
         )
       },
@@ -81,7 +81,7 @@ expr_type <- function(x) {
 concat_lists <- function(list1, list2){
   keys <- unique(c(names(list1), names(list2)))
   for (key in keys){
-    for (index in c(1:length(list2[[key]]))){
+    for (index in seq_along(list2[[key]])){
       list1[[key]][[length(list1[[key]])+1]] <- list2[[key]][[index]]
       list1[[key]] <- unique(list1[[key]])
     }
@@ -98,20 +98,21 @@ concat_lists1 <- function(lists){
 
 
 find_assign <- function(x, start_path=c()) {
-  assignation_paths <- list()
   switch(expr_type(x),
          constant = {
-           list()
+           return(NULL)
          },
          symbol = {
-           list()
+           return(NULL)
          },
          call = {
+           res <- c()
            if (is_call(x, "<-") && is_symbol(x[[2]])) {
              lhs <- as_string(x[[2]])
+             assignation_paths <- list()
              assignation_paths[[lhs]] <- list(start_path)
+             res <- c(assignation_paths)
            }
-           res <- c(assignation_paths)
            for(child_index in seq_along(x)){
              path <- c(start_path, child_index)
              res <- c(res, find_assign(x[[child_index]], path))
