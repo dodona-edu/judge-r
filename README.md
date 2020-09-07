@@ -80,9 +80,13 @@ The `testIdentical` function use the `base::identical` function internally to de
 
 The `testImage` function is a special case, since it won't actually add a test to the output. Instead, it only expects one argument: a function taking the environment, that will generate an image when called. By default, this function will make the output wrong if the expected image wasn't generated. This behaviour can be changed by setting the optional `failIfAbsent` parameter to `FALSE`.
 
-### `testDF`
+#### `testDF`
 
 The `testDF` function can be used to test the equality of dataframes. It uses `dplyr::all_equal` under the hood (with the `ignore_col_order` and `ignore_row_order` options set to `TRUE` by default). All arguments that the `dplyr::all_equal` function accepts can be passed to this function as well. Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the first five rows of the dataframe(s).
+
+#### `testGGPlot`
+
+The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has three optional arguments: `test_data`, `test_aes` and `test_geom`. All of them are true by default and are used to determine whether that particular layer should be tested or not.
 
 #### `testFunctionUsedInVar`
 

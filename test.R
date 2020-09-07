@@ -74,7 +74,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
     )
 }
 
-testGGPlot <- function(description, generated, expected, test_data = TRUE, test_aes = TRUE, test_geom = TRUE, ...) {
+testGGPlot <- function(description, generated, expected, test_data = TRUE, test_aes = TRUE, test_geom = TRUE) {
     get_reporter()$start_test("", description)
 
     tryCatch(
@@ -96,6 +96,7 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
                          equal <- FALSE
                      }
                  }
+
                  # Dont execute if a difference was already found in one of the previous layers
                  if (test_aes && equal) {
                      test_aes_result <- test_aes_layer(expected_gg$mapping, generated_gg$mapping)
