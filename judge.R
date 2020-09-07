@@ -2,8 +2,8 @@ source('reporter-env.R', local=TRUE)
 source('context.R', local=TRUE)
 source('testcase.R', local=TRUE)
 source('test.R', local=TRUE)
-source('test_funcs.R', local=TRUE)
-source('ast-utils.R', local=TRUE)
+source('utils-ast.R', local=TRUE)
+source('utils-plot.R', local=TRUE)
 
 student_code <- NULL
 
