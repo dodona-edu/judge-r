@@ -20,7 +20,6 @@ test_aes_layer <- function(sol_mapping, stud_mapping) {
     return(list('equal' = TRUE, 'feedback' = ""))
 }
 
-#' @importFrom stats na.omit
 test_geom_layer <- function(sol_layers, stud_layers) {
     nb_sol_layers <- length(sol_layers)
 
