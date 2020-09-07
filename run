@@ -5,6 +5,7 @@ invisible(evalq({
     library('base64enc')
     library('R6')
     library('rlang')
+    library('purrr')
 
     input <- fromJSON(file('stdin'))
     source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE, local=TRUE)
