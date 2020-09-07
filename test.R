@@ -34,33 +34,30 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
 }
 
 
-testDF <- function(description, generated, expected, comparator = NULL, ignore_col_order=TRUE, ignore_row_order=TRUE, ...) {
-    get_reporter()$start_test("", description)
-
+testDF <- function(description, generated, expected, comparator = NULL, ...) {
+    expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
+    get_reporter()$start_test(expected_formatted, description)
     tryCatch(
              withCallingHandlers({
-                 expected_val <- expected
-                 generated_val <- generated(test_env$clean_env)
 
-                 # Convert first 5 lines of dataframe to HTML
-                 expected_html <- knitr::kable(head(expected), "html", table.attr = "class=\"table\"")
-                 generated_html <- knitr::kable(head(generated_val), "html", table.attr = "class=\"table\"")
+                 generated_val <- generated(test_env$clean_env)
+                 generated_formatted <- paste(knitr::kable(head(generated_val), "simple"), collapse = '\n')
 
                  equal <- FALSE
                  if (is.null(comparator)) {
-                     # use the dplyr all_equal to compare dataframes, ignoring row/col order by default
-                     equal <- isTRUE(dplyr::all_equal(generated_val, expected_val, ignore_col_order=ignore_col_order, ignore_row_order=ignore_row_order, ...))
+                     # Use the dplyr all_equal to compare dataframes
+                     equal <- isTRUE(dplyr::all_equal(generated_val, expected, ...))
                  } else {
-                     equal <- comparator(generated_val, expected_val, ...)
+                     equal <- comparator(generated_val, expected, ...)
                  }
 
                  if (equal) {
-                     get_reporter()$add_message(generated_html, type = "html")
-                     get_reporter()$end_test("", "correct")
+                     get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
+                     get_reporter()$end_test(generated_formatted, "correct")
                  } else {
-                     get_reporter()$add_message(paste("Generated", generated_html, sep = '\n'), type = "html")
-                     get_reporter()$add_message(paste("Expected", expected_html, sep = '\n'), type = "html")
-                     get_reporter()$end_test("", "wrong")
+                     # TODO: Try to be smarter about what data is shown. If the error is not in the first five rows, the diff will be useless to the student.
+                     get_reporter()$add_message("Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
+                     get_reporter()$end_test(generated_formatted, "wrong")
                  }
              },
              warning = function(w) {
