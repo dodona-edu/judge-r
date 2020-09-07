@@ -21,9 +21,7 @@ context <- function(testcases={}, preExec={}) {
                  eval(preExec, envir = test_env$clean_env)
                  # We don't use source, because otherwise syntax errors leak the location of the student code
                  test_env$parsed_code <- parse(text = read_lines(student_code))
-                 assign(".Last.value",
-                        eval(test_env$parsed_code, envir = test_env$clean_env),
-                        envir = test_env$clean_env)
+                 assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
                  eval(testcases)
              },
              warning = function(w) {
