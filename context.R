@@ -65,7 +65,8 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
              withCallingHandlers({
                  eval(substitute(preExec), envir = test_env$clean_env)
                  # We don't use source, because otherwise syntax errors leak the location of the student code
-                 eval(parse(text = read_lines(student_code)), envir = test_env$clean_env)
+                 test_env$parsed_code <- parse(text = read_lines(student_code))
+                 eval(test_env$parsed_code, envir = test_env$clean_env)
                  # We need to do this here, since the testcases might generate more plots, so we need to write the images before then.
                  dev.off()
                  eval(testcases)
