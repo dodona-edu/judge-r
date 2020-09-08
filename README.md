@@ -9,11 +9,11 @@ The test file for a basic exercise can look like this:
 ```r
 context({
   testcase('The correct method was used', {
-    testEqual("test$alternative", function(env) { env$test$alternative }, 'two.sided')
-    testEqual("test$method", function(env) { env$test$method }, ' Two Sample t-test')
+    testEqual("test$alternative", function(studentEnv) { studentEnv$test$alternative }, 'two.sided')
+    testEqual("test$method", function(studentEnv) { studentEnv$test$method }, ' Two Sample t-test')
   })
   testcase('p value is correct', {
-    testEqual("test$p.value", function(env) { env$test$p.value }, 0.175)
+    testEqual("test$p.value", function(studentEnv) { studentEnv$test$p.value }, 0.175)
   })
 }, preExec = {
   set.seed(20190322)
@@ -21,7 +21,7 @@ context({
 
 context({
   testcase('x has the correct length', {
-    testEqual("length(x)", function(env) { length(env$x) }, 100)
+    testEqual("length(x)", function(studentEnv) { length(studentEnv$x) }, 100)
   })
 })
 ```
@@ -50,7 +50,7 @@ For introductory exercises students often use R as a calculator and do not store
 ```r
 context({
   testcase('the correct value is calculated', {
-    testEqual("Result", function(env) { env$evaluationResult }, 42)
+    testEqual("Result", function(studentEnv) { studentEnv$evaluationResult }, 42)
   })
 })
 ```
@@ -74,7 +74,7 @@ The `testEqual` function uses the `base::all.equal` function internally to deter
 
 #### `testIdentical`
 
-The `testIdentical` function use the `base::identical` function internally to determine whether the two values are equal. Any parameters that can be passed to `identical` can be passed to `testIdentical` (but the first three arguments need to be as described above).
+The `testIdentical` function uses the `base::identical` function internally to determine whether the two values are equal. Any parameters that can be passed to `identical` can be passed to `testIdentical` (but the first three arguments need to be as described above).
 
 #### `testImage`
 
@@ -88,10 +88,10 @@ The `testDF` function can be used to test the equality of dataframes. It uses `d
 
 The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has three optional arguments: `test_data`, `test_aes` and `test_geom`. All of them are true by default and are used to determine whether that particular layer should be tested or not.
 
-#### `testFunctionUsedInVar`
-
-The `testFunctionUsedInVar` function is testfunction to test if a certain function is used in the assignation of a certain variable in the student code. It can also detect indirect assignations (e.g. `a <- b <- mean(1)` will return correct if the testfunction `testFunctionUsedInVar("mean", "a")` is used). As you can see in the example the function takes 2 parameters (1. The name of the function you want to test for (string), 2. The name of the variable for which the function is used in it's assignment (string))
-
 #### `testFunctionUsed`
 
-The `testFunctionUsed` function is a testfunction to test if a certain function is used in the student code. the function takes 1 parameters (1. The name of the function you want to test for (string)) (e.g. `testFunctionUsed("mean")`)
+The `testFunctionUsed` function is a function you can use to test if a certain function is used in the student code. The function takes 1 parameter: the name of the function you want to make sure the student used.
+
+#### `testFunctionUsedInVar`
+
+The `testFunctionUsedInVar` function is a function you can use to test if a certain function is used in the assignation of a certain variable in the student code. It can also detect indirect assignations: `testFunctionUsedInVar("mean", "a")` will add a correct test to the feedback if the student code is `a <- b <- mean(1)`. As you can see in the example the function takes 2 parameters. The first parameter should be the name of the function you want to test for. The second parameter is the name of the variable where the given function should be used in its assignment.
