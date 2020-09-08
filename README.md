@@ -86,7 +86,7 @@ The `testDF` function can be used to test the equality of dataframes. It uses `d
 
 #### `testGGPlot`
 
-The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has three optional arguments: `test_data`, `test_aes` and `test_geom`. All of them are true by default and are used to determine whether that particular layer should be tested or not.
+The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has 5 optional arguments: `test_data`, `test_aes`, `test_geom`, `test_label` and `test_scale`. These are used to determine whether that particular layer should be tested or not. `test_data`, `test_aes` and `test_geom` are true by default, `test_label` and `test_scale` are false by default.
 
 #### `testFunctionUsed`
 
