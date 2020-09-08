@@ -2,7 +2,7 @@
 
 test_data_layer <- function(sol_data, stud_data) {
     feedback <- "You did not add the correct data."
-    list('equal' = isTRUE(all.equal(sol_data, stud_data, check.attributes = FALSE)), 'feedback' = feedback)
+    list('equal' = isTRUE(all.equal(sol_data, stud_data)), 'feedback' = feedback)
 }
 
 test_aes_layer <- function(sol_mapping, stud_mapping) {
