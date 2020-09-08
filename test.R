@@ -204,7 +204,7 @@ testFunctionUsedInVar <- function(funcName, varName){
     tryCatch(
              withCallingHandlers({
                  assignment_paths <- find_assign(test_env$parsed_code)
-                 used <- isFunctionUsedInVar(funcName, assignment_paths, varName, test_env$parsed_code)
+                 used <- is_function_used_in_var(funcName, assignment_paths, varName, test_env$parsed_code)
                  if (used) {
                      get_reporter()$add_message(
                                                 paste("You used the \"", funcName, "\" function in an assignment to variable \"",  varName, "\".")
