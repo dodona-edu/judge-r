@@ -1,6 +1,10 @@
 #!/usr/bin/env Rscript
 
 invisible(evalq({
+    # We need to save the parent of the global environment before we load any
+    # libraries. See context.R for a more extensive explanation.
+    starting_parent_env <- parent.env(.GlobalEnv)
+
     library('jsonlite')
     library('base64enc')
     library('R6')
