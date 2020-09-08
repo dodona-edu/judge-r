@@ -1,3 +1,25 @@
+# We need to do some tricky stuff to make sure students can both load libraries
+# and not actually use the libraries loaded by the test code. The reasons for
+# this are two-fold:
+#  1. When loading a library, R takes the global env and injects the library
+#     between the global env and its parent env. This means that if we base a new
+#     environment on something above the global env, loading a new library when
+#     executing in that env doesn't actually make that library show up in the
+#     environment we are currently executing in.
+#  2. A number of libraries are loaded by default when starting R. This means
+#     that when starting R, the parent of the global env is not in fact the
+#     base env. These libraries also contain some pretty important functions
+#     (e.g. `data`), so not having them in the student environment is not an
+#     option.
+# So, what do we do? When starting the judge, we immediately save the parent of
+# the global environment to a variable (`starting_parent_env`). Right before we
+# start executing in the student env, we (again) save the parent of the global
+# env (`old_parent`) and then change the parent of the global env to
+# `starting_parent_env`. When we stop executing in the student env, we change
+# the parent of the global env back to `old_parent`. This makes sure that any
+# test code using libraries can do so.
+
+
 test_env <- new.env()
 
 read_lines <- function(filename) {
@@ -18,10 +40,16 @@ context <- function(testcases={}, preExec={}) {
     test_env$clean_env <- new.env(parent = globalenv())
     tryCatch(
              withCallingHandlers({
-                 eval(substitute(preExec), envir = test_env$clean_env)
-                 # We don't use source, because otherwise syntax errors leak the location of the student code
-                 test_env$parsed_code <- parse(text = read_lines(student_code))
-                 assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                 old_parent <- parent.env(.GlobalEnv)
+                 parent.env(.GlobalEnv) <- starting_parent_env
+                 tryCatch({
+                     eval(substitute(preExec), envir = test_env$clean_env)
+                     # We don't use source, because otherwise syntax errors leak the location of the student code
+                     test_env$parsed_code <- parse(text = read_lines(student_code))
+                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                 }, finally = {
+                     parent.env(.GlobalEnv) <- old_parent
+                 })
                  eval(testcases)
              },
              warning = function(w) {
@@ -63,12 +91,17 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
     test_env$clean_env <- new.env(parent = globalenv())
     tryCatch(
              withCallingHandlers({
-                 eval(substitute(preExec), envir = test_env$clean_env)
-                 # We don't use source, because otherwise syntax errors leak the location of the student code
-                 test_env$parsed_code <- parse(text = read_lines(student_code))
-                 eval(test_env$parsed_code, envir = test_env$clean_env)
-                 # We need to do this here, since the testcases might generate more plots, so we need to write the images before then.
-                 dev.off()
+                 old_parent <- parent.env(.GlobalEnv)
+                 parent.env(.GlobalEnv) <- starting_parent_env
+                 tryCatch({
+                     eval(substitute(preExec), envir = test_env$clean_env)
+                     # We don't use source, because otherwise syntax errors leak the location of the student code
+                     test_env$parsed_code <- parse(text = read_lines(student_code))
+                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                 }, finally = {
+                     dev.off()
+                     parent.env(.GlobalEnv) <- old_parent
+                 })
                  eval(testcases)
              },
              warning = function(w) {
