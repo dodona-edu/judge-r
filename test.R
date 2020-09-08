@@ -123,19 +123,11 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
                          equal <- FALSE
                      }
                  }
-                 
-                 # Building the plot is required to correctly evaluate the panel scales using all.equal
-                 expected_build <- ggplot_build(expected_gg)
-                 generated_build <- ggplot_build(generated_gg)
 
                  if (test_scale && equal) {
-                     expected_scale_x <- expected_build$layout$panel_scales_x
-                     expected_scale_y <- expected_build$layout$panel_scales_y
-                     generated_scale_x <- generated_build$layout$panel_scales_x
-                     generated_scale_y <- generated_build$layout$panel_scales_y
-
-                     if (!isTRUE(all.equal(expected_scale_x, generated_scale_x)) |
-                         !isTRUE(all.equal(expected_scale_y, generated_scale_y))){
+                     expected_scale <- expected_gg$scales$scales
+                     generated_scale <- generated_gg$scales$scales
+                     if (!isTRUE(all.equal(expected_scale, generated_scale))) {
                          feedback <- "Did you specify the correct scales?"
                          equal <- FALSE
                      }
