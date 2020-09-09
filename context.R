@@ -67,6 +67,45 @@ context <- function(testcases={}, preExec={}) {
     )
 }
 
+contextWithRmd <- function(testcases={}, preExec={}) {
+    get_reporter()$start_context()
+    do_exit <- TRUE
+    on.exit({
+        if(do_exit) {
+            get_reporter()$end_context()
+        }
+    })
+
+    test_env$clean_env <- new.env(parent = globalenv())
+    tryCatch(
+             withCallingHandlers({
+                 old_parent <- parent.env(.GlobalEnv)
+                 parent.env(.GlobalEnv) <- starting_parent_env
+                 tryCatch({
+                     eval(substitute(preExec), envir = test_env$clean_env)
+                     # We don't use source, because otherwise syntax errors leak the location of the student code
+                     test_env$parsed_code <- parse(text = knitr::purl(text = read_lines(student_code)))
+                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                 }, finally = {
+                     parent.env(.GlobalEnv) <- old_parent
+                 })
+                 eval(testcases)
+             },
+             warning = function(w) {
+                 get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
+             },
+             message = function(m) {
+                 get_reporter()$add_message(paste("Message while evaluating context: ", conditionMessage(m), sep = ''))
+             }),
+             error = function(e) {
+                 get_reporter()$add_message(paste("Error while evaluating context: ", conditionMessage(e), sep = ''))
+                 get_reporter()$escalate("compilation error")
+                 get_reporter()$end_context(accepted = FALSE)
+                 do_exit <<- FALSE
+             }
+    )
+}
+
 contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
     png(tf <- tempfile(fileext = ".png"))
     get_reporter()$start_context()
