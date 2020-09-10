@@ -1,5 +1,10 @@
-testEqual <- function(description, generated, expected, comparator = NULL, ...) {
-    get_reporter()$start_test(expected, description)
+testEqual <- function(description, generated, expected, comparator = NULL, formatter = NULL, ...) {
+    if (is.null(formatter)) {
+        expected_formatted <- expected
+    } else {
+        expected_formatted = formatter(expected)
+    }
+    get_reporter()$start_test(expected_formatted, description)
 
     tryCatch(
              withCallingHandlers({
@@ -13,10 +18,15 @@ testEqual <- function(description, generated, expected, comparator = NULL, ...) 
                      equal <- comparator(generated_val, expected_val, ...)
                  }
 
-                 if (equal) {
-                     get_reporter()$end_test(generated_val, "correct")
+                 if (is.null(formatter)) {
+                     generated_formatted <- generated_val
                  } else {
-                     get_reporter()$end_test(generated_val, "wrong")
+                     generated_formatted <- formatter(generated_val)
+                 }
+                 if (equal) {
+                     get_reporter()$end_test(generated_formatted, "correct")
+                 } else {
+                     get_reporter()$end_test(generated_formatted, "wrong")
                  }
              },
              warning = function(w) {
@@ -160,8 +170,13 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
     )
 }
 
-testIdentical <- function(description, generated, expected, ...) {
-    get_reporter()$start_test(expected, description)
+testIdentical <- function(description, generated, expected, formatter = NULL, ...) {
+    if (is.null(formatter)) {
+        expected_formatted <- expected
+    } else {
+        expected_formatted = formatter(expected)
+    }
+    get_reporter()$start_test(expected_formatted, description)
 
     tryCatch(
              withCallingHandlers({
@@ -170,10 +185,16 @@ testIdentical <- function(description, generated, expected, ...) {
 
                  equal <- isTRUE(identical(generated_val, expected_val, ...))
 
-                 if (equal) {
-                     get_reporter()$end_test(generated_val, "correct")
+                 if (is.null(formatter)) {
+                     generated_formatted <- generated_val
                  } else {
-                     get_reporter()$end_test(generated_val, "wrong")
+                     generated_formatted = formatter(generated_val)
+                 }
+
+                 if (equal) {
+                     get_reporter()$end_test(generated_formatted, "correct")
+                 } else {
+                     get_reporter()$end_test(generated_formatted, "wrong")
                  }
              },
              warning = function(w) {
