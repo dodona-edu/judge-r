@@ -28,10 +28,6 @@ test_facet_layer <- function(sol_facet, stud_facet) {
         if (stud_type == "FacetGrid") {
             stud_cols <- names(stud_facet$params$cols)
             stud_rows <- names(stud_facet$params$rows)
-            print(paste("1.1", length(intersect(sol_cols, stud_cols))))
-            print(paste("1.2", length(sol_cols)))
-            print(paste("2.1", length(intersect(sol_rows, stud_rows))))
-            print(paste("2.2", length(sol_rows)))
             equal <- (length(intersect(sol_cols, stud_cols)) >= length(sol_cols) && 
                       length(intersect(sol_rows, stud_rows)) >= length(sol_rows))||
                      (length(intersect(sol_rows, stud_cols)) >= length(sol_rows) && 
