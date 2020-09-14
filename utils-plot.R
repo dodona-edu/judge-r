@@ -21,7 +21,7 @@ test_facet_layer <- function(sol_facet, stud_facet) {
         return(list('equal' = FALSE, 'feedback' = "Did you define a multipanel plot?"))
     }
     equal <- FALSE
-    # A faced wrap student code can be matched with a faced grid solution if the solution has 1 row or column and the other way arround
+    # A facet wrap student code can be matched with a facet grid solution if the solution has 1 row or column and the other way arround
     if (sol_type == "FacetGrid") {
         sol_cols <- names(sol_facet$params$cols)
         sol_rows <- names(sol_facet$params$rows)
