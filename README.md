@@ -88,8 +88,8 @@ The `testDF` function can be used to test the equality of dataframes. It uses `d
 
 #### `testGGPlot`
 
-The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has some optional arguments: 
-- `show_expected = TRUE` A logical value indicating whether the solution plot should be shown to the student if the `testGGPlot` function determines the solution to be incorrect. If set to `FALSE` the student won't be able to compare his/her ggplot with the solution which could make an exercise really hard to solve. Please handle with care.
+The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has some optional arguments:
+- `show_expected = TRUE` A logical value indicating whether the solution plot should be shown to the student if the `testGGPlot` function determines the solution to be incorrect. If set to `FALSE` the student won't be able to compare their plot with the solution which could make an exercise really hard to solve. Please handle with care.
 - `test_data = TRUE` A logical value indicating whether the input data to the `ggplot` function should be verified. This test will succeed if all columns from the solution have a corresponding column in the given input with the same column name and data.
 - `test_geom = TRUE` A logical value indicating whether the geometric layers should be checked. For each layer the parameters and aesthetics are verified. This test method also takes into account the default aesthetics set in the `ggplot` function itself.
 - `test_facet = TRUE` A logical value indicating whether the facet layer should be tested. This test supports `facet_grid` and `facet_wrap` layers and can compare them to one another (e.g. a `facet_grid` with only 1 row/column can be equal to a `facet_wrap` and vice versa).
