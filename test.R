@@ -84,7 +84,14 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
     )
 }
 
-testGGPlot <- function(description, generated, expected, test_data = TRUE, test_aes = TRUE, test_geom = TRUE, test_label = FALSE, test_scale = FALSE) {
+testGGPlot <- function(description, generated, expected, show_expected = TRUE,
+                        test_data = TRUE, 
+                        test_geom = TRUE, 
+                        test_facet = TRUE,
+                        test_label = FALSE, 
+                        test_scale = FALSE
+                        ) {
+
     get_reporter()$start_test("", description)
 
     tryCatch(
@@ -117,17 +124,16 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
                      }
                  }
 
-                 # Dont execute if a difference was already found in one of the previous layers
-                 if (test_aes && equal) {
-                     test_aes_result <- test_aes_layer(expected_gg$mapping, generated_gg$mapping)
-                     if (!test_aes_result$equal) {
-                         feedback <- test_aes_result$feedback
+                 if (test_facet && equal) {
+                     test_facet_result <- test_facet_layer(expected_gg$facet, generated_gg$facet)
+                     if (!test_facet_result$equal) {
+                         feedback <- test_facet_result$feedback
                          equal <- FALSE
                      }
                  }
 
                  if (test_geom && equal) {
-                     test_geom_result <- test_geom_layer(expected_gg$layers, generated_gg$layers)
+                     test_geom_result <- test_geom_layer(expected_gg, generated_gg)
                      if (!test_geom_result$equal) {
                          feedback <- test_geom_result$feedback
                          equal <- FALSE
@@ -150,8 +156,10 @@ testGGPlot <- function(description, generated, expected, test_data = TRUE, test_
                  } else {
                      image_generated <- base64enc::base64encode(tf_generated)
                      get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
-                     image_expected <- base64enc::base64encode(tf_expected)
-                     get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
+                     if(show_expected){
+                        image_expected <- base64enc::base64encode(tf_expected)
+                        get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
+                     }
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }

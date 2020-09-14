@@ -88,7 +88,15 @@ The `testDF` function can be used to test the equality of dataframes. It uses `d
 
 #### `testGGPlot`
 
-The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has 5 optional arguments: `test_data`, `test_aes`, `test_geom`, `test_label` and `test_scale`. These are used to determine whether that particular layer should be tested or not. `test_data`, `test_aes` and `test_geom` are true by default, `test_label` and `test_scale` are false by default.
+The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside from the usual `description`, `generated` and `expected` arguments it has some optional arguments:
+- `show_expected = TRUE` A logical value indicating whether the solution plot should be shown to the student if the `testGGPlot` function determines the solution to be incorrect. If set to `FALSE` the student won't be able to compare their plot with the solution which could make an exercise really hard to solve. Please handle with care.
+- `test_data = TRUE` A logical value indicating whether the input data to the `ggplot` function should be verified. This test will succeed if all columns from the solution have a corresponding column in the given input with the same column name and data.
+- `test_geom = TRUE` A logical value indicating whether the geometric layers should be checked. For each layer the parameters and aesthetics are verified. This test method also takes into account the default aesthetics set in the `ggplot` function itself.
+- `test_facet = TRUE` A logical value indicating whether the facet layer should be tested. This test supports `facet_grid` and `facet_wrap` layers and can compare them to one another (e.g. a `facet_grid` with only 1 row/column can be equal to a `facet_wrap` and vice versa).
+- `test_label = FALSE` A logical value indicating whether the label layers should be tested.
+- `test_scale = FALSE` A logical value indicating whether the scale of the axis should be tested.
+
+> Note: Because we want the testing of the `ggplot` to be as flexible as possible the test functions are all made in a way that the given solution `ggplot` is the plot that defines the minimal requirements for the student plot. When writing exercises this is a very important aspect to keep in mind. For example we don't recommend testing plots where you defined parameters to be used in geometric layers in the `ggplot` function itself. This because the test function would test for these parameters in every geometric layer in the student plot even when they are not used.
 
 #### `testFunctionUsed`
 

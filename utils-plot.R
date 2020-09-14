@@ -1,26 +1,66 @@
 # These functions were inspired by the check_ggplot functions of the testwhat package https://github.com/datacamp/testwhat
 
 test_data_layer <- function(sol_data, stud_data) {
-    feedback <- "You did not add the correct data."
-    list('equal' = isTRUE(all.equal(sol_data, stud_data)), 'feedback' = feedback)
-}
-
-test_aes_layer <- function(sol_mapping, stud_mapping) {
-    for (map in names(sol_mapping)) {
-        feedback_msg <- c(paste0("Have you specified the `", map, "` aesthetic?"),
-                          paste0("Found `", stud_mapping[map], "` for the `", map, "` aesthetic. Expected `", sol_mapping[map], "`."))
-
-        if (is.null(stud_mapping[map][[1]])){
-            return(list('equal' = FALSE, 'feedback' = feedback_msg[1]))
-        }
-        if(!isTRUE(all.equal(stud_mapping[map], sol_mapping[map], check.attributes = FALSE))){
-            return(list('equal' = FALSE, 'feedback' = feedback_msg[2]))
-        }
+    equal_names <- names(sol_data) %in% names(stud_data)
+    equal <- all(equal_names)
+    feedback <- paste0("You did not add the correct data, missing ", ifelse(sum(equal_names)==1, "column", "columns"), " named: ", names(sol_data)[!equal_names])
+    if(equal){
+        equal <- isTRUE(all.equal(select(sol_data, names(sol_data)), select(stud_data, names(sol_data))))
+        feedback <- "The data you used in your ggplot contains the right column names but is wrong"
     }
-    return(list('equal' = TRUE, 'feedback' = ""))
+    list('equal' = equal, 'feedback' = feedback)
 }
 
-test_geom_layer <- function(sol_layers, stud_layers) {
+test_facet_layer <- function(sol_facet, stud_facet) {
+    sol_type <- class(sol_facet)[1]
+    stud_type <- class(stud_facet)[1]
+    if(sol_type == "FacetNull"){
+        return(list('equal' = TRUE, 'feedback' = ""))
+    }
+    if(stud_type == "FacetNull"){
+        return(list('equal' = FALSE, 'feedback' = "Did you define a multipanel plot?"))
+    }
+    equal <- FALSE
+    # A facet wrap student code can be matched with a facet grid solution if the solution has 1 row or column and the other way arround
+    if (sol_type == "FacetGrid") {
+        sol_cols <- names(sol_facet$params$cols)
+        sol_rows <- names(sol_facet$params$rows)
+        if (stud_type == "FacetGrid") {
+            stud_cols <- names(stud_facet$params$cols)
+            stud_rows <- names(stud_facet$params$rows)
+            equal <- (length(intersect(sol_cols, stud_cols)) >= length(sol_cols) && 
+                      length(intersect(sol_rows, stud_rows)) >= length(sol_rows))||
+                     (length(intersect(sol_rows, stud_cols)) >= length(sol_rows) && 
+                      length(intersect(sol_cols, stud_rows)) >= length(sol_cols))
+        } else if (stud_type == "FacetWrap" && (length(sol_cols) == 0 || length(sol_rows) == 0)){
+            stud_facets <- names(stud_facet$params$facets)
+            equal <- length(intersect(sol_cols, stud_facets)) >= length(sol_cols)||
+                     length(intersect(sol_rows, stud_facets)) >= length(sol_rows)
+        }
+        if(length(sol_cols) == 0 || length(sol_rows) == 0){
+            return(list('equal' = equal, 'feedback' = paste0("Did you make a multipanel plot with rows or columns at least divided by (", c(sol_rows, sol_cols), ")?")))
+        } else {
+            return(list('equal' = equal, 'feedback' = paste0("Did you make a multipanel plot with rows and columns respectively divided by (", sol_rows, "), (", sol_cols, ") or the other way arround?")))
+        }
+        
+    } else if (sol_type == "FacetWrap"){
+        sol_facets <- names(sol_facet$params$facets)
+        if (stud_type == "FacetGrid") {
+            stud_cols <- names(stud_facet$params$cols)
+            stud_rows <- names(stud_facet$params$rows)
+            equal <- length(intersect(sol_facets, stud_cols)) >= length(sol_facets)||
+                     length(intersect(sol_facets, stud_rows)) >= length(sol_facets)
+        } else if (stud_type == "FacetWrap") {
+            stud_facets <- names(stud_facet$params$facets)
+            equal <- length(intersect(sol_facets, stud_facets)) >= length(sol_facets)
+        }
+        return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", sol_facets, ")?")))) 
+    }
+}
+
+test_geom_layer <- function(sol_gg, stud_gg){
+    sol_layers <- sol_gg$layers
+    stud_layers <- stud_gg$layers
     nb_sol_layers <- length(sol_layers)
 
     if (!(nb_sol_layers > 0)) {
@@ -37,41 +77,66 @@ test_geom_layer <- function(sol_layers, stud_layers) {
 
         sol_geom_type <- get_type(sol_layer$geom)
 
-        nb_stud_layers <- length(stud_layers)
-        if (nb_stud_layers > 0) {
-            for (j in 1:nb_stud_layers) {
-                stud_layer <- stud_layers[[j]]
+        for (j in seq_along(stud_layers)) {
+            stud_layer <- stud_layers[[j]]
 
-                stud_geom_type <- get_type(stud_layer$geom)
-                if (sol_geom_type == stud_geom_type) {
-                    found_geom <- TRUE
-                    found_params <- TRUE
+            stud_geom_type <- get_type(stud_layer$geom)
+            if (sol_geom_type == stud_geom_type) {
 
-                    stud_params <- get_params(stud_layer)
+                # Testing aes for every layer, we will check if every aes component of a layer in the solution-plot is
+                # also specified in the corresponding layer of the student-plot or in the aes of the base ggplot function
+                mapping_keys <- unique(c(names(sol_layer$mapping), names(sol_gg$mapping)))
+                for(key in mapping_keys){
 
-                    for (sol_param in names(sol_params)) {
-                        if (!(sol_param %in% names(stud_params))) {
-                            found_params <- FALSE
-                            break
-                        } else {
-                            sol_value <- sol_params[[sol_param]]
-                            stud_value <- stud_params[[sol_param]]
-
-                            if (!isTRUE(all.equal(sol_value, stud_value))) {
-                                found_params <- FALSE
-                                break
-                            }
+                    stud_map_component <- stud_layer$mapping[key]
+                    if (is.null(stud_map_component[[1]])){
+                        stud_map_component <- stud_gg$mapping[key]
+                        if (is.null(stud_map_component[[1]])){
+                            return(list('equal' = FALSE, 
+                                        'feedback' = paste0("Have you specified the `", key, "` aesthetic needed in the `", as.character(sol_geom_type), "` layer?"))
+                            )
                         }
                     }
 
-                    if (found_params) {
-                        found_geom_with_params <- TRUE
+                    sol_map_component <- sol_layer$mapping[key]
+                    if (is.null(sol_map_component[[1]])){
+                        sol_map_component <- sol_gg$mapping[key]
                     }
 
-                    if (found_geom_with_params) {
-                        stud_layers[[j]] <- NULL
-                        break
+                    if(!isTRUE(all.equal(stud_map_component, sol_map_component, check.attributes = FALSE))){
+                        return(list('equal' = FALSE, 
+                                    'feedback' = paste0("Found `", stud_map_component, "` for the `", key, "` aesthetic. Expected `", sol_map_component, "`."))
+                        )
                     }
+                }
+
+                found_geom <- TRUE
+                found_params <- TRUE
+
+                stud_params <- get_params(stud_layer)
+
+                for (sol_param in names(sol_params)) {
+                    if (!(sol_param %in% names(stud_params))) {
+                        found_params <- FALSE
+                        break
+                    } else {
+                        sol_value <- sol_params[[sol_param]]
+                        stud_value <- stud_params[[sol_param]]
+
+                        if (!isTRUE(all.equal(sol_value, stud_value))) {
+                            found_params <- FALSE
+                            break
+                        }
+                    }
+                }
+
+                if (found_params) {
+                    found_geom_with_params <- TRUE
+                }
+
+                if (found_geom_with_params) {
+                    stud_layers[[j]] <- NULL
+                    break
                 }
             }
         }
@@ -93,8 +158,6 @@ get_params <- function(geom_layer) {
     params <- geom_layer$geom_params
     stat_params <- geom_layer$stat_params
     params[names(stat_params)] <- stat_params
-    mapping_params <- lapply(geom_layer$mapping, function(x) structure(x, aes = TRUE))
-    params[names(mapping_params)] <- mapping_params
     aes_params <- geom_layer$aes_params
     params[names(aes_params)] <- aes_params
     return(params)
