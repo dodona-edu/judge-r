@@ -105,3 +105,14 @@ The `testFunctionUsed` function is a function you can use to test if a certain f
 #### `testFunctionUsedInVar`
 
 The `testFunctionUsedInVar` function is a function you can use to test if a certain function is used in the assignation of a certain variable in the student code. It can also detect indirect assignations: `testFunctionUsedInVar("mean", "a")` will add a correct test to the feedback if the student code is `a <- b <- mean(1)`. As you can see in the example the function takes 2 parameters. The first parameter should be the name of the function you want to test for. The second parameter is the name of the variable where the given function should be used in its assignment.
+
+#### `testHtest`
+
+The `testHtest` function is a function you can use to test objects of the `htest` class (e.g. result of `t.test` function). Aside from the usual `description`, `generated` and `expected` arguments it has some optional arguments:
+
+- `test_p_value = TRUE` A logical value indicating whether the p-value should be tested.
+- `test_interval = TRUE` A logical value indicating whether the confidence interval should be tested.
+- `test_statistic = FALSE` A logical value indicating whether test-statistic should be tested.
+- `test_alternative = FALSE` A logical value indicating whether the alternative should be tested.
+- `test_confidence_level = FALSE` A logical value indicating whether the confidence level should be tested.
+- `test_method = FALSE` A logical value indicating whether the used method should be tested.

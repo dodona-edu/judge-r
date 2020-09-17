@@ -272,3 +272,79 @@ testFunctionUsed <- function(funcName){
              }
     )
 }
+
+testHtest <- function(description, generated, expected, 
+                        test_p_value = TRUE,
+                        test_interval = TRUE,
+                        test_statistic = FALSE,
+                        test_alternative = FALSE,
+                        test_confidence_level = FALSE,
+                        test_method = FALSE
+                        ){
+
+    tryCatch(
+            withCallingHandlers({
+                expected_val <- expected
+                generated_val <- generated(test_env$clean_env)
+                
+                expected_formatted <- ""
+                generated_formatted <- ""
+
+                equal <- TRUE
+                if (test_p_value) {
+                    equal <- equal && isTRUE(all.equal(generated_val$p.value, expected_val$p.value))
+                    expected_formatted <- paste0(expected_formatted, "\np-value = ", expected_val$p.value)
+                    generated_formatted <- paste0(generated_formatted, "\np-value = ", generated_val$p.value)
+                }
+                if (test_interval) {
+                    equal <- equal && isTRUE(all.equal(generated_val$conf.int, expected_val$conf.int))
+                    expected_formatted <- paste0(expected_formatted, "\nconfidence interval = ", toString(expected_val$conf.int))
+                    generated_formatted <- paste0(generated_formatted, "\nconfidence interval = ", toString(generated_val$conf.int))
+                }
+                if (test_statistic) {
+                    equal <- equal && isTRUE(all.equal(generated_val$statistic, expected_val$statistic))
+                    expected_formatted <- paste0(expected_formatted, "\ntest statistic = ")
+                    generated_formatted <- paste0(generated_formatted, "\ntest statistic = ")
+                    for (statistic in names(expected_val$statistic)){
+                        expected_formatted <- paste0(expected_formatted, "\n\t", statistic, ": ", expected_val$statistic[[statistic]])
+                    }
+                    for (statistic in names(generated_val$statistic)){
+                        generated_formatted <- paste0(generated_formatted, "\n\t", statistic, ": ", generated_val$statistic[[statistic]])
+                    }
+                }
+                if (test_alternative) {
+                    equal <- equal && isTRUE(all.equal(generated_val$alternative, expected_val$alternative))
+                    expected_formatted <- paste0(expected_formatted, "\nalternative = ", expected_val$alternative)
+                    generated_formatted <- paste0(generated_formatted, "\nalternative = ", generated_val$alternative)
+                }
+                if (test_confidence_level) {
+                    equal <- equal && isTRUE(all.equal(attr(generated_val$conf.int,'conf.level'), attr(expected_val$conf.int,'conf.level')))
+                    expected_formatted <- paste0(expected_formatted, "\nconfidence level = ", attr(expected_val$conf.int,'conf.level'))
+                    generated_formatted <- paste0(generated_formatted, "\nconfidence level = ", attr(generated_val$conf.int,'conf.level'))
+                }
+                if (test_method) {
+                    equal <- equal && isTRUE(all.equal(generated_val$method, expected_val$method))
+                    expected_formatted <- paste0(expected_formatted, "\nmethod = ", expected_val$method)
+                    generated_formatted <- paste0(generated_formatted, "\nmethod = ", generated_val$method)
+                }
+
+                get_reporter()$start_test(expected_formatted, description)
+                if (equal) {
+                    get_reporter()$end_test(generated_formatted, "correct")
+                } else {
+                    get_reporter()$end_test(generated_formatted, "wrong")
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+            }),
+            error = function(e) {
+                get_reporter()$end_test("", "wrong")
+                get_reporter()$start_test("", description)
+                get_reporter()$end_test(conditionMessage(e), "runtime error")
+            }
+    )
+}
