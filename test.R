@@ -99,7 +99,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  expected_gg <- expected
                  generated_gg <- generated(test_env$clean_env)
 
-                 if(show_expected){
+                 if(show_expected) {
                     expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
                     suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
                  }
