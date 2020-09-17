@@ -99,15 +99,20 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  expected_gg <- expected
                  generated_gg <- generated(test_env$clean_env)
 
-                 if(show_expected) {
+                 plot_exists <- is.ggplot(generated_gg)
+                 feedback <- "You did not generate a ggplot"
+                 if (plot_exists) {
+                    generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
+                    suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
+                 }
+
+                 if(show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
                     expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
                     suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
                  }
-                 generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
-                 suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
-
-                 equal <- TRUE
-                 if (test_data) {
+                 
+                 equal <- plot_exists
+                 if (test_data && equal) {
                      test_data_result <- test_data_layer(expected_gg$data, generated_gg$data)
                      if (!test_data_result$equal) {
                          feedback <- test_data_result$feedback
@@ -115,7 +120,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                      }
                  }
 
-                 if (test_label) {
+                 if (test_label && equal) {
                      expected_labels <- expected_gg$labels
                      generated_labels <- generated_gg$labels
                      if (!isTRUE(all.equal(expected_labels$x, generated_labels$x)) |
@@ -150,24 +155,24 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                      }
                  }
 
-                 if (equal) {
+                 if (plot_exists) {
                      image_generated <- base64enc::base64encode(tf_generated)
                      get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
+                 }
+                 if (equal) {
                      get_reporter()$end_test("", "correct")
                  } else {
-                     image_generated <- base64enc::base64encode(tf_generated)
-                     get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_generated, "\"/>", sep=''), type = "html")
-                     if(show_expected){
+                     if(show_expected && plot_exists){
                         image_expected <- base64enc::base64encode(tf_expected)
                         get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                      }
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }
-                 if (show_expected && file.exists(tf_expected)) {
+                 if (show_expected) {
                     file.remove(tf_expected)
                  }
-                 if (file.exists(tf_generated)) {
+                 if (plot_exists) {
                      file.remove(tf_generated)
                  }                 
              },
