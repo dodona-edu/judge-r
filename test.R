@@ -99,11 +99,12 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  expected_gg <- expected
                  generated_gg <- generated(test_env$clean_env)
 
-                 expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
+                 if(show_expected){
+                    expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
+                    suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
+                 }
                  generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
-
-                 ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg)
-                 ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg)
+                 suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
 
                  equal <- TRUE
                  if (test_data) {
@@ -163,6 +164,12 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }
+                 if (show_expected && file.exists(tf_expected)){
+                    file.remove(tf_expected)
+                 }
+                 if (file.exists(tf_generated)){
+                     file.remove(tf_generated)
+                 }                 
              },
              warning = function(w) {
                  get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
