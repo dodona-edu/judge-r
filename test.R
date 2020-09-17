@@ -167,7 +167,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  if (show_expected && file.exists(tf_expected)) {
                     file.remove(tf_expected)
                  }
-                 if (file.exists(tf_generated)){
+                 if (file.exists(tf_generated)) {
                      file.remove(tf_generated)
                  }                 
              },
