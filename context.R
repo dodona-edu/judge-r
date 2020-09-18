@@ -46,7 +46,7 @@ context <- function(testcases={}, preExec={}) {
                      eval(substitute(preExec), envir = test_env$clean_env)
                      # We don't use source, because otherwise syntax errors leak the location of the student code
                      test_env$parsed_code <- parse(text = read_lines(student_code))
-                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                     capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
                  }, finally = {
                      parent.env(.GlobalEnv) <- old_parent
                  })
@@ -85,7 +85,7 @@ contextWithRmd <- function(testcases={}, preExec={}) {
                      eval(substitute(preExec), envir = test_env$clean_env)
                      # We don't use source, because otherwise syntax errors leak the location of the student code
                      test_env$parsed_code <- parse(text = knitr::purl(text = read_lines(student_code), quiet=TRUE))
-                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                     capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
                  }, finally = {
                      parent.env(.GlobalEnv) <- old_parent
                  })
@@ -136,7 +136,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
                      eval(substitute(preExec), envir = test_env$clean_env)
                      # We don't use source, because otherwise syntax errors leak the location of the student code
                      test_env$parsed_code <- parse(text = read_lines(student_code))
-                     assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)
+                     capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
                  }, finally = {
                      dev.off()
                      parent.env(.GlobalEnv) <- old_parent
