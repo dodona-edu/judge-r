@@ -169,7 +169,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }
-                 if (show_expected) {
+                 if (show_expected && plot_exists) {
                     file.remove(tf_expected)
                  }
                  if (plot_exists) {
