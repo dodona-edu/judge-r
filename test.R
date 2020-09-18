@@ -403,6 +403,8 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                     if (feedback_res != "" && !equal && give_feedback){
                         get_reporter()$add_message(feedback_res)
                     }
+                } else if (!verify_anwser && equal){
+                    get_reporter()$add_message("Your solution will be verified after the deadline.")
                 }
                 
                 if (equal) {
