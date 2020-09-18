@@ -162,7 +162,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  if (equal) {
                      get_reporter()$end_test("", "correct")
                  } else {
-                     if(show_expected && plot_exists){
+                     if(show_expected && plot_exists) {
                         image_expected <- base64enc::base64encode(tf_expected)
                         get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                      }
