@@ -360,3 +360,67 @@ testHtest <- function(description, generated, expected,
             }
     )
 }
+
+testMultipleChoice <- function(description, generated, expected, posible_anwsers,
+                                verify_anwser = FALSE, 
+                                give_feedback = TRUE, 
+                                feedback = NULL, 
+                                show_expected = FALSE) {
+
+    get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
+
+    tryCatch(
+            withCallingHandlers({
+                expected_val <- unique(sort(expected))
+                generated_raw <- generated(test_env$clean_env)
+                generated_val <- unique(sort(generated_raw))
+
+                equal <- TRUE
+                if (!all(generated_val %in% posible_anwsers) || length(generated_val) == 0){
+                    equal <- FALSE
+                    get_reporter()$add_message(paste0("Your anwser is no valid option, the valid options are (", toString(posible_anwsers), ")."))
+                }
+
+                if (verify_anwser && equal) {
+                    feedback_res <- ""
+                    for (anwser in generated_val){
+                        if (!(anwser %in% expected_val)){
+                            equal <- FALSE
+                            feedback_res <- paste0(feedback_res, "\n", anwser, " is not a right anwser")
+                            if (anwser %in% names(feedback) || anwser %in% seq_along(feedback)) {
+                                feedback_res <- paste0(feedback_res, " because: ", feedback[[anwser]]) 
+                            } else {
+                                feedback_res <- paste0(feedback_res, ".")
+                            }
+                        }
+                    }
+                    if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
+                        equal <- FALSE
+                        feedback_res <- paste0(feedback_res, "\nYour anwser does not include all the correct options.")
+                        
+                    }
+                    
+                    if (feedback_res != "" && !equal && give_feedback){
+                        get_reporter()$add_message(feedback_res)
+                    }
+                }
+                
+                if (equal) {
+                    get_reporter()$end_test(generated_raw, "correct")
+                } else {
+                    get_reporter()$end_test(generated_raw, "wrong")
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+            }),
+            error = function(e) {
+                get_reporter()$end_test("", "wrong")
+                get_reporter()$start_test("", description)
+                get_reporter()$end_test(conditionMessage(e), "runtime error")
+            }
+    )
+}

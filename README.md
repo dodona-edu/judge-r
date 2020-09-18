@@ -116,3 +116,13 @@ The `testHtest` function is a function you can use to test objects of the `htest
 - `test_alternative = FALSE` A logical value indicating whether the alternative should be tested.
 - `test_confidence_level = FALSE` A logical value indicating whether the confidence level should be tested.
 - `test_method = FALSE` A logical value indicating whether the used method should be tested.
+
+#### `testMultipleChoice`
+
+The `testMultipleChoice` function is a function you can use to test multiple choice questions. This function can handle multiple right anwsers if they are passed in a vector. Aside from the usual `description`, `generated` and `expected` arguments it has the following arguments:
+
+- `posible_anwsers` A vector/list containing all possible options for the multiple choice question. The options can be integer or character values.
+- `verify_anwser = FALSE` A logical value indicating whether the given anwser should be tested. When set to `TRUE` the judge will tell the student if his anwser war wrong or correct. When set to `FALSE` the judge will only test if the given anwser is contained within the `posible_anwsers` parameter.
+- `give_feedback = TRUE` A logical value indicating whether the judge should show the student where his/her mistake is.
+- `feedback = NULL`A list containing optional extra information about why a certain option is wrong. This should be a named list with the options as names when your options are characters.
+- `show_expected = FALSE` A logical value indicating whether the judge should show the correct anwser to the student.
