@@ -376,7 +376,7 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                 generated_val <- unique(sort(generated_raw))
 
                 equal <- TRUE
-                if (!all(generated_val %in% posible_anwsers) || length(generated_val) == 0){
+                if (!all(generated_val %in% posible_anwsers) || length(generated_val) == 0) {
                     equal <- FALSE
                     get_reporter()$add_message(paste0("Your anwser is not a valid option, the valid options are (", toString(posible_anwsers), ")."))
                 }
