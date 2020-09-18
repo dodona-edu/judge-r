@@ -398,7 +398,6 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                         equal <- FALSE
                         feedback_res <- paste0(feedback_res, "\nYour anwser does not include all the correct options.")
                     }
-                    
                     if (feedback_res != "" && !equal && give_feedback){
                         get_reporter()$add_message(feedback_res)
                     }
