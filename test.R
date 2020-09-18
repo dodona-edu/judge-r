@@ -397,7 +397,6 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                     if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
                         equal <- FALSE
                         feedback_res <- paste0(feedback_res, "\nYour anwser does not include all the correct options.")
-                        
                     }
                     
                     if (feedback_res != "" && !equal && give_feedback){
