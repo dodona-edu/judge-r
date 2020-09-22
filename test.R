@@ -360,3 +360,67 @@ testHtest <- function(description, generated, expected,
             }
     )
 }
+
+testMultipleChoice <- function(description, generated, expected, possible_answers,
+                                verify_answer = FALSE, 
+                                give_feedback = TRUE, 
+                                feedback = NULL, 
+                                show_expected = FALSE) {
+
+    get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
+
+    tryCatch(
+            withCallingHandlers({
+                expected_val <- unique(sort(expected))
+                generated_raw <- generated(test_env$clean_env)
+                generated_val <- unique(sort(generated_raw))
+
+                equal <- TRUE
+                if (!all(generated_val %in% possible_answers) || length(generated_val) == 0) {
+                    equal <- FALSE
+                    get_reporter()$add_message(paste0("Your answer is not a valid option, the valid options are (", toString(possible_answers), ")."))
+                }
+
+                if (verify_answer && equal) {
+                    feedback_res <- ""
+                    for (answer in generated_val){
+                        if (!(answer %in% expected_val)){
+                            equal <- FALSE
+                            feedback_res <- paste0(feedback_res, "\n", answer, " is not a right answer")
+                            if (answer %in% names(feedback) || answer %in% seq_along(feedback)) {
+                                feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]]) 
+                            } else {
+                                feedback_res <- paste0(feedback_res, ".")
+                            }
+                        }
+                    }
+                    if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
+                        equal <- FALSE
+                        feedback_res <- paste0(feedback_res, "\nYour answer does not include all the correct options.")
+                    }
+                    if (feedback_res != "" && !equal && give_feedback){
+                        get_reporter()$add_message(feedback_res)
+                    }
+                } else if (!verify_answer && equal){
+                    get_reporter()$add_message("Your solution will be verified after the deadline.")
+                }
+                
+                if (equal) {
+                    get_reporter()$end_test(generated_raw, "correct")
+                } else {
+                    get_reporter()$end_test(generated_raw, "wrong")
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+            }),
+            error = function(e) {
+                get_reporter()$end_test("", "wrong")
+                get_reporter()$start_test("", description)
+                get_reporter()$end_test(conditionMessage(e), "runtime error")
+            }
+    )
+}

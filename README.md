@@ -116,3 +116,17 @@ The `testHtest` function is a function you can use to test objects of the `htest
 - `test_alternative = FALSE` A logical value indicating whether the alternative should be tested.
 - `test_confidence_level = FALSE` A logical value indicating whether the confidence level should be tested.
 - `test_method = FALSE` A logical value indicating whether the used method should be tested.
+
+#### `testMultipleChoice`
+
+The `testMultipleChoice` function is a function you can use to test multiple choice questions. This function can handle multiple right anwsers if they are passed in a vector. Aside from the usual `description`, `generated` and `expected` arguments it has the following arguments:
+
+- `possible_answers` A vector/list containing all possible options for the multiple choice question. The options can be integer or character values.
+- `verify_answer = FALSE` A logical value indicating whether the given answer should be tested. When set to `TRUE` the judge will tell the student if his answer is wrong or correct. When set to `FALSE` the judge will only test if the given answer is valid (contained within `possible_answers`).
+- `give_feedback = TRUE` A logical value indicating whether the judge should show the student where their mistake is.
+- `feedback = NULL` A list containing optional extra information about why a certain option is wrong. This should be a named list with the options as names when your options are characters.
+- `show_expected = FALSE` A logical value indicating whether the judge should show the correct anwser to the student.
+
+> :warning: **We do not recommend using this test method** because it won't deliver an optimal experience for students nor teachers.
+
+> If you would like to see multiple choice questions implemented in Dodona you can voice your support  [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
