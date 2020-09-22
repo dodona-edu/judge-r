@@ -126,3 +126,7 @@ The `testMultipleChoice` function is a function you can use to test multiple cho
 - `give_feedback = TRUE` A logical value indicating whether the judge should show the student where their mistake is.
 - `feedback = NULL` A list containing optional extra information about why a certain option is wrong. This should be a named list with the options as names when your options are characters.
 - `show_expected = FALSE` A logical value indicating whether the judge should show the correct anwser to the student.
+
+> :warning: **We do not recommend using this test method** because is won't deliver an optimal experience for students nor teachers.
+
+> If you would like to see multiple choice questions implemented in Dodona you can voice your support  [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
