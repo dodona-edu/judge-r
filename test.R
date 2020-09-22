@@ -361,8 +361,8 @@ testHtest <- function(description, generated, expected,
     )
 }
 
-testMultipleChoice <- function(description, generated, expected, posible_anwsers,
-                                verify_anwser = FALSE, 
+testMultipleChoice <- function(description, generated, expected, possible_answers,
+                                verify_answer = FALSE, 
                                 give_feedback = TRUE, 
                                 feedback = NULL, 
                                 show_expected = FALSE) {
@@ -376,19 +376,19 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                 generated_val <- unique(sort(generated_raw))
 
                 equal <- TRUE
-                if (!all(generated_val %in% posible_anwsers) || length(generated_val) == 0) {
+                if (!all(generated_val %in% possible_answers) || length(generated_val) == 0) {
                     equal <- FALSE
-                    get_reporter()$add_message(paste0("Your anwser is not a valid option, the valid options are (", toString(posible_anwsers), ")."))
+                    get_reporter()$add_message(paste0("Your answer is not a valid option, the valid options are (", toString(possible_answers), ")."))
                 }
 
-                if (verify_anwser && equal) {
+                if (verify_answer && equal) {
                     feedback_res <- ""
-                    for (anwser in generated_val){
-                        if (!(anwser %in% expected_val)){
+                    for (answer in generated_val){
+                        if (!(answer %in% expected_val)){
                             equal <- FALSE
-                            feedback_res <- paste0(feedback_res, "\n", anwser, " is not a right anwser")
-                            if (anwser %in% names(feedback) || anwser %in% seq_along(feedback)) {
-                                feedback_res <- paste0(feedback_res, " because: ", feedback[[anwser]]) 
+                            feedback_res <- paste0(feedback_res, "\n", answer, " is not a right answer")
+                            if (answer %in% names(feedback) || answer %in% seq_along(feedback)) {
+                                feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]]) 
                             } else {
                                 feedback_res <- paste0(feedback_res, ".")
                             }
@@ -396,12 +396,12 @@ testMultipleChoice <- function(description, generated, expected, posible_anwsers
                     }
                     if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
                         equal <- FALSE
-                        feedback_res <- paste0(feedback_res, "\nYour anwser does not include all the correct options.")
+                        feedback_res <- paste0(feedback_res, "\nYour answer does not include all the correct options.")
                     }
                     if (feedback_res != "" && !equal && give_feedback){
                         get_reporter()$add_message(feedback_res)
                     }
-                } else if (!verify_anwser && equal){
+                } else if (!verify_answer && equal){
                     get_reporter()$add_message("Your solution will be verified after the deadline.")
                 }
                 
