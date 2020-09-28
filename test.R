@@ -56,7 +56,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
                  equal <- FALSE
                  if (is.null(comparator)) {
                      # Use the dplyr all_equal to compare dataframes
-                     equal <- isTRUE(dplyr::all_equal(generated_val, expected, ...))
+                     equal <- isTRUE(dplyr::all_equal(round_df(generated_val), round_df(expected), ...))
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }
