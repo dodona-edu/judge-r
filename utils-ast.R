@@ -18,7 +18,7 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
                }
                children <- as.list(sub_tree_root)
                # No need to check assignation branches of parameters before assignation symbol
-               if(is_call(sub_tree_root, "<-") && is_symbol(children[[2]])){
+               if((is_call(sub_tree_root, "<-") || is_call(sub_tree_root, "=")) && is_symbol(children[[2]])){
                    children[[2]] <- NULL
                }
                return(some(children, function(x) is_function_used(func_name, var_paths, x, main_code)))
@@ -89,7 +89,7 @@ find_assign <- function(x, start_path=c()) {
            },
            call = {
                assignation_path <- NULL
-               if (is_call(x, "<-") && is_symbol(x[[2]])) {
+               if ((is_call(x, "<-") || is_call(x, "=")) && is_symbol(x[[2]])) {
                    assignation_path <- list()
                    assignation_path[[as_string(x[[2]])]] <- list(start_path)
                }
