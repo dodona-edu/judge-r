@@ -50,7 +50,7 @@ context <- function(testcases={}, preExec={}) {
                  }, finally = {
                      parent.env(.GlobalEnv) <- old_parent
                  })
-                 eval(testcases)
+                 capture.output(eval(testcases))
              },
              warning = function(w) {
                  get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
@@ -89,7 +89,7 @@ contextWithRmd <- function(testcases={}, preExec={}) {
                  }, finally = {
                      parent.env(.GlobalEnv) <- old_parent
                  })
-                 eval(testcases)
+                 capture.output(eval(testcases))
              },
              warning = function(w) {
                  get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
@@ -141,7 +141,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
                      dev.off()
                      parent.env(.GlobalEnv) <- old_parent
                  })
-                 eval(testcases)
+                 capture.output(eval(testcases))
              },
              warning = function(w) {
                  get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
