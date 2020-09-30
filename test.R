@@ -85,10 +85,10 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
 }
 
 testGGPlot <- function(description, generated, expected, show_expected = TRUE,
-                        test_data = TRUE,
-                        test_geom = TRUE,
+                        test_data = TRUE, 
+                        test_geom = TRUE, 
                         test_facet = TRUE,
-                        test_label = FALSE,
+                        test_label = FALSE, 
                         test_scale = FALSE
                         ) {
 
@@ -110,7 +110,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                     expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
                     suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
                  }
-
+                 
                  equal <- plot_exists
                  if (test_data && equal) {
                      test_data_result <- test_data_layer(expected_gg$data, generated_gg$data)
@@ -174,7 +174,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  }
                  if (plot_exists) {
                      file.remove(tf_generated)
-                 }
+                 }                 
              },
              warning = function(w) {
                  get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
@@ -285,7 +285,7 @@ testFunctionUsed <- function(funcName){
     )
 }
 
-testHtest <- function(description, generated, expected,
+testHtest <- function(description, generated, expected, 
                         test_p_value = TRUE,
                         test_interval = TRUE,
                         test_statistic = FALSE,
@@ -298,7 +298,7 @@ testHtest <- function(description, generated, expected,
             withCallingHandlers({
                 expected_val <- expected
                 generated_val <- generated(test_env$clean_env)
-
+                
                 expected_formatted <- ""
                 generated_formatted <- ""
 
@@ -362,9 +362,9 @@ testHtest <- function(description, generated, expected,
 }
 
 testMultipleChoice <- function(description, generated, expected, possible_answers,
-                                verify_answer = FALSE,
-                                give_feedback = TRUE,
-                                feedback = NULL,
+                                verify_answer = FALSE, 
+                                give_feedback = TRUE, 
+                                feedback = NULL, 
                                 show_expected = FALSE) {
 
     get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
@@ -388,7 +388,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
                             equal <- FALSE
                             feedback_res <- paste0(feedback_res, "\n", answer, " is not a right answer")
                             if (answer %in% names(feedback) || answer %in% seq_along(feedback)) {
-                                feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]])
+                                feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]]) 
                             } else {
                                 feedback_res <- paste0(feedback_res, ".")
                             }
@@ -404,7 +404,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
                 } else if (!verify_answer && equal){
                     get_reporter()$add_message("Your solution will be verified after the deadline.")
                 }
-
+                
                 if (equal) {
                     get_reporter()$end_test(generated_raw, "correct")
                 } else {
