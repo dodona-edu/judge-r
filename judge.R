@@ -4,6 +4,7 @@ source('testcase.R', local=TRUE)
 source('test.R', local=TRUE)
 source('utils-ast.R', local=TRUE)
 source('utils-plot.R', local=TRUE)
+source('utils-df.R', local=TRUE)
 
 student_code <- NULL
 
