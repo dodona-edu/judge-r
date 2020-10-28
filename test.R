@@ -354,7 +354,6 @@ testHtest <- function(description, generated, expected,
                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
             }),
             error = function(e) {
-                get_reporter()$end_test("", "wrong")
                 get_reporter()$start_test("", description)
                 get_reporter()$end_test(conditionMessage(e), "runtime error")
             }
