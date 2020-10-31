@@ -84,6 +84,55 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
     )
 }
 
+testDF2 <- function(description, generated, expected, comparator = NULL, ignore_col_order = TRUE, ignore_row_order = FALSE, ...) {
+    tryCatch(
+             withCallingHandlers({
+
+                 capture.output(generated_val <- generated(test_env$clean_env))
+                 df1_bad_frame = 1:10
+                 df2_bad_frame = 1:10
+                 if (is.null(comparator)) {
+                     # Use the dplyr all_equal to compare dataframes
+                     test_result <- dataframe_all_equal(round_df(generated_val), round_df(expected), ignore_col_order, ignore_row_order)
+                     equal <- test_result$equal
+                     df1_bad_frame <- test_result$df1_rows
+                     df2_bad_frame <- test_result$df2_rows
+                     df2_cols <- test_result$df2_cols
+                     
+                 } else {
+                     equal <- comparator(generated_val, expected, ...)
+                 }
+
+                 if (equal) {
+                     get_reporter()$start_test(paste(knitr::kable(head(expected), "simple", row.names = FALSE), collapse = '\n'), description)
+                     get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
+                     get_reporter()$end_test(paste(knitr::kable(head(generated_val), "simple", row.names = FALSE), collapse = '\n'), "correct")
+                 } else {
+                     expected_dataframe <- dplyr::slice(expected, df2_bad_frame)
+                     expected_dataframe <- expected_dataframe[df2_cols]
+                     #row.names(expected_dataframe) <- df1_bad_frame
+                     generated_dataframe <- dplyr::slice(generated_val, df1_bad_frame)
+                     #row.names(generated_dataframe) <- df1_bad_frame
+                     get_reporter()$start_test(paste(knitr::kable(expected_dataframe, "simple", row.names = FALSE), collapse = '\n'), description)
+                     # TODO: Try to be smarter about what data is shown. If the error is not in the first five rows, the diff will be useless to the student.
+                     get_reporter()$add_message("Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
+                     get_reporter()$end_test(paste(knitr::kable(generated_dataframe, "simple", row.names = FALSE), collapse = '\n'), "wrong")
+                 }
+             },
+             warning = function(w) {
+                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+             },
+             message = function(m) {
+                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+             }),
+             error = function(e) {
+                 get_reporter()$end_test("", "wrong")
+                 get_reporter()$start_test("", description)
+                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+             }
+    )
+}
+
 testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                         test_data = TRUE,
                         test_geom = TRUE,
