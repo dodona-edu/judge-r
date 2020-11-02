@@ -98,6 +98,8 @@ The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside f
 
 > Note: Because we want the testing of the `ggplot` to be as flexible as possible the test functions are all made in a way that the given solution `ggplot` is the plot that defines the minimal requirements for the student plot. When writing exercises this is a very important aspect to keep in mind. For example we don't recommend testing plots where you defined parameters to be used in geometric layers in the `ggplot` function itself. This because the test function would test for these parameters in every geometric layer in the student plot even when they are not used.
 
+> Note: When testing ggplots we recommend using geom layers instead of stat layers. Both provide the same functionalities but tests written with geom layers will also work for ggplots with stat layers, this is not he case for tests written with stat layers.
+
 #### `testFunctionUsed`
 
 The `testFunctionUsed` function is a function you can use to test if a certain function is used in the student code. The function takes 1 parameter: the name of the function you want to make sure the student used.
