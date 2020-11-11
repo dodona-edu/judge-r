@@ -5,7 +5,7 @@ test_data_layer <- function(sol_data, stud_data) {
     equal <- all(equal_names)
     feedback <- paste0("You did not add the correct data, missing ", ifelse(sum(equal_names)==1, "column", "columns"), " named: ", names(sol_data)[!equal_names])
     if(equal){
-        equal <- isTRUE(all.equal(select(sol_data, names(sol_data)), select(stud_data, names(sol_data))))
+        equal <- isTRUE(all.equal(dplyr::select(sol_data, names(sol_data)), dplyr::select(stud_data, names(sol_data))))
         feedback <- "The data you used in your ggplot contains the right column names but is wrong"
     }
     list('equal' = equal, 'feedback' = feedback)
