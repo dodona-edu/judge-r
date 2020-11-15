@@ -112,7 +112,7 @@ testDF2 <- function(description, generated, expected,
 
                  if (is.null(comparator)) {
                      # Use the dplyr all_equal to compare dataframes
-                     test_result <- dataframe_all_equal(round_df(generated_val), round_df(expected), 
+                     test_result <- dataframe_all_equal(generated_val, expected, 
                                                         ignore_col_order = ignore_col_order, 
                                                         ignore_row_order = ignore_row_order,
                                                         before_error = rows_before_error,

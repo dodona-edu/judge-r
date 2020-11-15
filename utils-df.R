@@ -10,7 +10,11 @@ round_df <- function(x) {
 #df1 is the dataframe from which the order of collumns and rows will be preserved when ignore_col_order or ignore_row_order is set to TRUE
 dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_order = FALSE, after_error=2, before_error=2){
     
-    # change the column order of df2 to match df1
+    # rounding to avoid identical testing
+    df1 <- round_df(df1)
+    df2 <- round_df(df2)
+
+    # change the column order of df2 to match df1 if needed
     if (ignore_col_order){
         df2 <- df2[intersect(names(df1), names(df2))]
     }
@@ -50,8 +54,9 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
             } else {# search a match for this row
                 df2_row_ind <- 1
                 while(df2_row_ind <= length(df2_row_options) && 
+                        #TODO write a function that can also test for row.names so that row names can be displayed in the future
+                        #look into: !isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = TRUE,check.attributes = FALSE)))
                         !isTRUE(dplyr::all_equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], ignore_col_order = FALSE, ignore_row_order = FALSE)))
-                      #!isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = FALSE,check.attributes = FALSE)))
                       {
 
                     df2_row_ind <- df2_row_ind + 1
@@ -66,35 +71,17 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
                     df2_matches <- c(df2_matches, df2_row_options[df2_row_ind])
                 }
             }
-            
-            print(paste("########################### df1_row: ", df1_row, " ###############################"))
-            print(paste("matches: ", df1[df1_row,]))
         }
-        print("no_match_count")
-        print(no_match_count)
-        print("**********************matches**************************")
-        print(paste(knitr::kable(dplyr::slice(df2, df2_matches), "simple", row.names = TRUE), collapse = '\n'))
-        print("**********************generated**************************")
-        print(paste(knitr::kable(dplyr::slice(df1, 1:df1_row), "simple", row.names = TRUE), collapse = '\n'))
 
         # add unmatched rows from df2 to df2_matches if needed
         df2_row_options <- c(1:nrow(df2))[!c(1:nrow(df2)) %in% df2_matches]
         to_add <- min(after_error - (past_error - no_match_count), nrow(df1) - length(df2_matches))
-        print("to add: ")
-        print(to_add)
         if(to_add > 0){
             df2_matches <- c(df2_matches, df2_row_options[1:to_add])
         }
         
         eind <- length(df2_matches)
         begin <- max(1, eind - (before_error + after_error))
-        print("nrow(df1)")
-        print(nrow(df1))
-        print("begin:")
-        print(begin)
-        print("einde:")
-        print(eind)
-        print(df2_matches)
         return(list(
             'equal' = !error, 
             'df1_rows' = begin:eind, 
