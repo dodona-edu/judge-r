@@ -169,9 +169,6 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                         test_scale = FALSE
                         ) {
 
-
-testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE) {
-
     get_reporter()$start_test("", description)
 
     tryCatch(
