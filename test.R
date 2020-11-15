@@ -84,6 +84,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
     )
 }
 
+
 testDF__inReview__ <- function(description, generated, expected, 
                     comparator = NULL, 
                     ignore_col_order = TRUE, 
@@ -168,6 +169,9 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                         test_scale = FALSE
                         ) {
 
+
+testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE) {
+
     get_reporter()$start_test("", description)
 
     tryCatch(
@@ -178,13 +182,13 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  plot_exists <- is.ggplot(generated_gg)
                  feedback <- "You did not generate a ggplot"
                  if (plot_exists) {
-                    generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
-                    suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
+                     generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
+                     suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
                  }
 
-                 if(show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
-                    expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
-                    suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
+                 if (show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
+                     expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
+                     suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
                  }
 
                  equal <- plot_exists
@@ -238,15 +242,15 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE,
                  if (equal) {
                      get_reporter()$end_test("", "correct")
                  } else {
-                     if(show_expected && plot_exists) {
-                        image_expected <- base64enc::base64encode(tf_expected)
-                        get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
+                     if (show_expected && plot_exists) {
+                         image_expected <- base64enc::base64encode(tf_expected)
+                         get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                      }
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }
                  if (show_expected && plot_exists) {
-                    file.remove(tf_expected)
+                     file.remove(tf_expected)
                  }
                  if (plot_exists) {
                      file.remove(tf_generated)
@@ -295,10 +299,10 @@ testImage <- function(generate, failIfAbsent = TRUE) {
              }
     )
     dev.off()
-    if(file.exists(tf)) {
+    if (file.exists(tf)) {
         image <- base64enc::base64encode(tf)
         get_reporter()$add_message(paste("<img src=\"data:image/png;base64,", image, "\"/>", sep=''), type = "html")
-    } else if(failIfAbsent) {
+    } else if (failIfAbsent) {
         get_reporter()$start_test("", "")
         get_reporter()$end_test("We expected an image, but it doesn't seem like the code generated one.", "wrong")
     } else {
@@ -310,15 +314,22 @@ testFunctionUsedInVar <- function(funcName, varName){
     tryCatch(
              withCallingHandlers({
                  assignment_paths <- find_assign(test_env$parsed_code)
-                 used <- is_function_used_in_var(funcName, assignment_paths, varName, test_env$parsed_code)
-                 if (used) {
-                     get_reporter()$add_message(
-                                                paste("You used the \"", funcName, "\" function in an assignment to variable \"",  varName, "\".")
-                     )
+                 if (varName %in% names(assignment_paths)) {
+                     used <- is_function_used_in_var(funcName, assignment_paths, varName, test_env$parsed_code)
+                     if (used) {
+                         get_reporter()$add_message(paste0("You used the \"", funcName, "\" function in an assignment to variable \"",  varName, "\".")
+                         )
+                     } else {
+                         get_reporter()$start_test("", "")
+                         get_reporter()$end_test(
+                                                 paste0("We expected you to use the \"", funcName, "\" function in an assignment to variable \"",  varName, "\"."),
+                                                 "wrong"
+                         )
+                     }
                  } else {
                      get_reporter()$start_test("", "")
                      get_reporter()$end_test(
-                                             paste("We expected you to use the \"", funcName, "\" function in an assignment to variable \"",  varName, "\"."),
+                                             paste0("Variable \"",  varName, "\" not found"),
                                              "wrong"
                      )
                  }
@@ -362,150 +373,150 @@ testFunctionUsed <- function(funcName){
 }
 
 testHtest <- function(description, generated, expected,
-                        test_p_value = TRUE,
-                        test_interval = TRUE,
-                        test_statistic = FALSE,
-                        test_alternative = FALSE,
-                        test_confidence_level = FALSE,
-                        test_method = FALSE
-                        ){
+                      test_p_value = TRUE,
+                      test_interval = TRUE,
+                      test_statistic = FALSE,
+                      test_alternative = FALSE,
+                      test_confidence_level = FALSE,
+                      test_method = FALSE
+                      ){
 
     tryCatch(
-            withCallingHandlers({
-                expected_val <- expected
-                capture.output(generated_val <- generated(test_env$clean_env))
+             withCallingHandlers({
+                 expected_val <- expected
+                 capture.output(generated_val <- generated(test_env$clean_env))
 
-                if (!"htest" %in% class(generated_val)) {
-                    get_reporter()$start_test("", "")
-                    get_reporter()$end_test(
-                                            paste0("We expected an object of the class \"htest\" but none was found. ",
+                 if (!"htest" %in% class(generated_val)) {
+                     get_reporter()$start_test("", "")
+                     get_reporter()$end_test(
+                                             paste0("We expected an object of the class \"htest\" but none was found. ",
                                                     "This is the class of objects generated by functions that perform ",
                                                     "hypothesis tests (e.g., the R function t.test)"),
-                                            "wrong")
-                    return()
-                }
+                                             "wrong")
+                     return()
+                 }
 
-                expected_formatted <- ""
-                generated_formatted <- ""
+                 expected_formatted <- ""
+                 generated_formatted <- ""
 
-                equal <- TRUE
-                if (test_p_value) {
-                    equal <- equal && isTRUE(all.equal(generated_val$p.value, expected_val$p.value))
-                    expected_formatted <- paste0(expected_formatted, "\np-value = ", expected_val$p.value)
-                    generated_formatted <- paste0(generated_formatted, "\np-value = ", generated_val$p.value)
-                }
-                if (test_interval) {
-                    equal <- equal && isTRUE(all.equal(generated_val$conf.int, expected_val$conf.int))
-                    expected_formatted <- paste0(expected_formatted, "\nconfidence interval = ", toString(expected_val$conf.int))
-                    generated_formatted <- paste0(generated_formatted, "\nconfidence interval = ", toString(generated_val$conf.int))
-                }
-                if (test_statistic) {
-                    equal <- equal && isTRUE(all.equal(generated_val$statistic, expected_val$statistic))
-                    expected_formatted <- paste0(expected_formatted, "\ntest statistic = ")
-                    generated_formatted <- paste0(generated_formatted, "\ntest statistic = ")
-                    for (statistic in names(expected_val$statistic)){
-                        expected_formatted <- paste0(expected_formatted, "\n\t", statistic, ": ", expected_val$statistic[[statistic]])
-                    }
-                    for (statistic in names(generated_val$statistic)){
-                        generated_formatted <- paste0(generated_formatted, "\n\t", statistic, ": ", generated_val$statistic[[statistic]])
-                    }
-                }
-                if (test_alternative) {
-                    equal <- equal && isTRUE(all.equal(generated_val$alternative, expected_val$alternative))
-                    expected_formatted <- paste0(expected_formatted, "\nalternative = ", expected_val$alternative)
-                    generated_formatted <- paste0(generated_formatted, "\nalternative = ", generated_val$alternative)
-                }
-                if (test_confidence_level) {
-                    equal <- equal && isTRUE(all.equal(attr(generated_val$conf.int,'conf.level'), attr(expected_val$conf.int,'conf.level')))
-                    expected_formatted <- paste0(expected_formatted, "\nconfidence level = ", attr(expected_val$conf.int,'conf.level'))
-                    generated_formatted <- paste0(generated_formatted, "\nconfidence level = ", attr(generated_val$conf.int,'conf.level'))
-                }
-                if (test_method) {
-                    equal <- equal && isTRUE(all.equal(generated_val$method, expected_val$method))
-                    expected_formatted <- paste0(expected_formatted, "\nmethod = ", expected_val$method)
-                    generated_formatted <- paste0(generated_formatted, "\nmethod = ", generated_val$method)
-                }
+                 equal <- TRUE
+                 if (test_p_value) {
+                     equal <- equal && isTRUE(all.equal(generated_val$p.value, expected_val$p.value))
+                     expected_formatted <- paste0(expected_formatted, "\np-value = ", expected_val$p.value)
+                     generated_formatted <- paste0(generated_formatted, "\np-value = ", generated_val$p.value)
+                 }
+                 if (test_interval) {
+                     equal <- equal && isTRUE(all.equal(generated_val$conf.int, expected_val$conf.int))
+                     expected_formatted <- paste0(expected_formatted, "\nconfidence interval = ", toString(expected_val$conf.int))
+                     generated_formatted <- paste0(generated_formatted, "\nconfidence interval = ", toString(generated_val$conf.int))
+                 }
+                 if (test_statistic) {
+                     equal <- equal && isTRUE(all.equal(generated_val$statistic, expected_val$statistic))
+                     expected_formatted <- paste0(expected_formatted, "\ntest statistic = ")
+                     generated_formatted <- paste0(generated_formatted, "\ntest statistic = ")
+                     for (statistic in names(expected_val$statistic)){
+                         expected_formatted <- paste0(expected_formatted, "\n\t", statistic, ": ", expected_val$statistic[[statistic]])
+                     }
+                     for (statistic in names(generated_val$statistic)){
+                         generated_formatted <- paste0(generated_formatted, "\n\t", statistic, ": ", generated_val$statistic[[statistic]])
+                     }
+                 }
+                 if (test_alternative) {
+                     equal <- equal && isTRUE(all.equal(generated_val$alternative, expected_val$alternative))
+                     expected_formatted <- paste0(expected_formatted, "\nalternative = ", expected_val$alternative)
+                     generated_formatted <- paste0(generated_formatted, "\nalternative = ", generated_val$alternative)
+                 }
+                 if (test_confidence_level) {
+                     equal <- equal && isTRUE(all.equal(attr(generated_val$conf.int,'conf.level'), attr(expected_val$conf.int,'conf.level')))
+                     expected_formatted <- paste0(expected_formatted, "\nconfidence level = ", attr(expected_val$conf.int,'conf.level'))
+                     generated_formatted <- paste0(generated_formatted, "\nconfidence level = ", attr(generated_val$conf.int,'conf.level'))
+                 }
+                 if (test_method) {
+                     equal <- equal && isTRUE(all.equal(generated_val$method, expected_val$method))
+                     expected_formatted <- paste0(expected_formatted, "\nmethod = ", expected_val$method)
+                     generated_formatted <- paste0(generated_formatted, "\nmethod = ", generated_val$method)
+                 }
 
-                get_reporter()$start_test(expected_formatted, description)
-                if (equal) {
-                    get_reporter()$end_test(generated_formatted, "correct")
-                } else {
-                    get_reporter()$end_test(generated_formatted, "wrong")
-                }
-            },
-            warning = function(w) {
-                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-            },
-            message = function(m) {
-                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
-            }),
-            error = function(e) {
-                get_reporter()$start_test("", description)
-                get_reporter()$end_test(conditionMessage(e), "runtime error")
-            }
+                 get_reporter()$start_test(expected_formatted, description)
+                 if (equal) {
+                     get_reporter()$end_test(generated_formatted, "correct")
+                 } else {
+                     get_reporter()$end_test(generated_formatted, "wrong")
+                 }
+             },
+             warning = function(w) {
+                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+             },
+             message = function(m) {
+                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+             }),
+             error = function(e) {
+                 get_reporter()$start_test("", description)
+                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+             }
     )
 }
 
 testMultipleChoice <- function(description, generated, expected, possible_answers,
-                                verify_answer = FALSE,
-                                give_feedback = TRUE,
-                                feedback = NULL,
-                                show_expected = FALSE) {
+                               verify_answer = FALSE,
+                               give_feedback = TRUE,
+                               feedback = NULL,
+                               show_expected = FALSE) {
 
     get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
 
     tryCatch(
-            withCallingHandlers({
-                expected_val <- unique(sort(expected))
-                capture.output(generated_raw <- generated(test_env$clean_env))
-                generated_val <- unique(sort(generated_raw))
+             withCallingHandlers({
+                 expected_val <- unique(sort(expected))
+                 capture.output(generated_raw <- generated(test_env$clean_env))
+                 generated_val <- unique(sort(generated_raw))
 
-                equal <- TRUE
-                if (!all(generated_val %in% possible_answers) || length(generated_val) == 0) {
-                    equal <- FALSE
-                    get_reporter()$add_message(paste0("Your answer is not a valid option, the valid options are (", toString(possible_answers), ")."))
-                }
+                 equal <- TRUE
+                 if (!all(generated_val %in% possible_answers) || length(generated_val) == 0) {
+                     equal <- FALSE
+                     get_reporter()$add_message(paste0("Your answer is not a valid option, the valid options are (", toString(possible_answers), ")."))
+                 }
 
-                if (verify_answer && equal) {
-                    feedback_res <- ""
-                    for (answer in generated_val){
-                        if (!(answer %in% expected_val)){
-                            equal <- FALSE
-                            feedback_res <- paste0(feedback_res, "\n", answer, " is not a right answer")
-                            if (answer %in% names(feedback) || answer %in% seq_along(feedback)) {
-                                feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]])
-                            } else {
-                                feedback_res <- paste0(feedback_res, ".")
-                            }
-                        }
-                    }
-                    if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
-                        equal <- FALSE
-                        feedback_res <- paste0(feedback_res, "\nYour answer does not include all the correct options.")
-                    }
-                    if (feedback_res != "" && !equal && give_feedback){
-                        get_reporter()$add_message(feedback_res)
-                    }
-                } else if (!verify_answer && equal){
-                    get_reporter()$add_message("Your solution will be verified after the deadline.")
-                }
+                 if (verify_answer && equal) {
+                     feedback_res <- ""
+                     for (answer in generated_val){
+                         if (!(answer %in% expected_val)){
+                             equal <- FALSE
+                             feedback_res <- paste0(feedback_res, "\n", answer, " is not a right answer")
+                             if (answer %in% names(feedback) || answer %in% seq_along(feedback)) {
+                                 feedback_res <- paste0(feedback_res, " because: ", feedback[[answer]])
+                             } else {
+                                 feedback_res <- paste0(feedback_res, ".")
+                             }
+                         }
+                     }
+                     if (length(intersect(expected_val, generated_val)) < length(expected_val)) {
+                         equal <- FALSE
+                         feedback_res <- paste0(feedback_res, "\nYour answer does not include all the correct options.")
+                     }
+                     if (feedback_res != "" && !equal && give_feedback){
+                         get_reporter()$add_message(feedback_res)
+                     }
+                 } else if (!verify_answer && equal){
+                     get_reporter()$add_message("Your solution will be verified after the deadline.")
+                 }
 
-                if (equal) {
-                    get_reporter()$end_test(generated_raw, "correct")
-                } else {
-                    get_reporter()$end_test(generated_raw, "wrong")
-                }
-            },
-            warning = function(w) {
-                get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-            },
-            message = function(m) {
-                get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
-            }),
-            error = function(e) {
-                get_reporter()$end_test("", "wrong")
-                get_reporter()$start_test("", description)
-                get_reporter()$end_test(conditionMessage(e), "runtime error")
-            }
+                 if (equal) {
+                     get_reporter()$end_test(generated_raw, "correct")
+                 } else {
+                     get_reporter()$end_test(generated_raw, "wrong")
+                 }
+             },
+             warning = function(w) {
+                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
+             },
+             message = function(m) {
+                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
+             }),
+             error = function(e) {
+                 get_reporter()$end_test("", "wrong")
+                 get_reporter()$start_test("", description)
+                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+             }
     )
 }
