@@ -21,6 +21,7 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
         no_match_count <- 0
         df2_matches <- c()
         past_error <- 0
+
         # loop over every df1 row and find its match
         df1_row <- 0
         while((df1_row < nrow(df1) || length(df2_matches) < nrow(df2)) && 
@@ -39,8 +40,7 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
                 if(!error){
                     error <- TRUE
                     textual_feedback <- "Your dataframe is missing at least one row."
-                }
-                
+                } 
             } else if (length(df2_row_options) == 0){# no possible matches left, df1 has a row too much                
                 df2_matches <- c(df2_matches, NA)
                 if(!error){
@@ -50,7 +50,9 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
             } else {# search a match for this row
                 df2_row_ind <- 1
                 while(df2_row_ind <= length(df2_row_options) && 
-                      !isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = FALSE,check.attributes = FALSE))){
+                        !isTRUE(dplyr::all_equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], ignore_col_order = FALSE, ignore_row_order = FALSE)))
+                      #!isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = FALSE,check.attributes = FALSE)))
+                      {
 
                     df2_row_ind <- df2_row_ind + 1
                 }
@@ -58,7 +60,7 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
                     no_match_count <- no_match_count + 1
                     if(!error){
                         error <- TRUE
-                        textual_feedback <- "Your dataframe contains a row which is not found in the solution."
+                        textual_feedback <- "Your dataframe contains at least one row which is not found in the solution."
                     }
                 } else { # match found!!
                     df2_matches <- c(df2_matches, df2_row_options[df2_row_ind])

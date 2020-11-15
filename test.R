@@ -84,39 +84,67 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
     )
 }
 
-testDF2 <- function(description, generated, expected, comparator = NULL, ignore_col_order = TRUE, ignore_row_order = FALSE, ...) {
+testDF2 <- function(description, generated, expected, 
+                    comparator = NULL, 
+                    ignore_col_order = TRUE, 
+                    ignore_row_order = FALSE,
+                    rows_before_error = 2,
+                    rows_after_error = 2,
+                    ...
+                    ){
+
     tryCatch(
              withCallingHandlers({
 
                  capture.output(generated_val <- generated(test_env$clean_env))
-                 df1_bad_frame = 1:10
-                 df2_bad_frame = 1:10
+                 
+                 #frames for custom comparator or when dataframe is correct
+                 df1_bad_frame <- 1:(rows_before_error + rows_after_error + 1)
+                 df2_bad_frame <- df1_bad_frame
+                 df2_cols <- names(expected)
+                 feedback <- ""
+
+                 if(!is.data.frame(generated_val)){
+                     get_reporter()$start_test("", "")
+                     get_reporter()$end_test("We expected an object of the class \"data.frame\" but none was found.", "wrong")
+                     return()
+                 }
+
                  if (is.null(comparator)) {
                      # Use the dplyr all_equal to compare dataframes
-                     test_result <- dataframe_all_equal(round_df(generated_val), round_df(expected), ignore_col_order, ignore_row_order)
+                     test_result <- dataframe_all_equal(round_df(generated_val), round_df(expected), 
+                                                        ignore_col_order = ignore_col_order, 
+                                                        ignore_row_order = ignore_row_order,
+                                                        before_error = rows_before_error,
+                                                        after_error = rows_after_error
+                                                        )
                      equal <- test_result$equal
-                     df1_bad_frame <- test_result$df1_rows
-                     df2_bad_frame <- test_result$df2_rows
-                     df2_cols <- test_result$df2_cols
-                     
+                     if(!equal){
+                        df1_bad_frame <- test_result$df1_rows
+                        df2_bad_frame <- test_result$df2_rows
+                        df2_cols <- test_result$df2_cols
+                        feedback <- test_result$feedback
+                     } 
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }
 
+                 generated_df_view <- dplyr::slice(generated_val, df1_bad_frame)
+                 expected_df_view <- dplyr::slice(expected, df2_bad_frame)
+                 expected_df_view <- expected_df_view[df2_cols]
+                 
+                 get_reporter()$start_test(paste(knitr::kable(expected_df_view, "simple", row.names = FALSE), collapse = '\n'), description)
+                 get_reporter()$add_message(paste0(nrow(generated_df_view), " of the ", nrow(generated_val), " generated rows are shown."))
                  if (equal) {
-                     get_reporter()$start_test(paste(knitr::kable(head(expected), "simple", row.names = FALSE), collapse = '\n'), description)
-                     get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
-                     get_reporter()$end_test(paste(knitr::kable(head(generated_val), "simple", row.names = FALSE), collapse = '\n'), "correct")
+                     get_reporter()$end_test(paste(knitr::kable(generated_df_view, "simple", row.names = FALSE), collapse = '\n'), "correct")
                  } else {
-                     expected_dataframe <- dplyr::slice(expected, df2_bad_frame)
-                     expected_dataframe <- expected_dataframe[df2_cols]
-                     #row.names(expected_dataframe) <- df1_bad_frame
-                     generated_dataframe <- dplyr::slice(generated_val, df1_bad_frame)
-                     #row.names(generated_dataframe) <- df1_bad_frame
-                     get_reporter()$start_test(paste(knitr::kable(expected_dataframe, "simple", row.names = FALSE), collapse = '\n'), description)
-                     # TODO: Try to be smarter about what data is shown. If the error is not in the first five rows, the diff will be useless to the student.
-                     get_reporter()$add_message("Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
-                     get_reporter()$end_test(paste(knitr::kable(generated_dataframe, "simple", row.names = FALSE), collapse = '\n'), "wrong")
+                     get_reporter()$add_message(feedback)
+                     if(ignore_row_order){
+                         get_reporter()$add_message("> Note: Row order doesn't matter, the expected dataframe is just one of the possible solutions.", type = "markdown")
+                     } else {
+                         get_reporter()$add_message("> Note: Row order does matter, your dataframe has to match the the expected dataframe exactly.", type = "markdown")
+                     }
+                     get_reporter()$end_test(paste(knitr::kable(generated_df_view, "simple", row.names = FALSE), collapse = '\n'), "wrong")
                  }
              },
              warning = function(w) {
@@ -126,7 +154,6 @@ testDF2 <- function(description, generated, expected, comparator = NULL, ignore_
                  get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$end_test("", "wrong")
                  get_reporter()$start_test("", description)
                  get_reporter()$end_test(conditionMessage(e), "runtime error")
              }
