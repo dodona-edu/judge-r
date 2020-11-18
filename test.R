@@ -85,20 +85,12 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
 }
 
 
-testDF__inReview__ <- function(description, generated, expected, 
-                    comparator = NULL, 
-                    ignore_col_order = TRUE, 
-                    ignore_row_order = FALSE,
-                    rows_before_error = 2,
-                    rows_after_error = 2,
-                    ...
-                    ){
-
+testDF__inReview__ <- function(description, generated, expected, comparator = NULL, ignore_col_order = TRUE, ignore_row_order = FALSE, rows_before_error = 2, rows_after_error = 2, ...){
     tryCatch(
              withCallingHandlers({
 
                  capture.output(generated_val <- generated(test_env$clean_env))
-                 
+
                  #frames for custom comparator or when dataframe is correct
                  df1_bad_frame <- 1:(rows_before_error + rows_after_error + 1)
                  df2_bad_frame <- df1_bad_frame
@@ -113,19 +105,19 @@ testDF__inReview__ <- function(description, generated, expected,
 
                  if (is.null(comparator)) {
                      # Use the dplyr all_equal to compare dataframes
-                     test_result <- dataframe_all_equal(generated_val, expected, 
-                                                        ignore_col_order = ignore_col_order, 
+                     test_result <- dataframe_all_equal(generated_val, expected,
+                                                        ignore_col_order = ignore_col_order,
                                                         ignore_row_order = ignore_row_order,
                                                         before_error = rows_before_error,
                                                         after_error = rows_after_error
-                                                        )
+                     )
                      equal <- test_result$equal
                      if(!equal){
-                        df1_bad_frame <- test_result$df1_rows
-                        df2_bad_frame <- test_result$df2_rows
-                        df2_cols <- test_result$df2_cols
-                        feedback <- test_result$feedback
-                     } 
+                         df1_bad_frame <- test_result$df1_rows
+                         df2_bad_frame <- test_result$df2_rows
+                         df2_cols <- test_result$df2_cols
+                         feedback <- test_result$feedback
+                     }
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }
@@ -133,7 +125,7 @@ testDF__inReview__ <- function(description, generated, expected,
                  generated_df_view <- dplyr::slice(generated_val, df1_bad_frame)
                  expected_df_view <- dplyr::slice(expected, df2_bad_frame)
                  expected_df_view <- expected_df_view[df2_cols]
-                 
+
                  get_reporter()$start_test(paste(knitr::kable(expected_df_view, "simple", row.names = FALSE), collapse = '\n'), description)
                  get_reporter()$add_message(paste0(nrow(generated_df_view), " of the ", nrow(generated_val), " generated rows are shown."))
                  if (equal) {
@@ -161,14 +153,7 @@ testDF__inReview__ <- function(description, generated, expected,
     )
 }
 
-testGGPlot <- function(description, generated, expected, show_expected = TRUE,
-                        test_data = TRUE,
-                        test_geom = TRUE,
-                        test_facet = TRUE,
-                        test_label = FALSE,
-                        test_scale = FALSE
-                        ) {
-
+testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE) {
     get_reporter()$start_test("", description)
 
     tryCatch(

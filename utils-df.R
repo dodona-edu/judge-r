@@ -3,13 +3,12 @@ round_df <- function(x) {
     # x: data frame
     # signif rounds to 6 significant digits by default
     x %>%
-       dplyr::mutate_if(is.numeric, signif)
+        dplyr::mutate_if(is.numeric, signif)
 }
 
 
 #df1 is the dataframe from which the order of collumns and rows will be preserved when ignore_col_order or ignore_row_order is set to TRUE
-dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_order = FALSE, after_error=2, before_error=2){
-    
+dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_order = FALSE, after_error = 2, before_error = 2) {
     # rounding to avoid identical testing
     df1 <- round_df(df1)
     df2 <- round_df(df2)
@@ -28,12 +27,12 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
 
         # loop over every df1 row and find its match
         df1_row <- 0
-        while((df1_row < nrow(df1) || length(df2_matches) < nrow(df2)) && 
+        while((df1_row < nrow(df1) || length(df2_matches) < nrow(df2)) &&
               (past_error < after_error + no_match_count || df1_row <= after_error + before_error + no_match_count)){
 
             df1_row <- df1_row + 1
             df2_row_options <- c(1:nrow(df2))[!c(1:nrow(df2)) %in% df2_matches]
-            
+
             if(error){
                 past_error <- past_error + 1
             }
@@ -44,8 +43,8 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
                 if(!error){
                     error <- TRUE
                     textual_feedback <- "Your dataframe is missing at least one row."
-                } 
-            } else if (length(df2_row_options) == 0){# no possible matches left, df1 has a row too much                
+                }
+            } else if (length(df2_row_options) == 0){# no possible matches left, df1 has a row too much
                 df2_matches <- c(df2_matches, NA)
                 if(!error){
                     error <- TRUE
@@ -53,15 +52,15 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
                 }
             } else {# search a match for this row
                 df2_row_ind <- 1
-                while(df2_row_ind <= length(df2_row_options) && 
-                        #TODO write a function that can also test for row.names so that row names can be displayed in the future
-                        #look into: !isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = TRUE,check.attributes = FALSE)))
-                        !isTRUE(dplyr::all_equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], ignore_col_order = FALSE, ignore_row_order = FALSE)))
-                      {
+                while(df2_row_ind <= length(df2_row_options) &&
+                      #TODO write a function that can also test for row.names so that row names can be displayed in the future
+                      #look into: !isTRUE(all.equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], use.names = TRUE,check.attributes = FALSE)))
+                      !isTRUE(dplyr::all_equal(df1[df1_row,], df2[df2_row_options[df2_row_ind],], ignore_col_order = FALSE, ignore_row_order = FALSE)))
+                {
 
                     df2_row_ind <- df2_row_ind + 1
                 }
-                if(df2_row_ind > length(df2_row_options)){ # no match found                    
+                if(df2_row_ind > length(df2_row_options)){ # no match found
                     no_match_count <- no_match_count + 1
                     if(!error){
                         error <- TRUE
@@ -79,16 +78,16 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
         if(to_add > 0){
             df2_matches <- c(df2_matches, df2_row_options[1:to_add])
         }
-        
+
         eind <- length(df2_matches)
         begin <- max(1, eind - (before_error + after_error))
         return(list(
-            'equal' = !error, 
-            'df1_rows' = begin:eind, 
-            'df2_rows' = tail(df2_matches, after_error + before_error + 1), 
-            'df2_cols' = names(df2),
-            "feedback" = textual_feedback
-        )) 
+                    'equal' = !error,
+                    'df1_rows' = begin:eind,
+                    'df2_rows' = tail(df2_matches, after_error + before_error + 1),
+                    'df2_cols' = names(df2),
+                    "feedback" = textual_feedback
+                    ))
 
     } else {
         df_row <- 0
@@ -101,16 +100,16 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
             if (!identical(df1[df_row,], df2[df_row,]) && !error){
                 textual_feedback <- paste0("unexpected row with rownumber: ", df_row)
                 error <- TRUE
-            } 
+            }
         }
         eind <- df_row
         begin <- max(1, eind - (after_error + before_error))
         return(list(
-            'equal' = !error, 
-            'df1_rows' = begin:eind, 
-            'df2_rows' = begin:eind,
-            'df2_cols' = names(df2),
-            'feedback' = textual_feedback
-        )) 
+                    'equal' = !error,
+                    'df1_rows' = begin:eind,
+                    'df2_rows' = begin:eind,
+                    'df2_cols' = names(df2),
+                    'feedback' = textual_feedback
+                    ))
     }
 }
