@@ -97,19 +97,15 @@ contextWithParsing <- function(testcases={}, preExec={}) {
         }
         if(!is.na(match) && match %in% names(filtered_testcases)){
             if(!is.null(codeblock_name)){
-                print("codeblock not NULL")
                 codeblocks[[codeblock_name]] <- codeblock
                 codeblock <- c()
             }
-            print(paste("codeblock_name changed to ", match))
             codeblock_name <- match
         } else {
-            print("line added")
             codeblock <- c(codeblock, line)
         }
     }
     if(!is.null(codeblock_name)){
-        print(paste("codeblocks[[", codeblock_name, "]] <- ", codeblock))
         codeblocks[[codeblock_name]] <- codeblock
     }
  
