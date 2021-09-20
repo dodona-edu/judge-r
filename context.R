@@ -67,6 +67,88 @@ context <- function(testcases={}, preExec={}) {
     )
 }
 
+
+contextWithParsing <- function(testcases={}, preExec={}) {
+    testcases <- substitute(testcases)
+
+    get_reporter()$start_context()
+    do_exit <- TRUE
+    on.exit({
+        if(do_exit) {
+            get_reporter()$end_context()
+        }
+    })
+
+    # remove unnamed list items and throw a warning
+    filtered_testcases <- testcases[!duplicated(names(testcases)) & names(testcases)!=""]
+    if(length(filtered_testcases) > length(testcases)){
+        get_reporter()$add_message("warning: There are duplicate names and/or unamed testcases found. Note that these won't be used for evaluation.")
+    }
+
+    # parse the student code into a named list linking the parsed codeblock names to codeblocks.
+    codeblocks <- list()
+    codeblock_name <- NULL
+    codeblock <- c()
+    for(line in read_lines(student_code)){
+        match <- str_match(line, "^###\\h*(.+[^\\h])\\h*###")[,2]
+        if(match %in% names(codeblocks)){
+            # duplicate template name
+            # not sure if i want to add a warning here
+        }
+        if(!is.na(match) && match %in% names(filtered_testcases)){
+            if(!is.null(codeblock_name)){
+                print("codeblock not NULL")
+                codeblocks[[codeblock_name]] <- codeblock
+                codeblock <- c()
+            }
+            print(paste("codeblock_name changed to ", match))
+            codeblock_name <- match
+        } else {
+            print("line added")
+            codeblock <- c(codeblock, line)
+        }
+    }
+    if(!is.null(codeblock_name)){
+        print(paste("codeblocks[[", codeblock_name, "]] <- ", codeblock))
+        codeblocks[[codeblock_name]] <- codeblock
+    }
+ 
+    test_env$clean_env <- new.env(parent = globalenv())
+    tryCatch(
+            withCallingHandlers({
+                old_parent <- parent.env(.GlobalEnv)
+                eval(substitute(preExec), envir = test_env$clean_env)
+                
+                # run the codeblock in order and evaluate after each codeblock
+                for (code_index in 1:length(codeblocks)){
+                    parent.env(.GlobalEnv) <- starting_parent_env
+                    tryCatch({
+                        # We don't use source, because otherwise syntax errors leak the location of the student code
+                        test_env$parsed_code <- parse(text = codeblocks[[code_index]])
+                        capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
+
+                    }, finally = {
+                        parent.env(.GlobalEnv) <- old_parent
+                    })
+                    eval(filtered_testcases[[names(codeblocks[code_index])]])
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating context: ", conditionMessage(m), sep = ''))
+            }),
+        error = function(e) {
+            get_reporter()$add_message(paste("Error while evaluating context: ", conditionMessage(e), sep = ''))
+            get_reporter()$escalate("compilation error")
+            get_reporter()$end_context(accepted = FALSE)
+            do_exit <<- FALSE
+        }
+    )
+}
+
+
 contextWithRmd <- function(testcases={}, preExec={}) {
     get_reporter()$start_context()
     do_exit <- TRUE
