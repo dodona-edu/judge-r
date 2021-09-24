@@ -47,7 +47,7 @@ A context represents one execution of the student code. It is generally desirabl
 Note that the student code is executed once for each call to `context`. Technically, this allows the student to store intermediate results in the global environment. The use of this is limited, so we don't see this as a problem.
 
 #### `contextWithParsing`
-The `contextWithParsing` function does the same as context but it allows you to test on intermediate (retuned/printed) results that are not stored in objects. In order to use this function you have to split the student code using "section titles". these are comments with the following pattern: `###[whitespace(s)][section title][whitespace(s)]###`. To define testfunctions per section you can know pass a named list to the `testcases` argument, which links each `section title` with a codeblock containing the testfunctions. 
+The `contextWithParsing` function does the same as `context` but it allows you to test on intermediate (returned/printed) results that are not stored in objects. In order to use this function you have to split the student code using "section titles". these are comments with the following pattern: `###[whitespace(s)][section title][whitespace(s)]###`. To define testfunctions per section you can know pass a named list to the `testcases` argument, which links each `section title` with a codeblock containing the test functions. 
 
 Here you can find an example:
 ```r
