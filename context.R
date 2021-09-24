@@ -76,12 +76,12 @@ contextWithParsing <- function(testcases=list(), preExec={}) {
     get_reporter()$start_context()
     do_exit <- TRUE
     on.exit({
-        if(do_exit) {
+        if (do_exit) {
             get_reporter()$end_context()
         }
     })
 
-    if(sum(duplicated(names(testcases)) | names(testcases) == "") > 0) {
+    if (sum(duplicated(names(testcases)) | names(testcases) == "") > 0) {
         get_reporter()$add_message("Error: There are duplicate named testcases and/or unnamed testcases found.", permission = "staff")
         get_reporter()$escalate("internal error")
         get_reporter()$end_context(accepted = FALSE)
@@ -93,14 +93,14 @@ contextWithParsing <- function(testcases=list(), preExec={}) {
     codeblocks <- list()
     codeblock_name <- NULL
     codeblock <- c()
-    for(line in read_lines(student_code)){
+    for (line in read_lines(student_code)) {
         match <- str_match(line, "^###\\h*(.+[^\\h])\\h*###")[,2]
-        if(match %in% names(codeblocks)){
+        if (match %in% names(codeblocks)) {
             get_reporter()$add_message(paste0("Warning: There are duplicate section title(s) found in the code.",
                                                 "This means the same test will be repeated for all sections with the same title."))
         }
-        if(!is.na(match) && match %in% names(testcases)){
-            if(!is.null(codeblock_name)){
+        if (!is.na(match) && match %in% names(testcases)) {
+            if (!is.null(codeblock_name)) {
                 codeblocks[[codeblock_name]] <- codeblock
                 codeblock <- c()
             }
@@ -109,16 +109,16 @@ contextWithParsing <- function(testcases=list(), preExec={}) {
             codeblock <- c(codeblock, line)
         }
     }
-    if(!is.null(codeblock_name)){
+    if (!is.null(codeblock_name)) {
         codeblocks[[codeblock_name]] <- codeblock
     }
 
     # throw parsing error when section titles are missing in the student code to avoid students skipping tests
     missing_sections <- setdiff(names(testcases), names(codeblocks))
-    if(length(missing_sections) > 0) {
+    if (length(missing_sections) > 0) {
         get_reporter()$add_message(
             paste0("Parsing error: could not find rhe following section title(s): \r\n", 
-                    paste(sapply(missing_sections, function(x){paste("###", x, "###")}), collapse = ',\r\n'))
+                    paste(sapply(missing_sections, function(x) {paste("###", x, "###")}), collapse = ',\r\n'))
         )
         get_reporter()$escalate("compilation error")
         get_reporter()$end_context(accepted = FALSE)
@@ -133,7 +133,7 @@ contextWithParsing <- function(testcases=list(), preExec={}) {
                 eval(substitute(preExec), envir = test_env$clean_env)
                 
                 # run the codeblock in order and evaluate after each codeblock
-                for (code_index in seq_along(codeblocks)){
+                for (code_index in seq_along(codeblocks)) {
                     parent.env(.GlobalEnv) <- starting_parent_env
                     tryCatch({
                         # We don't use source, because otherwise syntax errors leak the location of the student code
