@@ -84,7 +84,12 @@ The `testImage` function is a special case, since it won't actually add a test t
 
 #### `testDF`
 
-The `testDF` function can be used to test the equality of dataframes. It uses `dplyr::all_equal` under the hood (with the `ignore_col_order` and `ignore_row_order` options set to `TRUE` by default). All arguments that the `dplyr::all_equal` function accepts can be passed to this function as well. Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the first five rows of the dataframe(s).
+The `testDF` function can be used to test the equality of
+dataframes. By default row and column order are ignored. If you do not
+want this, pass the `ignore_col_order` and `ignore_row_order`
+arguments as `FALSE` (when applicable). Again, a custom `comparator`
+can be passed if necessary. The feedback in Dodona will show the first
+five rows of the dataframe(s).
 
 #### `testGGPlot`
 
