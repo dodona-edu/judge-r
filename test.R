@@ -44,23 +44,31 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
 }
 
 
-testDF <- function(description, generated, expected, comparator = NULL, ...) {
-    expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
-    get_reporter()$start_test(expected_formatted, description)
+testDF <- function(description, generated, expected, comparator = NULL, ignore_row_order = TRUE, ignore_col_order = TRUE, ...) {
     tryCatch(
              withCallingHandlers({
 
                  capture.output(generated_val <- generated(test_env$clean_env))
+                 # Format before comparison, this allows us to change the values below
+                 expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
                  generated_formatted <- paste(knitr::kable(head(generated_val), "simple"), collapse = '\n')
 
                  equal <- FALSE
                  if (is.null(comparator)) {
-                     # Use the dplyr all_equal to compare dataframes
-                     equal <- isTRUE(dplyr::all_equal(round_df(generated_val), round_df(expected), ...))
+                     if (ignore_col_order) {
+                         expected <- expected[,order(colnames(expected))]
+                         generated_val <- generated_val[,order(colnames(generated_val))]
+                     }
+                     if (ignore_row_order) {
+                         expected <- expected[do.call(order, expected),]
+                         generated_val <- generated_val[do.call(order, generated_val),]
+                     }
+                     equal <- isTRUE(all.equal(generated_val, expected), ...)
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }
 
+                 get_reporter()$start_test(expected_formatted, description)
                  if (equal) {
                      get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
                      get_reporter()$end_test(generated_formatted, "correct")
@@ -77,6 +85,8 @@ testDF <- function(description, generated, expected, comparator = NULL, ...) {
                  get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
+                 expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
+                 get_reporter()$start_test(expected_formatted, description)
                  get_reporter()$end_test("", "wrong")
                  get_reporter()$start_test("", description)
                  get_reporter()$end_test(conditionMessage(e), "runtime error")
