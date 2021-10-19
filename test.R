@@ -63,7 +63,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                          expected <- expected[do.call(order, expected),]
                          generated_val <- generated_val[do.call(order, generated_val),]
                      }
-                     equal <- isTRUE(all.equal(generated_val, expected), ...)
+                     equal <- isTRUE(all.equal(generated_val, expected, ...))
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }
