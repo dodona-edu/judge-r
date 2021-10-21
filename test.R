@@ -47,7 +47,6 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
 testDF <- function(description, generated, expected, comparator = NULL, ignore_row_order = TRUE, ignore_col_order = TRUE, ...) {
     tryCatch(
              withCallingHandlers({
-
                  capture.output(generated_val <- generated(test_env$clean_env))
                  # Format before comparison, this allows us to change the values below
                  expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
@@ -60,10 +59,10 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                          generated_val <- generated_val[,order(colnames(generated_val))]
                      }
                      if (ignore_row_order) {
-                         expected <- expected[do.call(order, expected),]
-                         generated_val <- generated_val[do.call(order, generated_val),]
+                         equal <- isTRUE(compare_data_frames_row_independent(expected, generated_val, ...))
+                     } else {
+                         equal <- isTRUE(all.equal(generated_val, expected), ...)
                      }
-                     equal <- isTRUE(all.equal(generated_val, expected, ...))
                  } else {
                      equal <- comparator(generated_val, expected, ...)
                  }

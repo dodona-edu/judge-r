@@ -6,6 +6,42 @@ round_df <- function(x) {
         dplyr::mutate_if(is.numeric, signif)
 }
 
+# Sorting and then just checking for equality isn't good enough. If
+# there are near-equal floating point numbers, floating point errors
+# can make it so some rows are sorted differently in the expected
+# dataframe and the generated dataframe. We fix this by looking in the
+# vicinity of the rows after sorting. Note that this vicinity is
+# implemented quite naively at the moment, in that we just store the
+# index below the first row that wasn't matched yet to determine where
+# we start looking, and we don't check any stop condition other than
+# getting to the end of the dataframe. This could theoretically result
+# in poor performance (in that we would need n^2 expensive
+# comparisons), but in practice once we get too far from the original
+# row, we won't be able to match the row and the process will stop
+# since we will have found a mistake.
+compare_data_frames_row_independent <- function(expected, generated, ...) {
+    expected <- dplyr::arrange(expected, dplyr::across())
+    generated <- dplyr::arrange(generated, dplyr::across())
+
+    mistakes_found <- !isTRUE(all.equal(nrow(expected), nrow(generated)))
+    used_rows <- c()
+    definitely_used <- 0
+    i <- 1
+    while(i <= nrow(generated) && !mistakes_found) {
+        j <- definitely_used + 1
+        while (j <= nrow(expected) && (is.element(j, used_rows) || !isTRUE(all.equal(generated[i,], expected[j,], ...)))) {
+            j <- j + 1
+        }
+        mistakes_found <- isTRUE(all.equal(j, nrow(expected) + 1))
+        used_rows <- c(used_rows, j)
+        while (is.element(definitely_used + 1, used_rows)) {
+            definitely_used <- definitely_used + 1
+        }
+        i <- i + 1
+    }
+    return(!mistakes_found)
+}
+
 
 #df1 is the dataframe from which the order of collumns and rows will be preserved when ignore_col_order or ignore_row_order is set to TRUE
 dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_order = FALSE, after_error = 2, before_error = 2) {
