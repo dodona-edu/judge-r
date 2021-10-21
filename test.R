@@ -61,7 +61,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                      if (ignore_row_order) {
                          equal <- isTRUE(compare_data_frames_row_independent(expected, generated_val, ...))
                      } else {
-                         equal <- isTRUE(all.equal(generated_val, expected), ...)
+                         equal <- isTRUE(all.equal(generated_val, expected, ...))
                      }
                  } else {
                      equal <- comparator(generated_val, expected, ...)
