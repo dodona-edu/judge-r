@@ -162,7 +162,7 @@ testDF__inReview__ <- function(description, generated, expected, comparator = NU
     )
 }
 
-testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE) {
+testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE, ...) {
     get_reporter()$start_test("", description)
 
     tryCatch(
@@ -202,7 +202,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  }
 
                  if (test_facet && equal) {
-                     test_facet_result <- test_facet_layer(expected_gg$facet, generated_gg$facet)
+                     test_facet_result <- test_facet_layer(expected_gg$facet, generated_gg$facet, ...)
                      if (!test_facet_result$equal) {
                          feedback <- test_facet_result$feedback
                          equal <- FALSE

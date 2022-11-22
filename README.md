@@ -98,6 +98,7 @@ The `testGGPlot` function can be used to test the equality of `GGPlot`s. Aside f
 - `test_data = TRUE` A logical value indicating whether the input data to the `ggplot` function should be verified. This test will succeed if all columns from the solution have a corresponding column in the given input with the same column name and data.
 - `test_geom = TRUE` A logical value indicating whether the geometric layers should be checked. For each layer the parameters and aesthetics are verified. This test method also takes into account the default aesthetics set in the `ggplot` function itself.
 - `test_facet = TRUE` A logical value indicating whether the facet layer should be tested. This test supports `facet_grid` and `facet_wrap` layers and can compare them to one another (e.g. a `facet_grid` with only 1 row/column can be equal to a `facet_wrap` and vice versa).
+- `ignore_facet_type = TRUE` A logical value indicating whether the facet type should be tested when testing the facet layer. Even though `facet_grid` and `facet_wrap` return similar graphs, the instructor may want to force `facet_grid` as it can create clearer graphs when facetting with multiple variables.
 - `test_label = FALSE` A logical value indicating whether the label layers should be tested.
 - `test_scale = FALSE` A logical value indicating whether the scale of the axis should be tested.
 
