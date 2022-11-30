@@ -53,7 +53,6 @@ test_facet_layer <- function(sol_facet, stud_facet, ignore_facet_type = TRUE) {
   } 
 }
 
-
 test_geom_layer <- function(sol_gg, stud_gg){
     sol_layers <- sol_gg$layers
     stud_layers <- stud_gg$layers
