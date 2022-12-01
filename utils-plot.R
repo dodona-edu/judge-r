@@ -11,51 +11,46 @@ test_data_layer <- function(sol_data, stud_data) {
     list('equal' = equal, 'feedback' = feedback)
 }
 
-test_facet_layer <- function(sol_facet, stud_facet) {
+test_facet_layer <- function(sol_facet, stud_facet, ignore_facet_type = TRUE) {
     sol_type <- class(sol_facet)[1]
     stud_type <- class(stud_facet)[1]
-    if(sol_type == "FacetNull"){
+    
+    if (sol_type == "FacetNull") {
         return(list('equal' = TRUE, 'feedback' = ""))
     }
-    if(stud_type == "FacetNull"){
+    if (stud_type == "FacetNull") {
         return(list('equal' = FALSE, 'feedback' = "Did you define a multipanel plot?"))
     }
     equal <- FALSE
-    # A facet wrap student code can be matched with a facet grid solution if the solution has 1 row or column and the other way arround
-    if (sol_type == "FacetGrid") {
-        sol_cols <- names(sol_facet$params$cols)
-        sol_rows <- names(sol_facet$params$rows)
-        if (stud_type == "FacetGrid") {
-            stud_cols <- names(stud_facet$params$cols)
-            stud_rows <- names(stud_facet$params$rows)
-            equal <- (length(intersect(sol_cols, stud_cols)) >= length(sol_cols) && 
-                      length(intersect(sol_rows, stud_rows)) >= length(sol_rows))||
-                     (length(intersect(sol_rows, stud_cols)) >= length(sol_rows) && 
-                      length(intersect(sol_cols, stud_rows)) >= length(sol_cols))
-        } else if (stud_type == "FacetWrap" && (length(sol_cols) == 0 || length(sol_rows) == 0)){
-            stud_facets <- names(stud_facet$params$facets)
-            equal <- length(intersect(sol_cols, stud_facets)) >= length(sol_cols)||
-                     length(intersect(sol_rows, stud_facets)) >= length(sol_rows)
-        }
-        if(length(sol_cols) == 0 || length(sol_rows) == 0){
-            return(list('equal' = equal, 'feedback' = paste0("Did you make a multipanel plot with rows or columns at least divided by (", c(sol_rows, sol_cols), ")?")))
+    
+    if (ignore_facet_type) {
+        equal <- setequal(sol_facet$vars(), stud_facet$vars())
+        return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", paste0(sol_facet$vars(), collapse = ", "), ")?")))) 
+    } else {
+        if (sol_type == "FacetWrap") {
+            if (stud_type  == "FacetWrap") {
+                equal <- setequal(sol_facet$vars(), stud_facet$vars())
+                return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", paste0(sol_facet$vars(), collapse = ", "), ")?")))) 
+            } else {
+                return(list('equal' = FALSE, `feedback` = "Did you use the facet_wrap layer?"))
+            }
         } else {
-            return(list('equal' = equal, 'feedback' = paste0("Did you make a multipanel plot with rows and columns respectively divided by (", sol_rows, "), (", sol_cols, ") or the other way arround?")))
+            if (stud_type  == "FacetGrid") {
+                
+                sol_rows <- names(sol_facet$params$rows)
+                sol_cols <- names(sol_facet$params$cols)
+                
+                stud_rows <- names(stud_facet$params$rows)
+                stud_cols <- names(stud_facet$params$cols)
+                
+                #Cols and rows can be interchanged
+                equal <- (setequal(sol_rows, stud_rows) && setequal(sol_cols, stud_cols)) || (setequal(sol_rows, stud_cols) && setequal(sol_cols, stud_rows))  
+                return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", paste0(sol_facet$vars(), collapse = ", "), ")?")))) 
+            } else {
+                return(list('equal' = FALSE, `feedback` = "Did you use the facet_grid layer?"))
+            }
         }
-        
-    } else if (sol_type == "FacetWrap"){
-        sol_facets <- names(sol_facet$params$facets)
-        if (stud_type == "FacetGrid") {
-            stud_cols <- names(stud_facet$params$cols)
-            stud_rows <- names(stud_facet$params$rows)
-            equal <- length(intersect(sol_facets, stud_cols)) >= length(sol_facets)||
-                     length(intersect(sol_facets, stud_rows)) >= length(sol_facets)
-        } else if (stud_type == "FacetWrap") {
-            stud_facets <- names(stud_facet$params$facets)
-            equal <- length(intersect(sol_facets, stud_facets)) >= length(sol_facets)
-        }
-        return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", sol_facets, ")?")))) 
-    }
+    } 
 }
 
 test_geom_layer <- function(sol_gg, stud_gg){
