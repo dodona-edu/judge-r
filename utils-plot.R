@@ -44,7 +44,7 @@ test_facet_layer <- function(sol_facet, stud_facet, ignore_facet_type = TRUE) {
                 stud_cols <- names(stud_facet$params$cols)
                 
                 #Cols and rows can be interchanged
-                equal <- (setequal(sol_rows, stud_rows) & setequal(sol_cols, stud_cols)) | (setequal(sol_rows, stud_cols) & setequal(sol_cols, stud_rows))  
+                equal <- (setequal(sol_rows, stud_rows) && setequal(sol_cols, stud_cols)) || (setequal(sol_rows, stud_cols) && setequal(sol_cols, stud_rows))  
                 return(list('equal' = equal, 'feedback' = ifelse(equal, "", paste0("Did you make a multipanel plot with rows or columns at least divided by (", paste0(sol_facet$vars(), collapse = ", "), ")?")))) 
             } else {
                 return(list('equal' = FALSE, `feedback` = "Did you use the facet_grid layer?"))
