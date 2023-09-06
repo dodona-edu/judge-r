@@ -62,6 +62,12 @@ context({
 
 Testcases group a number of related tests. The first argument of the `testcase` function is a description of that related group. The second argument is a code block (containing tests) which will be executed by the `testcase` function. There is little functionality in the `testcase` function. It is mostly used as a wrapper for the Dodona concept.
 
+In addition to the usual `testcase` function, there is also `testcaseAssert`. This specialist function can be used for testcases where the related test doesn't map cleanly to the Dodona concept of a test. For example, to check if a variable is present in the student's env, one could use this function like this:
+
+```r
+testcase('x exists', function(studentEnv) { exists("x", envir = studentEnv) })
+```
+
 ### Tests
 
 A test is an actual evaluation of correctness. Multiple `test*` functions are available and are explained in more detail below. The only constant thing for tests are the first three arguments:
