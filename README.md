@@ -90,12 +90,7 @@ The `testImage` function is a special case, since it won't actually add a test t
 
 #### `testDF`
 
-The `testDF` function can be used to test the equality of
-dataframes. By default row and column order are ignored. If you do not
-want this, pass the `ignore_col_order` and `ignore_row_order`
-arguments as `FALSE` (when applicable). Again, a custom `comparator`
-can be passed if necessary. The feedback in Dodona will show the first
-five rows of the dataframe(s).
+The `testDF` function can be used to test the equality of dataframes. By default row and column order are ignored. If you do not want this, pass the `ignore_col_order` and `ignore_row_order` arguments as `FALSE` (when applicable). Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the first five rows of the dataframe(s).
 
 #### `testGGPlot`
 
@@ -143,4 +138,4 @@ The `testMultipleChoice` function is a function you can use to test multiple cho
 
 > :warning: **We do not recommend using this test method** because it won't deliver an optimal experience for students nor teachers.
 
-> If you would like to see multiple choice questions implemented in Dodona you can voice your support  [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
+> If you would like to see multiple choice questions implemented in Dodona you can voice your support [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
