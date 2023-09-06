@@ -17,19 +17,21 @@ testcase <- function(description = NULL, tests={}) {
 testcaseAssert <- function(description, checker) {
     get_reporter()$start_testcase(description)
     tryCatch(
-        withCallingHandlers({
+        withCallingHandlers(
+            {
                 capture.output(checker_val <- checker(test_env$clean_env))
-                get_reporter()$end_testcase(accepted = checker_val))
+                get_reporter()$end_testcase(accepted = checker_val)
             },
             warning = function(w) {
                 get_reporter()$add_message(paste("Warning while evaluating assert: ", conditionMessage(w), sep = ''))
             },
             message = function(m) {
                 get_reporter()$add_message(paste("Message while evaluating assert: ", conditionMessage(m), sep = ''))
-        }),
+            }
+        ),
         error = function(e) {
             get_reporter()$add_message(paste("Error while evaluating assert: ", conditionMessage(e), sep = ''))
             get_reporter()$end_testcase(accepted = FALSE)
-        })
+        }
     )
 }
