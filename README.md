@@ -62,6 +62,12 @@ context({
 
 Testcases group a number of related tests. The first argument of the `testcase` function is a description of that related group. The second argument is a code block (containing tests) which will be executed by the `testcase` function. There is little functionality in the `testcase` function. It is mostly used as a wrapper for the Dodona concept.
 
+In addition to the usual `testcase` function, there is also `testcaseAssert`. This specialist function can be used for testcases where the related test doesn't map cleanly to the Dodona concept of a test. For example, to check if a variable is present in the student's env, one could use this function like this:
+
+```r
+testcaseAssert('x exists', function(studentEnv) { isTRUE(exists("x", studentEnv)) })
+```
+
 ### Tests
 
 A test is an actual evaluation of correctness. Multiple `test*` functions are available and are explained in more detail below. The only constant thing for tests are the first three arguments:
@@ -84,12 +90,7 @@ The `testImage` function is a special case, since it won't actually add a test t
 
 #### `testDF`
 
-The `testDF` function can be used to test the equality of
-dataframes. By default row and column order are ignored. If you do not
-want this, pass the `ignore_col_order` and `ignore_row_order`
-arguments as `FALSE` (when applicable). Again, a custom `comparator`
-can be passed if necessary. The feedback in Dodona will show the first
-five rows of the dataframe(s).
+The `testDF` function can be used to test the equality of dataframes. By default row and column order are ignored. If you do not want this, pass the `ignore_col_order` and `ignore_row_order` arguments as `FALSE` (when applicable). Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the first five rows of the dataframe(s).
 
 #### `testGGPlot`
 
@@ -137,4 +138,4 @@ The `testMultipleChoice` function is a function you can use to test multiple cho
 
 > :warning: **We do not recommend using this test method** because it won't deliver an optimal experience for students nor teachers.
 
-> If you would like to see multiple choice questions implemented in Dodona you can voice your support  [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
+> If you would like to see multiple choice questions implemented in Dodona you can voice your support [in this Dodona issue](https://github.com/dodona-edu/dodona/issues/2195).
