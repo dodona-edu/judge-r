@@ -65,7 +65,7 @@ Testcases group a number of related tests. The first argument of the `testcase` 
 In addition to the usual `testcase` function, there is also `testcaseAssert`. This specialist function can be used for testcases where the related test doesn't map cleanly to the Dodona concept of a test. For example, to check if a variable is present in the student's env, one could use this function like this:
 
 ```r
-testcase('x exists', function(studentEnv) { exists("x", envir = studentEnv) })
+testcaseAssert('x exists', function(studentEnv) { isTRUE(exists("x", studentEnv)) })
 ```
 
 ### Tests
