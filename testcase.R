@@ -20,6 +20,9 @@ testcaseAssert <- function(description, checker) {
         withCallingHandlers(
             {
                 capture.output(checker_val <- checker(test_env$clean_env))
+                if (!checker_val) {
+                    get_reporter()$escalate("wrong")
+                }
                 get_reporter()$end_testcase(accepted = checker_val)
             },
             warning = function(w) {
@@ -31,6 +34,7 @@ testcaseAssert <- function(description, checker) {
         ),
         error = function(e) {
             get_reporter()$add_message(paste("Error while evaluating assert: ", conditionMessage(e), sep = ''))
+            get_reporter()$escalate("runtime error")
             get_reporter()$end_testcase(accepted = FALSE)
         }
     )
