@@ -20,8 +20,8 @@ round_df <- function(x) {
 # row, we won't be able to match the row and the process will stop
 # since we will have found a mistake.
 compare_data_frames_row_independent <- function(expected, generated, ...) {
-    expected <- dplyr::arrange(expected, dplyr::across())
-    generated <- dplyr::arrange(generated, dplyr::across())
+    expected <- dplyr::arrange(expected, dplyr::across(everything()))
+    generated <- dplyr::arrange(generated, dplyr::across(everything()))
 
     mistakes_found <- !isTRUE(all.equal(nrow(expected), nrow(generated)))
     used_rows <- c()
