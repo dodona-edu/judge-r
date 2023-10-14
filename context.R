@@ -67,6 +67,101 @@ context <- function(testcases={}, preExec={}) {
     )
 }
 
+
+contextWithParsing <- function(testcases=list(), preExec={}) {
+
+    # hacky way to make sure the list items are not evaluating yet
+    testcases <- as.list(substitute(testcases))[-1]
+
+    get_reporter()$start_context()
+    do_exit <- TRUE
+    on.exit({
+        if (do_exit) {
+            get_reporter()$end_context()
+        }
+    })
+
+    if (sum(duplicated(names(testcases)) | names(testcases) == "") > 0) {
+        get_reporter()$add_message("Error: There are duplicate named testcases and/or unnamed testcases found.", permission = "staff")
+        get_reporter()$escalate("internal error")
+        get_reporter()$end_context(accepted = FALSE)
+        do_exit <<- FALSE
+        return()
+    }
+
+    # parse the student code into a named list linking the parsed codeblock names to codeblocks.
+    codeblocks <- list()
+    codeblock_name <- NULL
+    codeblock <- c()
+    for (line in read_lines(student_code)) {
+        match <- str_match(line, "^###\\h*(.+[^\\h])\\h*###")[,2]
+        if (match %in% names(codeblocks)) {
+            get_reporter()$add_message(paste0("Warning: There are duplicate section title(s) found in the code.",
+                                                "This means the same test will be repeated for all sections with the same title."))
+        }
+        if (!is.na(match) && match %in% names(testcases)) {
+            if (!is.null(codeblock_name)) {
+                codeblocks[[codeblock_name]] <- codeblock
+                codeblock <- c()
+            }
+            codeblock_name <- match
+        } else {
+            codeblock <- c(codeblock, line)
+        }
+    }
+    if (!is.null(codeblock_name)) {
+        codeblocks[[codeblock_name]] <- codeblock
+    }
+
+    # throw parsing error when section titles are missing in the student code to avoid students skipping tests
+    missing_sections <- setdiff(names(testcases), names(codeblocks))
+    if (length(missing_sections) > 0) {
+        get_reporter()$add_message(
+            paste0("Parsing error: could not find rhe following section title(s): \r\n", 
+                    paste(sapply(missing_sections, function(x) {paste("###", x, "###")}), collapse = ',\r\n'))
+        )
+        get_reporter()$escalate("compilation error")
+        get_reporter()$end_context(accepted = FALSE)
+        do_exit <<- FALSE
+        return()
+    }
+
+    test_env$clean_env <- new.env(parent = globalenv())
+    tryCatch(
+            withCallingHandlers({
+                old_parent <- parent.env(.GlobalEnv)
+                eval(substitute(preExec), envir = test_env$clean_env)
+                
+                # run the codeblock in order and evaluate after each codeblock
+                for (code_index in seq_along(codeblocks)) {
+                    parent.env(.GlobalEnv) <- starting_parent_env
+                    tryCatch({
+                        # We don't use source, because otherwise syntax errors leak the location of the student code
+                        test_env$parsed_code <- parse(text = codeblocks[[code_index]])
+                        capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
+
+                    }, finally = {
+                        parent.env(.GlobalEnv) <- old_parent
+                    })
+                    eval(testcases[[names(codeblocks[code_index])]])
+                }
+            },
+            warning = function(w) {
+                get_reporter()$add_message(paste("Warning while evaluating context: ", conditionMessage(w), sep = ''))
+            },
+            message = function(m) {
+                get_reporter()$add_message(paste("Message while evaluating context: ", conditionMessage(m), sep = ''))
+            }),
+        error = function(e) {
+            get_reporter()$add_message(paste("Error while evaluating context: ", conditionMessage(e), sep = ''))
+            get_reporter()$escalate("compilation error")
+            get_reporter()$end_context(accepted = FALSE)
+            do_exit <<- FALSE
+        }
+    )
+}
+
+
 contextWithRmd <- function(testcases={}, preExec={}) {
     get_reporter()$start_context()
     do_exit <- TRUE

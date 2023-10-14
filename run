@@ -10,6 +10,7 @@ invisible(evalq({
     library('R6')
     library('rlang')
     library('purrr')
+    library('stringr')
 
     input <- fromJSON(file('stdin'))
     source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE, local=TRUE)
