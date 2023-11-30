@@ -302,65 +302,30 @@ testImage <- function(generate, failIfAbsent = TRUE) {
 }
 
 testFunctionUsedInVar <- function(funcName, varName){
-    tryCatch(
-             withCallingHandlers({
-                 assignment_paths <- find_assign(test_env$parsed_code)
-                 if (varName %in% names(assignment_paths)) {
-                     used <- is_function_used_in_var(funcName, assignment_paths, varName, test_env$parsed_code)
-                     if (used) {
-                         get_reporter()$add_message(paste0("You used the \"", funcName, "\" function in an assignment to variable \"",  varName, "\".")
-                         )
-                     } else {
-                         get_reporter()$start_test("", "")
-                         get_reporter()$end_test(
-                                                 paste0("We expected you to use the \"", funcName, "\" function in an assignment to variable \"",  varName, "\"."),
-                                                 "wrong"
-                         )
-                     }
-                 } else {
-                     get_reporter()$start_test("", "")
-                     get_reporter()$end_test(
-                                             paste0("Variable \"",  varName, "\" not found"),
-                                             "wrong"
-                     )
-                 }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating image for testcase: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating image for testcase: ", conditionMessage(m), sep = ''))
-             }),
-             error = function(e) {
-                 get_reporter()$start_test("", "")
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
-             }
-    )
+    assignment_paths <- find_assign(test_env$parsed_code)
+    if (varName %in% names(assignment_paths)) {
+        used <- is_function_used_in_var(funcName, assignment_paths, varName, test_env$parsed_code)
+        if (used) {
+            get_reporter()$add_message(paste0("You used the \"", funcName, "\" function in an assignment to variable \"",  varName, "\"."))
+        } else {
+            get_reporter()$start_test("", "")
+            get_reporter()$end_test(paste0("We expected you to use the \"", funcName, "\" function in an assignment to variable \"",  varName, "\"."), "wrong")
+        }
+    } else {
+        get_reporter()$start_test("", "")
+        get_reporter()$end_test(paste0("Variable \"",  varName, "\" not found"), "wrong")
+    }
 }
 
 testFunctionUsed <- function(funcName){
-    tryCatch(
-             withCallingHandlers({
-                 assignment_paths <- find_assign(test_env$parsed_code)
-                 used <- is_function_used(funcName, assignment_paths, test_env$parsed_code, test_env$parsed_code)
-                 if (used) {
-                     get_reporter()$add_message(paste("You used the \"", funcName, "\" function in your code."))
-                 } else {
-                     get_reporter()$start_test("", "")
-                     get_reporter()$end_test(paste("We expected you to use the \"", funcName, "\" function in your code."), "wrong")
-                 }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating image for testcase: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating image for testcase: ", conditionMessage(m), sep = ''))
-             }),
-             error = function(e) {
-                 get_reporter()$start_test("", "")
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
-             }
-    )
+    assignment_paths <- find_assign(test_env$parsed_code)
+    used <- is_function_used(funcName, assignment_paths, test_env$parsed_code, test_env$parsed_code)
+    if (used) {
+        get_reporter()$add_message(paste("You used the \"", funcName, "\" function in your code."))
+    } else {
+        get_reporter()$start_test("", "")
+        get_reporter()$end_test(paste("We expected you to use the \"", funcName, "\" function in your code."), "wrong")
+    }
 }
 
 testHtest <- function(description, generated, expected,

@@ -4,7 +4,10 @@ is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
     return(some(var_paths[[var]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
 }
 
-is_function_used <- function(func_name, var_paths, sub_tree_root, main_code){
+is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
+    if (sub_tree_root == "") {
+        return(FALSE)
+    }
     switch(expr_type(sub_tree_root),
            constant = { return(FALSE) },
            symbol = {

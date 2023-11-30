@@ -9,6 +9,7 @@ testcase <- function(description = NULL, tests={}) {
 
     tryCatch({ eval(tests) }, error = function(e) {
         get_reporter()$add_message(paste("Error while evaluating testcase: ", conditionMessage(e), sep = ''))
+        get_reporter()$escalate("runtime error")
         get_reporter()$end_testcase(accepted = FALSE)
         do_exit <<- FALSE
     })
