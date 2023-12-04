@@ -5,7 +5,7 @@ is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
 }
 
 is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
-    if (sub_tree_root == "") {
+    if (isTRUE(all.equal(sub_tree_root, sym("")))) {
         return(FALSE)
     }
     switch(expr_type(sub_tree_root),
