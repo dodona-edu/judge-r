@@ -272,8 +272,8 @@ testIdentical <- function(description, generated, expected, formatter = NULL, ..
     )
 }
 
-testImage <- function(generate, failIfAbsent = TRUE) {
-    png(tf <- tempfile(fileext = ".png"))
+testImage <- function(generate, failIfAbsent = TRUE, ...) {
+    png(tf <- tempfile(fileext = ".png"), ...)
     tryCatch(
              withCallingHandlers({
                  generate(test_env$clean_env)

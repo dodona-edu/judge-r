@@ -106,8 +106,8 @@ contextWithRmd <- function(testcases={}, preExec={}) {
     )
 }
 
-contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE) {
-    png(tf <- tempfile(fileext = ".png"))
+contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...) {
+    png(tf <- tempfile(fileext = ".png"), ...)
     get_reporter()$start_context()
     do_exit <- TRUE
     on.exit({
