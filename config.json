@@ -1,5 +1,5 @@
 {
     "judge": "R",
     "image": "dodona-r",
-    "memory_limit": 200000000
+    "memory_limit": 256000000
 }
