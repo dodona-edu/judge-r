@@ -1,0 +1,8 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"chunks"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: <text>:4:0: unexpected end of input\n2: total <- sum(1:3\n3: \n  ^","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"close-judgement"}

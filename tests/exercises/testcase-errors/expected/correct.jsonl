@@ -1,0 +1,14 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"errors"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Broken formatter"}
+{"command":"append-message","message":{"description":"Error while evaluating testcase: bad formatter","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"runtime error"}}
+{"command":"close-testcase","accepted":false}
+{"command":"start-testcase","description":"Still runs"}
+{"command":"start-test","expected":"1","description":"x"}
+{"command":"close-test","generated":"1","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

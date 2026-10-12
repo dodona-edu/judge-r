@@ -1,0 +1,16 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"isolation"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Package attached by the student"}
+{"command":"start-test","expected":"Hello World","description":"titled"}
+{"command":"close-test","generated":"Hello World","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"student package is not attached for the tests"}
+{"command":"close-testcase","accepted":true}
+{"command":"start-testcase","description":"Test code is hidden from the student"}
+{"command":"start-test","expected":"FALSE, FALSE, FALSE, FALSE","description":"hidden"}
+{"command":"close-test","generated":"FALSE, FALSE, FALSE, FALSE","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

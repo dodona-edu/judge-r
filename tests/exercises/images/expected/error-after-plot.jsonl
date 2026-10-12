@@ -1,0 +1,18 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"contexts"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: this fails after plotting","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: this fails after plotting","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"start-tab","title":"testimage"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: this fails after plotting","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"close-judgement"}

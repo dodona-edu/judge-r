@@ -1,0 +1,38 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"contexts"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Required image"}
+{"command":"start-test","expected":"3","description":"n"}
+{"command":"close-test","generated":"3","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":""}
+{"command":"start-test","expected":"","description":""}
+{"command":"close-test","generated":"We expected an image, but it doesn't seem like the code generated one.","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Optional image"}
+{"command":"start-test","expected":"3","description":"n"}
+{"command":"close-test","generated":"3","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"append-message","message":{"description":"We expected an image, but it doesn't seem like the code generated one.","format":"plain"}}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"start-tab","title":"testimage"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Required image"}
+{"command":"start-test","expected":"","description":""}
+{"command":"close-test","generated":"We expected an image, but it doesn't seem like the code generated one.","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Optional image"}
+{"command":"append-message","message":{"description":"We expected an image, but it doesn't seem like the code generated one.","format":"plain"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Failing image"}
+{"command":"start-test","expected":"","description":""}
+{"command":"close-test","generated":"cannot draw","status":{"enum":"runtime error"}}
+{"command":"start-test","expected":"","description":""}
+{"command":"close-test","generated":"We expected an image, but it doesn't seem like the code generated one.","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

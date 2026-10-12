@@ -1,0 +1,17 @@
+---
+title: "Report"
+---
+
+Some text that is not code: `stop("not evaluated")`.
+
+```{r}
+total <- sum(1:3)
+```
+
+```{r, eval=FALSE}
+stop("this chunk is not evaluated")
+```
+
+```{r}
+"done"
+```

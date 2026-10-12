@@ -1,0 +1,22 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"values"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: <text>:3:0: unexpected end of input\n1: x <- (42 +\n2: square <- function(n) n^2\n  ^","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: <text>:3:0: unexpected end of input\n1: x <- (42 +\n2: square <- function(n) n^2\n  ^","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: <text>:3:0: unexpected end of input\n1: x <- (42 +\n2: square <- function(n) n^2\n  ^","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"start-tab","title":"functions"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: <text>:3:0: unexpected end of input\n1: x <- (42 +\n2: square <- function(n) n^2\n  ^","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"close-judgement"}

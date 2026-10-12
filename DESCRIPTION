@@ -1,0 +1,22 @@
+Package: judgeR
+Title: R Judge for Dodona
+Version: 0.0.0.9000
+Description: Not an installable package: lists what the judge and its tests
+    need, so a development environment can install them.
+License: file LICENSE
+Depends:
+    R (>= 4.5)
+Imports:
+    base64enc,
+    dplyr,
+    ggplot2,
+    jsonlite,
+    knitr,
+    purrr,
+    R6,
+    rlang
+Suggests:
+    processx,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
