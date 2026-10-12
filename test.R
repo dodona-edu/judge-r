@@ -7,7 +7,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
     get_reporter()$start_test(expected_formatted, description)
 
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
                  expected_val <- expected
                  capture.output(generated_val <- generated(test_env$clean_env))
 
@@ -28,17 +28,9 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
                  } else {
                      get_reporter()$end_test(generated_formatted, "wrong")
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$end_test("", "wrong")
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .close_test_with_runtime_error(description, e)
              }
     )
 }
@@ -46,7 +38,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
 
 testDF <- function(description, generated, expected, comparator = NULL, ignore_row_order = TRUE, ignore_col_order = TRUE, ...) {
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
                  capture.output(generated_val <- generated(test_env$clean_env))
                  # Format before comparison, this allows us to change the values below
                  expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
@@ -76,19 +68,11 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                      get_reporter()$add_message("Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
                      get_reporter()$end_test(generated_formatted, "wrong")
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
                  expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
                  get_reporter()$start_test(expected_formatted, description)
-                 get_reporter()$end_test("", "wrong")
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .close_test_with_runtime_error(description, e)
              }
     )
 }
@@ -96,7 +80,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
 
 testDF__inReview__ <- function(description, generated, expected, comparator = NULL, ignore_col_order = TRUE, ignore_row_order = FALSE, rows_before_error = 2, rows_after_error = 2, ...){
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
 
                  capture.output(generated_val <- generated(test_env$clean_env))
 
@@ -148,16 +132,9 @@ testDF__inReview__ <- function(description, generated, expected, comparator = NU
                      }
                      get_reporter()$end_test(paste(knitr::kable(generated_df_view, "simple", row.names = FALSE), collapse = '\n'), "wrong")
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .report_test_runtime_error(description, e)
              }
     )
 }
@@ -166,7 +143,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
     get_reporter()$start_test("", description)
 
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
                  expected_gg <- expected
                  capture.output(generated_gg <- generated(test_env$clean_env))
 
@@ -246,17 +223,9 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  if (plot_exists) {
                      file.remove(tf_generated)
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$end_test("", "wrong")
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .close_test_with_runtime_error(description, e)
              }
     )
 }
@@ -275,30 +244,15 @@ testIdentical <- function(description, generated, expected, formatter = NULL, ..
 testImage <- function(generate, failIfAbsent = TRUE, ...) {
     png(tf <- tempfile(fileext = ".png"), ...)
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("image for testcase", {
                  generate(test_env$clean_env)
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating image for testcase: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating image for testcase: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$start_test("", "")
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .report_test_runtime_error("", e)
              }
     )
     dev.off()
-    if (file.exists(tf)) {
-        image <- base64enc::base64encode(tf)
-        get_reporter()$add_message(paste("<img src=\"data:image/png;base64,", image, "\"/>", sep=''), type = "html")
-    } else if (failIfAbsent) {
-        get_reporter()$start_test("", "")
-        get_reporter()$end_test("We expected an image, but it doesn't seem like the code generated one.", "wrong")
-    } else {
-        get_reporter()$add_message("We expected an image, but it doesn't seem like the code generated one.")
-    }
+    .report_image(tf, failIfAbsent, within_testcase = TRUE)
 }
 
 testFunctionUsedInVar <- function(funcName, varName){
@@ -338,7 +292,7 @@ testHtest <- function(description, generated, expected,
                       ){
 
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
                  expected_val <- expected
                  capture.output(generated_val <- generated(test_env$clean_env))
 
@@ -399,16 +353,9 @@ testHtest <- function(description, generated, expected,
                  } else {
                      get_reporter()$end_test(generated_formatted, "wrong")
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .report_test_runtime_error(description, e)
              }
     )
 }
@@ -422,7 +369,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
     get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
 
     tryCatch(
-             withCallingHandlers({
+             .report_conditions("test", {
                  expected_val <- unique(sort(expected))
                  capture.output(generated_raw <- generated(test_env$clean_env))
                  generated_val <- unique(sort(generated_raw))
@@ -462,17 +409,9 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
                  } else {
                      get_reporter()$end_test(generated_raw, "wrong")
                  }
-             },
-             warning = function(w) {
-                 get_reporter()$add_message(paste("Warning while evaluating test: ", conditionMessage(w), sep = ''))
-             },
-             message = function(m) {
-                 get_reporter()$add_message(paste("Message while evaluating test: ", conditionMessage(m), sep = ''))
              }),
              error = function(e) {
-                 get_reporter()$end_test("", "wrong")
-                 get_reporter()$start_test("", description)
-                 get_reporter()$end_test(conditionMessage(e), "runtime error")
+                 .close_test_with_runtime_error(description, e)
              }
     )
 }
