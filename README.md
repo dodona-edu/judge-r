@@ -167,11 +167,13 @@ directory and an optional `config.json` with the `evaluation` keys Dodona
 merges into the run configuration. A test for a known bug asserts the intended
 behaviour inside `expect_failure()`, so it fails once the bug is fixed.
 
-Locally, install the packages `DESCRIPTION` lists and run the suite with the R
-on your PATH. The expected feedback was recorded with the judge image's package
-versions, so other versions can change some messages.
+Locally, install the package versions `renv.lock` pins into your own R library
+(the first entry of `.libPaths()`) and run the suite with the R on your PATH.
+The expected feedback was recorded with these versions, which the judge image
+ships, so other versions can change some messages. On Linux renv builds them
+from source, so some need system libraries, e.g. libuv for fs.
 
-    Rscript -e 'pak::local_install_deps(dependencies = TRUE)'
+    Rscript -e 'install.packages("renv")' -e 'renv::restore(library = .libPaths()[1], prompt = FALSE)'
     devel/run-tests.sh            # everything
     devel/run-tests.sh utils-ast  # only test-utils-ast.R
 
@@ -184,3 +186,15 @@ root with `JUDGE_R_IMAGE=1`, which starts the judge through the image's
     UPDATE_EXPECTED=1 devel/run-tests-in-image.sh         # rewrite the expected output
 
 An argument filters the test files by name, like `testthat::test_dir(filter = ...)`.
+
+`renv.lock` pins the packages `DESCRIPTION` lists, Suggests included (see
+`renv/settings.json`), and their dependencies at the versions installed in the
+judge image. Only developers use it: Dodona and the image do not. The renv.lock
+workflow fails when it differs from the R and packages installed in
+`ghcr.io/dodona-edu/dodona-r:latest`. After changing `DESCRIPTION`, or once
+docker-images publishes new versions, regenerate it in the image. A package the
+image does not install goes into docker-images' `dodona-r/DESCRIPTION` first.
+
+    docker run --rm --platform linux/amd64 --user root --env RENV_LOCKFILE_VERSION=1 \
+      -v "$PWD:/judge-r" -w /judge-r ghcr.io/dodona-edu/dodona-r:latest \
+      Rscript -e 'renv::snapshot(library = .libPaths(), prompt = FALSE)'
