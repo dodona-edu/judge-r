@@ -157,19 +157,23 @@ The `testMultipleChoice` function is a function you can use to test multiple cho
 
 ## Tests
 
-`tests/testthat` holds an end-to-end suite (`test-exercises.R`). It runs the
-judge on the submissions in `tests/exercises/*/submissions` and compares its
-feedback with `tests/exercises/*/expected`. PNG data in messages is replaced by
-`<png>`, so images are not compared pixel by pixel. Each exercise has an
-`evaluation/` directory and an optional `config.json` with the `evaluation` keys
-Dodona merges into the run configuration.
+`tests/testthat` holds unit tests for the judge's R files (`test-<file>.R`,
+with the helpers in `helper-judge.R`) and an end-to-end suite
+(`test-exercises.R`). The end-to-end suite runs the judge on the submissions in
+`tests/exercises/*/submissions` and compares its feedback with
+`tests/exercises/*/expected`. PNG data in messages is replaced by `<png>`, so
+images are not compared pixel by pixel. Each exercise has an `evaluation/`
+directory and an optional `config.json` with the `evaluation` keys Dodona
+merges into the run configuration. A test for a known bug asserts the intended
+behaviour inside `expect_failure()`, so it fails once the bug is fixed.
 
 Locally, install the packages `DESCRIPTION` lists and run the suite with the R
 on your PATH. The expected feedback was recorded with the judge image's package
 versions, so other versions can change some messages.
 
     Rscript -e 'pak::local_install_deps(dependencies = TRUE)'
-    devel/run-tests.sh
+    devel/run-tests.sh            # everything
+    devel/run-tests.sh utils-ast  # only test-utils-ast.R
 
 In the judge image, as CI does: `devel/run-tests-in-image.sh` runs the suite as
 root with `JUDGE_R_IMAGE=1`, which starts the judge through the image's
