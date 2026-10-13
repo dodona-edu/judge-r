@@ -36,3 +36,121 @@ test_that("strip_leading_digit keeps names without a numeric prefix", {
   expect_equal(strip_leading_digit("my-basics"), "my-basics")
   expect_equal(strip_leading_digit("01basics"), "01basics")
 })
+
+test_that("start_judgement opens and closes the judgement around a tab per evaluation file", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines("", file.path(tests, "01-values.R"))
+  writeLines("", file.path(tests, "02-functions.R"))
+
+  feedback <- capture_feedback(with_values(judge, tests = tests), start_judgement(tests, "submission.R"))
+
+  expect_equal(feedback, list(
+    list(command = "start-judgement"),
+    list(command = "start-tab", title = "values"),
+    list(command = "close-tab"),
+    list(command = "start-tab", title = "functions"),
+    list(command = "close-tab"),
+    list(command = "close-judgement")
+  ))
+})
+
+test_that("start_judgement orders the tabs by file name", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  for (file in c("2-second.R", "10-third.R", "01-first.R")) {
+    writeLines("", file.path(tests, file))
+  }
+
+  feedback <- capture_feedback(with_values(judge, tests = tests), start_judgement(tests, "submission.R"))
+
+  tabs <- Filter(function(command) command$command == "start-tab", feedback)
+  expect_equal(vapply(tabs, function(tab) tab$title, ""), c("first", "third", "second"))
+})
+
+test_that("start_judgement evaluates the contexts of an evaluation file against the submission", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines(
+    'context({ testcaseAssert("x is 42", function(env) identical(env$x, 42)) })',
+    file.path(tests, "values.R")
+  )
+  submission <- withr::local_tempfile(lines = "x <- 42")
+
+  feedback <- capture_feedback(
+    with_values(judge, tests = tests, submission = submission),
+    start_judgement(tests, submission)
+  )
+
+  expect_equal(feedback, list(
+    list(command = "start-judgement"),
+    list(command = "start-tab", title = "values"),
+    list(command = "start-context"),
+    list(command = "start-testcase", description = "x is 42"),
+    list(command = "close-testcase", accepted = TRUE),
+    list(command = "close-context"),
+    list(command = "close-tab"),
+    list(command = "close-judgement")
+  ))
+})
+
+test_that("start_judgement points student_code at the submission", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines("get_reporter()$add_message(student_code)", file.path(tests, "path.R"))
+
+  feedback <- capture_feedback(with_values(judge, tests = tests), start_judgement(tests, "/submission/source"))
+
+  expect_equal(feedback_messages(feedback), "/submission/source")
+})
+
+test_that("start_judgement evaluates every evaluation file in its own environment", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines("shared <- 1", file.path(tests, "01-first.R"))
+  writeLines('get_reporter()$add_message(exists("shared"))', file.path(tests, "02-second.R"))
+
+  feedback <- capture_feedback(with_values(judge, tests = tests), start_judgement(tests, "submission.R"))
+
+  expect_equal(feedback_messages(feedback), "FALSE")
+})
+
+test_that("start_judgement closes the tab and the judgement when an evaluation file errors", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines('stop("broken evaluation file")', file.path(tests, "broken.R"))
+
+  feedback <- capture_feedback(
+    with_values(judge, tests = tests),
+    try(start_judgement(tests, "submission.R"), silent = TRUE)
+  )
+
+  expect_equal(feedback, list(
+    list(command = "start-judgement"),
+    list(command = "start-tab", title = "broken"),
+    list(command = "close-tab"),
+    list(command = "close-judgement")
+  ))
+})
+
+test_that("start_judgement passes on the error of an evaluation file", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines('stop("broken evaluation file")', file.path(tests, "broken.R"))
+
+  expect_error(capture.output(judge$start_judgement(tests, "submission.R")), "broken evaluation file")
+})
+
+test_that("start_judgement skips the evaluation files after one that errors", {
+  judge <- local_judge()
+  tests <- withr::local_tempdir()
+  writeLines('stop("broken evaluation file")', file.path(tests, "01-broken.R"))
+  writeLines("", file.path(tests, "02-fine.R"))
+
+  feedback <- capture_feedback(
+    with_values(judge, tests = tests),
+    try(start_judgement(tests, "submission.R"), silent = TRUE)
+  )
+
+  expect_equal(feedback_commands(feedback), c("start-judgement", "start-tab", "close-tab", "close-judgement"))
+})

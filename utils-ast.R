@@ -1,7 +1,10 @@
+# purrr 1.2 warns when some() gets an expression or pairlist.
+.some_child <- function(x, f) some(as.list(x), f)
+
 is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
     var_paths_c <- var_paths
     var_paths_c[[var]] <- NULL
-    return(some(var_paths[[var]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
+    return(.some_child(var_paths[[var]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
 }
 
 is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
@@ -13,7 +16,7 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
            symbol = {
                var_paths_c <- var_paths
                var_paths_c[[sub_tree_root]] <- NULL
-               return(some(var_paths[[sub_tree_root]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
+               return(.some_child(var_paths[[sub_tree_root]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
            },
            call = {
                if (is_call(sub_tree_root, func_name)) {
@@ -24,13 +27,13 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
                if((is_call(sub_tree_root, "<-") || is_call(sub_tree_root, "=")) && is_symbol(children[[2]])){
                    children[[2]] <- NULL
                }
-               return(some(children, function(x) is_function_used(func_name, var_paths, x, main_code)))
+               return(.some_child(children, function(x) is_function_used(func_name, var_paths, x, main_code)))
            },
            expression = {
-               return(some(sub_tree_root, function(x) is_function_used(func_name, var_paths, x, main_code)))
+               return(.some_child(sub_tree_root, function(x) is_function_used(func_name, var_paths, x, main_code)))
            },
            pairlist = {
-               return(some(sub_tree_root, function(x) {
+               return(.some_child(sub_tree_root, function(x) {
                                !(is.symbol(x) && identical("", as.character(x))) && is_function_used(func_name, var_paths, x, main_code)
 }))
            },
