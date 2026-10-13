@@ -1,0 +1,12 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"chunks"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Chunks"}
+{"command":"start-test","expected":"6","description":"total"}
+{"command":"close-test","generated":"6","status":{"enum":"correct"}}
+{"command":"start-test","expected":"done","description":"evaluationResult"}
+{"command":"close-test","generated":"done","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

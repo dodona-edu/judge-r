@@ -1,0 +1,22 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"values"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: could not find function \"undefined_function\"","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: could not find function \"undefined_function\"","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: could not find function \"undefined_function\"","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"start-tab","title":"functions"}
+{"command":"start-context"}
+{"command":"append-message","message":{"description":"Error while evaluating context: could not find function \"undefined_function\"","format":"plain"}}
+{"command":"escalate-status","status":{"enum":"compilation error"}}
+{"command":"close-context","accepted":false}
+{"command":"close-tab"}
+{"command":"close-judgement"}

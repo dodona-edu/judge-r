@@ -1,0 +1,64 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"values"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Numbers"}
+{"command":"start-test","expected":"42","description":"x"}
+{"command":"close-test","generated":"41","status":{"enum":"wrong"}}
+{"command":"start-test","expected":"3.14","description":"approx"}
+{"command":"close-test","generated":"3.5","status":{"enum":"wrong"}}
+{"command":"start-test","expected":"3","description":"count"}
+{"command":"close-test","generated":"3","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Text"}
+{"command":"start-test","expected":"DODONA","description":"name"}
+{"command":"close-test","generated":"MOODLE","status":{"enum":"wrong"}}
+{"command":"start-test","expected":"ℹ","description":"symbol"}
+{"command":"close-test","generated":"i","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Comparator feedback"}
+{"command":"start-test","expected":"42","description":"x with a warning"}
+{"command":"append-message","message":{"description":"Warning while evaluating test: comparing anyway","format":"plain"}}
+{"command":"append-message","message":{"description":"Warning while evaluating context: comparing anyway","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating test: ℹ comparing\n","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating context: ℹ comparing\n","format":"plain"}}
+{"command":"close-test","generated":"41","status":{"enum":"wrong"}}
+{"command":"start-test","expected":"42","description":"x with a hint"}
+{"command":"append-message","message":{"description":"Compared **x** with `42`","format":"markdown"}}
+{"command":"close-test","generated":"41","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"x exists"}
+{"command":"close-testcase","accepted":true}
+{"command":"close-context"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Seeded"}
+{"command":"start-test","expected":"0.2655087","description":"noise"}
+{"command":"close-test","generated":"0.2655086631421","status":{"enum":"correct"}}
+{"command":"start-test","expected":"20","description":"doubled"}
+{"command":"close-test","generated":"12","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Last value"}
+{"command":"start-test","expected":"42","description":"evaluationResult"}
+{"command":"close-test","generated":"41","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"start-tab","title":"functions"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"square"}
+{"command":"start-test","expected":"9","description":"square(3)"}
+{"command":"close-test","generated":"6","status":{"enum":"wrong"}}
+{"command":"start-test","expected":"4","description":"square(-2)"}
+{"command":"close-test","generated":"-4","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"greet answers"}
+{"command":"escalate-status","status":{"enum":"wrong"}}
+{"command":"close-testcase","accepted":false}
+{"command":"start-testcase","description":"greet"}
+{"command":"start-test","expected":"Hello, Ada!","description":"greet(\"Ada\")"}
+{"command":"close-test","generated":"","status":{"enum":"wrong"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

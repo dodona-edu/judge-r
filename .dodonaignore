@@ -6,4 +6,8 @@
 
 /testing/
 /README.md
+/DESCRIPTION
 /.gitignore
+/tests/
+/devel/
+/.github/

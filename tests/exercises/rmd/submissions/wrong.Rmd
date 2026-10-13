@@ -1,0 +1,9 @@
+Adding up.
+
+```{r}
+total <- sum(1:4)
+```
+
+```{r}
+"almost"
+```

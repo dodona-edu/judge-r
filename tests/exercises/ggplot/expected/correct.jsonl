@@ -1,0 +1,30 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"ggplot"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Scatter plot"}
+{"command":"start-test","expected":"","description":"p"}
+{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
+{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
+{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
+{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
+{"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
+{"command":"close-test","generated":"","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Labels"}
+{"command":"start-test","expected":"","description":"p_labelled"}
+{"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
+{"command":"close-test","generated":"","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Scale"}
+{"command":"start-test","expected":"","description":"p_scaled"}
+{"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
+{"command":"close-test","generated":"","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Facet type"}
+{"command":"start-test","expected":"","description":"p_faceted"}
+{"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
+{"command":"close-test","generated":"","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

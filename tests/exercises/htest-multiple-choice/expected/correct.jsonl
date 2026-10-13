@@ -1,0 +1,31 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"htest"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"t-test"}
+{"command":"start-test","expected":"\np-value = 0.0479399246663342\nconfidence interval = 5.00600065985543, 5.89399934014457","description":"test"}
+{"command":"close-test","generated":"\np-value = 0.0479399246663342\nconfidence interval = 5.00600065985543, 5.89399934014457","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"t-test details"}
+{"command":"start-test","expected":"\ntest statistic = \n\tt: 2.60532329993932\nalternative = two.sided\nconfidence level = 0.95\nmethod = One Sample t-test","description":"test"}
+{"command":"close-test","generated":"\ntest statistic = \n\tt: 2.60532329993932\nalternative = two.sided\nconfidence level = 0.95\nmethod = One Sample t-test","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"start-tab","title":"multiple-choice"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Verified"}
+{"command":"start-test","expected":"●","description":"best measure"}
+{"command":"close-test","generated":"median, mean","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Shown answer"}
+{"command":"start-test","expected":"mean","description":"best measure again"}
+{"command":"close-test","generated":"median, mean","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"start-testcase","description":"Not verified"}
+{"command":"start-test","expected":"●","description":"favourite"}
+{"command":"append-message","message":{"description":"Your solution will be verified after the deadline.","format":"plain"}}
+{"command":"close-test","generated":"range","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}
