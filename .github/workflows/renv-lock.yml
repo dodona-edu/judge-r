@@ -1,0 +1,18 @@
+name: renv.lock
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  lock-matches-image:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/dodona-edu/dodona-r:latest
+      options: --user root
+
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check renv.lock against the image's installed packages
+        run: ./devel/check-renv-lock.R

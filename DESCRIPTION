@@ -1,4 +1,5 @@
 Package: judgeR
+Type: project
 Title: R Judge for Dodona
 Version: 0.0.0.9000
 Description: Not an installable package: lists what the judge and its tests
