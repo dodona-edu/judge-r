@@ -5,6 +5,9 @@ on:
     branches: [ master ]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   lock-matches-image:
     runs-on: ubuntu-latest
@@ -14,5 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Check renv.lock against the image's installed packages
         run: ./devel/check-renv-lock.R
