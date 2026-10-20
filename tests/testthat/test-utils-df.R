@@ -96,8 +96,14 @@ test_that("compare_data_frames_row_independent still rejects a near-equal row wi
 test_that("compare_data_frames_row_independent rejects a single column with another name", {
   compare <- local_judge()$compare_data_frames_row_independent
 
-  # Bug #106: testDF ignores the column name when it compares one-column data frames row by row
-  expect_failure(expect_false(compare(data.frame(id = c(1, 2)), data.frame(key = c(1, 2)))))
+  expect_false(compare(data.frame(id = c(1, 2)), data.frame(key = c(1, 2))))
+})
+
+test_that("compare_data_frames_row_independent accepts a single column with the same name", {
+  compare <- local_judge()$compare_data_frames_row_independent
+
+  expect_true(compare(data.frame(id = c(2, 1)), data.frame(id = c(1, 2))))
+  expect_false(compare(data.frame(id = c(1, 2)), data.frame(id = c(1, 3))))
 })
 
 test_that("dataframe_all_equal accepts equal data frames", {
