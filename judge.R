@@ -1,3 +1,9 @@
+# help() and file.show() otherwise page through an external program, which writes past capture.output().
+options(pager = function(files, header, title, delete.file) {
+    writeLines(unlist(lapply(files, readLines)))
+    if (delete.file) unlink(files)
+})
+
 source('reporter-env.R', local=TRUE)
 source('feedback.R', local=TRUE)
 source('context.R', local=TRUE)
