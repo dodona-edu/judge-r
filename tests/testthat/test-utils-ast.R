@@ -84,6 +84,13 @@ test_that("find_assign records assignments inside a function body", {
   expect_equal(find_assign(code), list(f = list(1L), y = list(c(1L, 3L, 3L, 2L))))
 })
 
+test_that("find_assign records assignments to an element with $<- and [[<- under the variable", {
+  find_assign <- local_judge()$find_assign
+  code <- parse(text = c("l$a <- 1", "l[['b']] <- 2", "l$c[['d']] <- 3"))
+
+  expect_equal(find_assign(code), list(l = list(1L, 2L, 3L)))
+})
+
 test_that("find_assign gives an empty path for a single assignment call", {
   find_assign <- local_judge()$find_assign
 
@@ -259,14 +266,12 @@ test_that("is_function_used_in_var counts an assignment to an element with $<-",
   judge <- local_judge()
   code <- parse(text = c("l <- list()", "l$a <- mean(1)"))
 
-  # Bug #63: `[[<-` and `$<-` are not picked up in `testFunctionUsed` and `testFunctionUsedInVar`
-  expect_failure(expect_true(judge$is_function_used_in_var("mean", judge$find_assign(code), "l", code)))
+  expect_true(judge$is_function_used_in_var("mean", judge$find_assign(code), "l", code))
 })
 
 test_that("is_function_used_in_var counts an assignment to an element with [[<-", {
   judge <- local_judge()
   code <- parse(text = c("l <- list()", "l[['a']] <- mean(1)"))
 
-  # Bug #63: `[[<-` and `$<-` are not picked up in `testFunctionUsed` and `testFunctionUsedInVar`
-  expect_failure(expect_true(judge$is_function_used_in_var("mean", judge$find_assign(code), "l", code)))
+  expect_true(judge$is_function_used_in_var("mean", judge$find_assign(code), "l", code))
 })
