@@ -6,11 +6,10 @@ test_that("testFunctionUsed adds a message when the code calls the function", {
 
   expect_length(feedback, 1)
   expect_equal(feedback[[1]]$command, "append-message")
-  # Bug #97: testFunctionUsed puts spaces around the function name
-  expect_failure(expect_equal(feedback[[1]], list(
+  expect_equal(feedback[[1]], list(
     command = "append-message",
     message = list(description = "You used the \"mean\" function in your code.", format = "plain")
-  )))
+  ))
 })
 
 test_that("testFunctionUsed fails a test when the code doesn't call the function", {
@@ -20,11 +19,10 @@ test_that("testFunctionUsed fails a test when the code doesn't call the function
   feedback <- capture_feedback(judge, testFunctionUsed("mean"))
 
   expect_equal(feedback[[2]]$status, list(enum = "wrong"))
-  # Bug #97: testFunctionUsed puts spaces around the function name
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "start-test", expected = "", description = ""),
     list(command = "close-test", generated = "We expected you to use the \"mean\" function in your code.", status = list(enum = "wrong"))
-  )))
+  ))
 })
 
 test_that("testFunctionUsed doesn't count the function's name in a string", {

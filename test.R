@@ -275,10 +275,10 @@ testFunctionUsed <- function(funcName){
     assignment_paths <- find_assign(test_env$parsed_code)
     used <- is_function_used(funcName, assignment_paths, test_env$parsed_code, test_env$parsed_code)
     if (used) {
-        get_reporter()$add_message(paste("You used the \"", funcName, "\" function in your code."))
+        get_reporter()$add_message(paste0("You used the \"", funcName, "\" function in your code."))
     } else {
         get_reporter()$start_test("", "")
-        get_reporter()$end_test(paste("We expected you to use the \"", funcName, "\" function in your code."), "wrong")
+        get_reporter()$end_test(paste0("We expected you to use the \"", funcName, "\" function in your code."), "wrong")
     }
 }
 
