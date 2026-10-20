@@ -238,11 +238,25 @@ test_that("testDF accepts a tibble with the same data as the expected data frame
   })
 
   expect_length(feedback, 6)
-  # Bug #116: testDF rejects a tibble with the same data as the expected data frame
-  expect_failure(expect_equal(
+  expect_equal(
     list(feedback[[3]]$status, feedback[[6]]$status),
     list(list(enum = "correct"), list(enum = "correct"))
-  ))
+  )
+})
+
+test_that("testDF rejects a tibble with other data than the expected data frame", {
+  judge <- local_judge_with(df = tibble::tibble(id = 1:2, name = c("a", "c")))
+
+  feedback <- capture_feedback(judge, {
+    expected <- data.frame(id = 1:2, name = c("a", "b"))
+    testDF("any rows", function(env) env$df, expected)
+    testDF("ordered rows", function(env) env$df, expected, ignore_row_order = FALSE)
+  })
+
+  expect_equal(
+    list(feedback[[3]]$status, feedback[[6]]$status),
+    list(list(enum = "wrong"), list(enum = "wrong"))
+  )
 })
 
 test_that("testDF reports a warning in the comparator before it starts the test", {
