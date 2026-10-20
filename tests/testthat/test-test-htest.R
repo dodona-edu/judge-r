@@ -174,13 +174,12 @@ test_that("testHtest reports a warning in generated", {
   judge <- local_judge_with(test = new_htest())
   judge$expected <- new_htest()
 
-  # The judge reports a warning without muffling it.
-  feedback <- suppressWarnings(capture_feedback(judge, {
+  feedback <- capture_feedback(judge, {
     testHtest("test", function(env) {
       warning("careful")
       env$test
     }, expected)
-  }))
+  })
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
   # Bug #91: Warnings and messages from student code never reach the feedback

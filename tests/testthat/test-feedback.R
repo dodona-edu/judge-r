@@ -54,8 +54,7 @@ test_that(".report_conditions reports a warning once when it is nested", {
     .report_conditions("context", .report_conditions("test", warning("careful")))
   }))
 
-  # Bug #93: Warnings and messages in tests are reported twice
-  expect_failure(expect_equal(feedback_messages(feedback), "Warning while evaluating test: careful"))
+  expect_equal(feedback_messages(feedback), "Warning while evaluating test: careful")
 })
 
 test_that(".fail_testcase reports the error and closes the testcase as a runtime error", {

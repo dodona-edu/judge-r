@@ -2,15 +2,16 @@
     get_reporter()$add_message(paste(kind, " while evaluating ", what, ": ", conditionMessage(condition), sep = ''))
 }
 
-# The handlers don't muffle: enclosing handlers report the same condition again.
 .report_conditions <- function(what, expr) {
     withCallingHandlers(
         expr,
         warning = function(w) {
             .add_condition_message("Warning", what, w)
+            invokeRestart("muffleWarning")
         },
         message = function(m) {
             .add_condition_message("Message", what, m)
+            invokeRestart("muffleMessage")
         }
     )
 }
