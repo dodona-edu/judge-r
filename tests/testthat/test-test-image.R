@@ -84,13 +84,12 @@ test_that("testImage reports a warning in generate", {
   local_tempdir_pngs()
   judge <- local_judge_with()
 
-  # The judge reports a warning without muffling it.
-  feedback <- suppressWarnings(capture_feedback(judge, {
+  feedback <- capture_feedback(judge, {
     testImage(function(env) {
       plot(1)
       warning("careful")
     })
-  }))
+  })
 
   expect_equal(hide_pngs(feedback), list(
     list(command = "append-message", message = list(description = "Warning while evaluating image for testcase: careful", format = "plain")),

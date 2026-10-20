@@ -195,13 +195,12 @@ test_that("testMultipleChoice reports an error in generated as a runtime error",
 test_that("testMultipleChoice reports a warning in generated", {
   judge <- local_judge_with(answer = "median")
 
-  # The judge reports a warning without muffling it.
-  feedback <- suppressWarnings(capture_feedback(judge, {
+  feedback <- capture_feedback(judge, {
     testMultipleChoice("q", function(env) {
       warning("careful")
       env$answer
     }, "median", c("mean", "median", "mode"), verify_answer = TRUE)
-  }))
+  })
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
   # Bug #91: Warnings and messages from student code never reach the feedback

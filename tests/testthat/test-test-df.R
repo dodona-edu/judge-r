@@ -248,14 +248,13 @@ test_that("testDF accepts a tibble with the same data as the expected data frame
 test_that("testDF reports a warning in the comparator before it starts the test", {
   judge <- local_judge_with(df = data.frame(id = 1:2, name = c("a", "b")))
 
-  # The judge reports a warning without muffling it.
-  feedback <- suppressWarnings(capture_feedback(judge, {
+  feedback <- capture_feedback(judge, {
     testDF("df", function(env) env$df, data.frame(id = 1:2, name = c("a", "b")),
            comparator = function(generated, expected) {
              warning("careful")
              TRUE
            })
-  }))
+  })
 
   expect_equal(feedback, list(
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),

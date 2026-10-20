@@ -18,9 +18,7 @@
 {"command":"start-testcase","description":"Comparator feedback"}
 {"command":"start-test","expected":"42","description":"x with a warning"}
 {"command":"append-message","message":{"description":"Warning while evaluating test: comparing anyway","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating context: comparing anyway","format":"plain"}}
 {"command":"append-message","message":{"description":"Message while evaluating test: ℹ comparing\n","format":"plain"}}
-{"command":"append-message","message":{"description":"Message while evaluating context: ℹ comparing\n","format":"plain"}}
 {"command":"close-test","generated":"42","status":{"enum":"correct"}}
 {"command":"start-test","expected":"42","description":"x with a hint"}
 {"command":"append-message","message":{"description":"Compared **x** with `42`","format":"markdown"}}

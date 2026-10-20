@@ -201,13 +201,12 @@ test_that("testEqual leaves an error formatting the expected value to the enclos
 test_that("testEqual reports a warning in the comparator inside the test", {
   judge <- local_judge_with()
 
-  # The judge reports a warning without muffling it.
-  feedback <- suppressWarnings(capture_feedback(judge, {
+  feedback <- capture_feedback(judge, {
     testEqual("x", function(env) 1, 1, comparator = function(generated, expected) {
       warning("careful")
       TRUE
     })
-  }))
+  })
 
   expect_equal(feedback, list(
     list(command = "start-test", expected = "1", description = "x"),
