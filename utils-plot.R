@@ -69,6 +69,7 @@ test_geom_layer <- function(sol_gg, stud_gg){
         found_geom_with_params <- FALSE
 
         sol_params <- get_params(sol_layer)
+        sol_defaults <- get_default_params(sol_layer)
 
         sol_geom_type <- get_type(sol_layer$geom)
 
@@ -109,6 +110,8 @@ test_geom_layer <- function(sol_gg, stud_gg){
                 found_params <- TRUE
 
                 stud_params <- get_params(stud_layer)
+                missing_params <- setdiff(names(sol_defaults), names(stud_params))
+                stud_params[missing_params] <- sol_defaults[missing_params]
 
                 for (sol_param in names(sol_params)) {
                     if (!(sol_param %in% names(stud_params))) {
@@ -167,6 +170,11 @@ get_params <- function(geom_layer) {
     aes_params <- geom_layer$aes_params
     params[names(aes_params)] <- aes_params
     return(params)
+}
+
+# layer$constructor is an internal ggplot2 field: the call that created the layer.
+get_default_params <- function(geom_layer) {
+    tryCatch(get_params(eval(geom_layer$constructor[[1]], asNamespace("ggplot2"))()), error = function(e) list())
 }
 
 get_type <- function(object) {
