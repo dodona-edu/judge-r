@@ -78,6 +78,16 @@ test_that("context discards what the student code prints", {
   expect_equal(feedback_commands(feedback), c("start-context", "close-context"))
 })
 
+test_that("student code can capture the help page it prints", {
+  judge <- local_judge()
+  local_student_code(judge, "page <- capture.output(print(help(mean)))")
+
+  capture_feedback(judge, context({}))
+
+  # Bug #45: `help` evades all output capturing
+  expect_failure(expect_match(judge$test_env$clean_env$page, "arithmetic mean", all = FALSE))
+})
+
 test_that("context evaluates the student code in a fresh environment every time", {
   judge <- local_judge()
   local_student_code(judge, 'seen <- exists("seen", inherits = FALSE)')
