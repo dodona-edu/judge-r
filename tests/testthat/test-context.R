@@ -439,6 +439,17 @@ test_that("contextWithImage adds the plot of the student code after the testcase
   expect_match(feedback[[4]]$message$description, '^<img src="data:image/png;base64,[A-Za-z0-9+/=]+"/>$')
 })
 
+test_that("contextWithImage removes the image it saves", {
+  local_tempdir_pngs()
+  judge <- local_judge()
+  local_student_code(judge, "plot(1)")
+  before <- tempdir_pngs()
+
+  capture_feedback(judge, contextWithImage({}))
+
+  expect_equal(tempdir_pngs(), before)
+})
+
 test_that("contextWithImage passes extra arguments to png", {
   judge <- local_judge()
   local_student_code(judge, "plot(1)")

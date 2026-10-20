@@ -276,8 +276,7 @@ test_that("testGGPlot removes the images it saves when a check fails with an err
     generated = "unused argument (ignore_facet_types = FALSE)",
     status = list(enum = "runtime error")
   ))
-  # Bug #120: testImage and testGGPlot leave PNG files in the temporary directory
-  expect_failure(expect_equal(tempdir_pngs(), before))
+  expect_equal(tempdir_pngs(), before)
 })
 
 test_that("testGGPlot reports an error in generated as a runtime error", {

@@ -117,6 +117,5 @@ test_that("testImage removes the image it saves", {
   feedback <- capture_feedback(judge, testImage(function(env) plot(1)))
 
   expect_length(feedback, 1)
-  # Bug #120: testImage and testGGPlot leave PNG files in the temporary directory
-  expect_failure(expect_equal(tempdir_pngs(), before))
+  expect_equal(tempdir_pngs(), before)
 })

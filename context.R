@@ -64,6 +64,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
             }
             get_reporter()$end_context()
         }
+        unlink(image_file)
     })
 
     test_env$clean_env <- new.env(parent = globalenv())
