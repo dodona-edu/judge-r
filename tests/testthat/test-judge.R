@@ -162,11 +162,10 @@ test_that("install.packages() in the student code warns instead of installing", 
 
   capture_feedback(judge, context({}))
 
-  # Bug #87: Ignore when evaluation or student code runs install.packages
-  expect_failure(expect_equal(
+  expect_equal(
     judge$test_env$clean_env$reported,
     "install.packages() is not available on Dodona; installed packages can be loaded with library()"
-  ))
+  )
 })
 
 test_that("install.packages() in the evaluation code warns instead of installing", {
@@ -176,9 +175,8 @@ test_that("install.packages() in the evaluation code warns instead of installing
   # No packages, so the real install.packages() does nothing.
   feedback <- capture_feedback(judge, context(install.packages(character())))
 
-  # Bug #87: Ignore when evaluation or student code runs install.packages
-  expect_failure(expect_equal(
+  expect_equal(
     feedback_messages(feedback),
     "Warning while evaluating context: install.packages() is not available on Dodona; installed packages can be loaded with library()"
-  ))
+  )
 })

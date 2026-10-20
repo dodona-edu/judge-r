@@ -15,6 +15,8 @@ local_judge <- function(env = parent.frame()) {
   # A context swaps the parent of the global environment while it evaluates student code.
   global_parent <- parent.env(.GlobalEnv)
   withr::defer(`parent.env<-`(.GlobalEnv, global_parent), envir = env)
+  # judge.R assigns install.packages in the global environment.
+  withr::defer(suppressWarnings(rm("install.packages", envir = .GlobalEnv)), envir = env)
 
   judge <- new.env(parent = globalenv())
   judge$starting_parent_env <- judge_starting_parent_env
