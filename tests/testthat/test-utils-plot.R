@@ -76,8 +76,15 @@ test_that("test_data_layer uses the singular for one missing column", {
   result <- test_data_layer(data.frame(a = 1, b = 2, c = 3), data.frame(a = 1, b = 2))
 
   expect_false(result$equal)
-  # Bug #103: testGGPlot's missing data message picks singular or plural from the columns that are present
-  expect_failure(expect_equal(result$feedback, "You did not add the correct data, missing column named: c"))
+  expect_equal(result$feedback, "You did not add the correct data, missing column named: c")
+})
+
+test_that("test_data_layer uses the plural for several missing columns when some are present", {
+  test_data_layer <- local_judge()$test_data_layer
+
+  result <- test_data_layer(data.frame(a = 1, b = 2, c = 3), data.frame(a = 1))
+
+  expect_equal(result$feedback, "You did not add the correct data, missing columns named: b, c")
 })
 
 test_that("test_data_layer handles a solution without plot data", {
