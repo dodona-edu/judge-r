@@ -359,3 +359,14 @@ test_that("testGGPlot reports a warning in generated", {
     list(command = "close-test", generated = "", status = list(enum = "correct"))
   ))
 })
+
+test_that("testGGPlot accepts the same geom_pointrange plot", {
+  judge <- local_judge_with(p = ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange())
+
+  feedback <- capture_feedback(judge, {
+    testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange())
+  })
+
+  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
+  expect_failure(expect_equal(feedback[[length(feedback)]]$status$enum, "correct"))
+})

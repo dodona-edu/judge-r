@@ -399,3 +399,19 @@ test_that("ggplot2 layers still record the call that created them", {
     "ggplot2 layers have no `constructor` field anymore: get_default_params in utils-plot.R needs it"
   )
 })
+
+test_that("test_geom_layer accepts the same geom_pointrange layer", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  plot <- ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange()
+
+  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
+  expect_failure(expect_no_error(test_geom_layer(plot, plot)))
+})
+
+test_that("test_geom_layer accepts the same geom_crossbar layer", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  plot <- ggplot(mtcars, aes(factor(cyl), mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_crossbar()
+
+  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
+  expect_failure(expect_no_error(test_geom_layer(plot, plot)))
+})
