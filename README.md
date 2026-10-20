@@ -125,7 +125,7 @@ The `testImage` function is a special case, since it won't actually add a test t
 
 #### `testDF`
 
-The `testDF` function can be used to test the equality of dataframes. By default row and column order are ignored. If you do not want this, pass the `ignore_col_order` and `ignore_row_order` arguments as `FALSE` (when applicable). Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the first five rows of the dataframe(s).
+The `testDF` function can be used to test the equality of dataframes. By default row and column order are ignored. If you do not want this, pass the `ignore_col_order` and `ignore_row_order` arguments as `FALSE` (when applicable). Again, a custom `comparator` can be passed if necessary. The feedback in Dodona will show the head of the dataframe(s), the first six rows.
 
 #### `testGGPlot`
 

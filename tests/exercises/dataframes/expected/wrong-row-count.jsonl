@@ -3,17 +3,17 @@
 {"command":"start-context"}
 {"command":"start-testcase","description":"Any order"}
 {"command":"start-test","expected":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00\n  6  fay      5.50","description":"scores"}
-{"command":"append-message","message":{"description":"Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.","format":"plain"}}
+{"command":"append-message","message":{"description":"Only the first six rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.","format":"plain"}}
 {"command":"close-test","generated":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00","status":{"enum":"wrong"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Strict order"}
 {"command":"start-test","expected":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00\n  6  fay      5.50","description":"ordered_scores"}
-{"command":"append-message","message":{"description":"Only the first five rows of the dataframe are shown.","format":"plain"}}
+{"command":"append-message","message":{"description":"Only the first six rows of the dataframe are shown.","format":"plain"}}
 {"command":"close-test","generated":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00\n  6  fay      5.50","status":{"enum":"correct"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Comparator"}
 {"command":"start-test","expected":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00\n  6  fay      5.50","description":"row count"}
-{"command":"append-message","message":{"description":"Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.","format":"plain"}}
+{"command":"append-message","message":{"description":"Only the first six rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.","format":"plain"}}
 {"command":"close-test","generated":" id  name    score\n---  -----  ------\n  1  ada      9.50\n  2  bob      7.00\n  3  cleo     8.25\n  4  dan      6.00\n  5  eve     10.00","status":{"enum":"wrong"}}
 {"command":"close-testcase"}
 {"command":"close-context"}
