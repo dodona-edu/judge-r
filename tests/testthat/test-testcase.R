@@ -15,8 +15,7 @@ test_that("testcase without a description writes an empty description", {
 
   feedback <- capture_feedback(judge, testcase(tests = NULL))
 
-  # Bug #114: testcase() without a description writes an invalid start-testcase command
-  expect_failure(expect_equal(feedback[[1]], list(command = "start-testcase", description = "")))
+  expect_equal(feedback[[1]], list(command = "start-testcase", description = ""))
 })
 
 test_that("testcase reports an error in its tests as a runtime error", {
