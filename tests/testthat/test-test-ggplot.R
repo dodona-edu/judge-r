@@ -367,6 +367,5 @@ test_that("testGGPlot accepts the same geom_pointrange plot", {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange())
   })
 
-  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
-  expect_failure(expect_equal(feedback[[length(feedback)]]$status$enum, "correct"))
+  expect_equal(feedback[[length(feedback)]]$status$enum, "correct")
 })

@@ -404,14 +404,38 @@ test_that("test_geom_layer accepts the same geom_pointrange layer", {
   test_geom_layer <- local_judge()$test_geom_layer
   plot <- ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange()
 
-  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
-  expect_failure(expect_no_error(test_geom_layer(plot, plot)))
+  expect_equal(test_geom_layer(plot, plot), list(equal = TRUE, feedback = ""))
 })
 
 test_that("test_geom_layer accepts the same geom_crossbar layer", {
   test_geom_layer <- local_judge()$test_geom_layer
   plot <- ggplot(mtcars, aes(factor(cyl), mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_crossbar()
 
-  # Bug #142: testGGPlot fails on geom_pointrange and geom_crossbar layers
-  expect_failure(expect_no_error(test_geom_layer(plot, plot)))
+  expect_equal(test_geom_layer(plot, plot), list(equal = TRUE, feedback = ""))
+})
+
+test_that("test_geom_layer rejects a geom_pointrange layer with other aesthetics", {
+  test_geom_layer <- local_judge()$test_geom_layer
+
+  result <- test_geom_layer(
+    ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)) + geom_pointrange(),
+    ggplot(mtcars, aes(cyl, mpg, ymin = mpg - 2, ymax = mpg + 1)) + geom_pointrange()
+  )
+
+  expect_false(result$equal)
+})
+
+test_that("test_geom_layer rejects a geom_pointrange layer with another parameter", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  aesthetics <- aes(cyl, mpg, ymin = mpg - 1, ymax = mpg + 1)
+
+  result <- test_geom_layer(
+    ggplot(mtcars, aesthetics) + geom_pointrange(colour = "red"),
+    ggplot(mtcars, aesthetics) + geom_pointrange(colour = "blue")
+  )
+
+  expect_equal(result, list(
+    equal = FALSE,
+    feedback = "Have you added a `geom_pointrange` layer with the correct parameters?"
+  ))
 })
