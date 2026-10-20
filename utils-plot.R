@@ -149,6 +149,17 @@ test_geom_layer <- function(sol_gg, stud_gg){
     return(list('equal' = TRUE, 'feedback' = ""))
 }
 
+# The constructor call and a name left to its default don't change the plot: compare the axis title drawn instead.
+comparable_scales <- function(gg) {
+    titles <- ggplot2::get_labs(gg)
+    lapply(gg$scales$scales, function(scale) {
+        fields <- as.list(scale, all.names = TRUE, sorted = TRUE)
+        fields$call <- NULL
+        fields$name <- titles[[scale$aesthetics[1]]]
+        c(list(class = class(scale)), fields)
+    })
+}
+
 get_params <- function(geom_layer) {
     params <- geom_layer$geom_params
     stat_params <- geom_layer$stat_params

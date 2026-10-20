@@ -209,6 +209,39 @@ test_that("testGGPlot compares the scales with test_scale = TRUE", {
   expect_equal(feedback[[4]]$status, list(enum = "wrong"))
 })
 
+test_that("testGGPlot accepts a scale named after its default axis title with test_scale = TRUE", {
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10("wt"))
+
+  feedback <- capture_feedback(judge, {
+    testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10(),
+               show_expected = FALSE, test_scale = TRUE)
+  })
+
+  expect_equal(feedback[[3]]$status, list(enum = "correct"))
+})
+
+test_that("testGGPlot rejects a scale with another axis title with test_scale = TRUE", {
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10("weight"))
+
+  feedback <- capture_feedback(judge, {
+    testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10(),
+               show_expected = FALSE, test_scale = TRUE)
+  })
+
+  expect_equal(feedback[[4]]$status, list(enum = "wrong"))
+})
+
+test_that("testGGPlot rejects a scale with other limits with test_scale = TRUE", {
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10(limits = c(1, 10)))
+
+  feedback <- capture_feedback(judge, {
+    testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10(),
+               show_expected = FALSE, test_scale = TRUE)
+  })
+
+  expect_equal(feedback[[4]]$status, list(enum = "wrong"))
+})
+
 test_that("testGGPlot reports only the first check that fails", {
   judge <- local_judge_with(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_line())
 

@@ -195,8 +195,8 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  }
 
                  if (test_scale && equal) {
-                     expected_scale <- expected_gg$scales$scales
-                     generated_scale <- generated_gg$scales$scales
+                     expected_scale <- comparable_scales(expected_gg)
+                     generated_scale <- comparable_scales(generated_gg)
                      if (!isTRUE(all.equal(expected_scale, generated_scale))) {
                          feedback <- "Did you specify the correct scales?"
                          equal <- FALSE
