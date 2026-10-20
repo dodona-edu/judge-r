@@ -189,13 +189,27 @@ test_that("testDF reports a comparator that returns NA as a runtime error", {
     tail(feedback, 1)[[1]],
     list(command = "close-test", generated = "missing value where TRUE/FALSE needed", status = list(enum = "runtime error"))
   )
-  # Bug #95: testDF emits invalid feedback when a comparator doesn't return TRUE or FALSE
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    ", description = "df"),
     list(command = "close-test", generated = "", status = list(enum = "wrong")),
     list(command = "start-test", expected = "", description = "df"),
     list(command = "close-test", generated = "missing value where TRUE/FALSE needed", status = list(enum = "runtime error"))
-  )))
+  ))
+})
+
+test_that("testDF reports a comparator that returns logical(0) as a runtime error", {
+  judge <- local_judge_with(df = data.frame(id = 1:2, name = c("a", "b")))
+
+  feedback <- capture_feedback(judge, {
+    testDF("df", function(env) env$df, data.frame(id = 1:2, name = c("a", "b")),
+           comparator = function(generated, expected) logical(0))
+  })
+
+  expect_equal(
+    vapply(feedback, function(item) item$command, ""),
+    c("start-test", "close-test", "start-test", "close-test")
+  )
+  expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "runtime error"))
 })
 
 test_that("testDF shows as many rows as its message says", {
