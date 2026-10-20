@@ -67,6 +67,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     })
 
     test_env$clean_env <- new.env(parent = globalenv())
+    error_status <- "compilation error"
     tryCatch(
              .report_conditions("context", {
                  old_parent <- parent.env(.GlobalEnv)
@@ -74,7 +75,9 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                  tryCatch({
                      eval(preExec, envir = test_env$clean_env)
                      test_env$parsed_code <- parse_student_code()
+                     error_status <- "runtime error"
                      capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
+                     error_status <- "compilation error"
                  }, finally = {
                      # The student code may have closed it with dev.off() already.
                      if(!is.null(image_file) && image_device %in% dev.list()) {
@@ -87,7 +90,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
              }),
              error = function(e) {
                  .add_condition_message("Error", "context", e)
-                 get_reporter()$escalate("compilation error")
+                 get_reporter()$escalate(error_status)
                  get_reporter()$end_context(accepted = FALSE)
                  do_exit <<- FALSE
              }
