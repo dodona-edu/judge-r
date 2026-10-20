@@ -169,7 +169,9 @@ get_params <- function(geom_layer) {
     params[names(stat_params)] <- stat_params
     aes_params <- geom_layer$aes_params
     params[names(aes_params)] <- aes_params
-    return(params)
+    # ggplot2 4 stores the deprecated `fatten` of geom_pointrange and geom_crossbar as an empty symbol
+    is_empty <- vapply(seq_along(params), function(i) identical(params[[i]], quote(expr = )), logical(1))
+    return(params[!is_empty])
 }
 
 # layer$constructor is an internal ggplot2 field: the call that created the layer.
