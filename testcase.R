@@ -1,4 +1,4 @@
-testcase <- function(description = NULL, tests={}) {
+testcase <- function(description = "", tests={}) {
     get_reporter()$start_testcase(description)
     do_exit <- TRUE
     on.exit({
