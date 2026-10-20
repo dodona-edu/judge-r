@@ -182,10 +182,9 @@ test_that("testHtest reports a warning in generated", {
   })
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "start-test", expected = "\np-value = 0.04\nconfidence interval = 1, 2", description = "test"),
     list(command = "close-test", generated = "\np-value = 0.04\nconfidence interval = 1, 2", status = list(enum = "correct"))
-  )))
+  ))
 })

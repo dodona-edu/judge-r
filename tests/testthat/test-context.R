@@ -255,8 +255,7 @@ test_that("context reports a warning from the student code", {
 
   feedback <- suppressWarnings(capture_feedback(judge, context({})))
 
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback_messages(feedback), "Warning while evaluating context: careful"))
+  expect_equal(feedback_messages(feedback), "Warning while evaluating context: careful")
 })
 
 test_that("context reports a message from the student code", {
@@ -265,8 +264,25 @@ test_that("context reports a message from the student code", {
 
   feedback <- suppressMessages(capture_feedback(judge, context({})))
 
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback_messages(feedback), "Message while evaluating context: just so you know\n"))
+  expect_equal(feedback_messages(feedback), "Message while evaluating context: just so you know\n")
+})
+
+test_that("context does not report a package startup message from the student code", {
+  judge <- local_judge()
+  local_student_code(judge, 'packageStartupMessage("Attaching package: \'fake\'")')
+
+  feedback <- capture_feedback(judge, context({}))
+
+  expect_equal(feedback_messages(feedback), character(0))
+})
+
+test_that("context does not report a package startup message from preExec", {
+  judge <- local_judge()
+  local_student_code(judge, "")
+
+  feedback <- capture_feedback(judge, context({}, preExec = packageStartupMessage("Attaching package: 'fake'")))
+
+  expect_equal(feedback_messages(feedback), character(0))
 })
 
 test_that("context reports an error in preExec and skips the student code", {

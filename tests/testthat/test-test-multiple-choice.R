@@ -203,10 +203,9 @@ test_that("testMultipleChoice reports a warning in generated", {
   })
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "start-test", expected = "●", description = "q"),
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "close-test", generated = "median", status = list(enum = "correct"))
-  )))
+  ))
 })

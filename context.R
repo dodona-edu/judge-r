@@ -76,7 +76,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      eval(preExec, envir = test_env$clean_env)
                      test_env$parsed_code <- parse_student_code()
                      error_status <- "runtime error"
-                     capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
+                     .report_captured_conditions("context", capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)))
                      error_status <- "compilation error"
                  }, finally = {
                      # The student code may have closed it with dev.off() already.
