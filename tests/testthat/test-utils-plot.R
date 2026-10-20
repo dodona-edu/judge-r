@@ -333,11 +333,69 @@ test_that("test_geom_layer looks past a layer of the same geom with other parame
 test_that("test_geom_layer accepts a stat layer for the equivalent geom layer", {
   test_geom_layer <- local_judge()$test_geom_layer
 
-  # The README promises this direction only; see #72.
   result <- test_geom_layer(
     ggplot(cars, aes(speed, dist)) + geom_smooth(method = "loess", formula = y ~ x),
     ggplot(cars, aes(speed, dist)) + stat_smooth(method = "loess", formula = y ~ x)
   )
 
   expect_equal(result, list(equal = TRUE, feedback = ""))
+})
+
+test_that("test_geom_layer accepts the equivalent geom layer for a stat layer", {
+  test_geom_layer <- local_judge()$test_geom_layer
+
+  result <- test_geom_layer(
+    ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::stat_smooth(method = "loess", formula = y ~ x),
+    ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::geom_smooth(method = "loess", formula = y ~ x)
+  )
+
+  expect_equal(result, list(equal = TRUE, feedback = ""))
+})
+
+test_that("test_geom_layer accepts stat_count and geom_bar for each other", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  geom <- ggplot2::ggplot(mtcars, ggplot2::aes(factor(cyl))) + ggplot2::geom_bar()
+  stat <- ggplot2::ggplot(mtcars, ggplot2::aes(factor(cyl))) + ggplot2::stat_count()
+
+  expect_true(test_geom_layer(geom, stat)$equal)
+  expect_true(test_geom_layer(stat, geom)$equal)
+})
+
+test_that("test_geom_layer accepts stat_boxplot and geom_boxplot for each other", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  geom <- ggplot2::ggplot(mtcars, ggplot2::aes(factor(cyl), mpg)) + ggplot2::geom_boxplot()
+  stat <- ggplot2::ggplot(mtcars, ggplot2::aes(factor(cyl), mpg)) + ggplot2::stat_boxplot()
+
+  expect_true(test_geom_layer(geom, stat)$equal)
+  expect_true(test_geom_layer(stat, geom)$equal)
+})
+
+test_that("test_geom_layer rejects a stat layer with other parameters than the geom layer", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  geom <- ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::geom_smooth(method = "lm", formula = y ~ x)
+  stat <- ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::stat_smooth(method = "loess", formula = y ~ x)
+
+  expect_false(test_geom_layer(geom, stat)$equal)
+  expect_false(test_geom_layer(stat, geom)$equal)
+})
+
+test_that("test_geom_layer compares a parameter the geom layer leaves out with its default", {
+  test_geom_layer <- local_judge()$test_geom_layer
+
+  result <- test_geom_layer(
+    ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::stat_smooth(method = "loess", formula = y ~ x, n = 20),
+    ggplot2::ggplot(cars, ggplot2::aes(speed, dist)) + ggplot2::geom_smooth(method = "loess", formula = y ~ x)
+  )
+
+  expect_equal(result, list(
+    equal = FALSE,
+    feedback = "Have you added a `geom_smooth` layer with the correct parameters?"
+  ))
+})
+
+test_that("ggplot2 layers still record the call that created them", {
+  expect(
+    !is.null(ggplot2::geom_point()$constructor),
+    "ggplot2 layers have no `constructor` field anymore: get_default_params in utils-plot.R needs it"
+  )
 })
