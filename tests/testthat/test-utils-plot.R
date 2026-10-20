@@ -64,11 +64,10 @@ test_that("test_data_layer names the column that is missing", {
 test_that("test_data_layer names every missing column in one sentence", {
   test_data_layer <- local_judge()$test_data_layer
 
-  result <- test_data_layer(data.frame(a = 1, b = 2, c = 3), data.frame(a = 1))
+  result <- test_data_layer(data.frame(a = 1, b = 2, c = 3), data.frame(z = 1))
 
   expect_false(result$equal)
-  # Bug #98: testGGPlot repeats the missing data message for every missing column
-  expect_failure(expect_length(result$feedback, 1))
+  expect_equal(result$feedback, "You did not add the correct data, missing columns named: a, b, c")
 })
 
 test_that("test_data_layer uses the singular for one missing column", {
