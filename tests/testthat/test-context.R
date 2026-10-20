@@ -246,8 +246,7 @@ test_that("context reports an error in the student code as a runtime error", {
 
   feedback <- capture_feedback(judge, context({}))
 
-  # Bug #92: Errors in student code are reported as compilation error, not runtime error
-  expect_failure(expect_equal(feedback[[3]], list(command = "escalate-status", status = list(enum = "runtime error"))))
+  expect_equal(feedback[[3]], list(command = "escalate-status", status = list(enum = "runtime error")))
 })
 
 test_that("context reports a warning from the student code", {
