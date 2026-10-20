@@ -9,6 +9,12 @@ source('utils-df.R', local=TRUE)
 
 student_code <- NULL
 
+# In the global environment, so the student code and the evaluation files find it before utils.
+assign("install.packages", function(...) {
+    warning("install.packages() is not available on Dodona; installed packages can be loaded with library()", call. = FALSE)
+    invisible(NULL)
+}, envir = globalenv())
+
 start_judgement <- function(tests_path, source_path) {
     get_reporter()$start_reporter()
     on.exit(get_reporter()$end_reporter())

@@ -154,3 +154,29 @@ test_that("start_judgement skips the evaluation files after one that errors", {
 
   expect_equal(feedback_commands(feedback), c("start-judgement", "start-tab", "close-tab", "close-judgement"))
 })
+
+test_that("install.packages() in the student code warns instead of installing", {
+  judge <- local_judge()
+  # No packages, so the real install.packages() does nothing.
+  local_student_code(judge, 'reported <- tryCatch({ install.packages(character()); "nothing" }, warning = conditionMessage)')
+
+  capture_feedback(judge, context({}))
+
+  expect_equal(
+    judge$test_env$clean_env$reported,
+    "install.packages() is not available on Dodona; installed packages can be loaded with library()"
+  )
+})
+
+test_that("install.packages() in the evaluation code warns instead of installing", {
+  judge <- local_judge()
+  local_student_code(judge, "")
+
+  # No packages, so the real install.packages() does nothing.
+  feedback <- capture_feedback(judge, context(install.packages(character())))
+
+  expect_equal(
+    feedback_messages(feedback),
+    "Warning while evaluating context: install.packages() is not available on Dodona; installed packages can be loaded with library()"
+  )
+})
