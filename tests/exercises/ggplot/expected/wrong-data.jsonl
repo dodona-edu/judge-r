@@ -3,10 +3,6 @@
 {"command":"start-context"}
 {"command":"start-testcase","description":"Scatter plot"}
 {"command":"start-test","expected":"","description":"p"}
-{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
 {"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
 {"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
 {"command":"append-message","message":{"description":"You did not add the correct data, missing columns named: mpg, You did not add the correct data, missing columns named: cyl, You did not add the correct data, missing columns named: disp, You did not add the correct data, missing columns named: hp, You did not add the correct data, missing columns named: drat, You did not add the correct data, missing columns named: wt, You did not add the correct data, missing columns named: qsec, You did not add the correct data, missing columns named: vs, You did not add the correct data, missing columns named: am, You did not add the correct data, missing columns named: gear, You did not add the correct data, missing columns named: carb","format":"plain"}}

@@ -147,7 +147,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  expected_gg <- expected
                  capture.output(generated_gg <- generated(test_env$clean_env))
 
-                 plot_exists <- is.ggplot(generated_gg)
+                 plot_exists <- is_ggplot(generated_gg)
                  feedback <- "You did not generate a ggplot"
                  if (plot_exists) {
                      generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
