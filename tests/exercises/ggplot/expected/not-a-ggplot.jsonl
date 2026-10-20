@@ -3,10 +3,6 @@
 {"command":"start-context"}
 {"command":"start-testcase","description":"Scatter plot"}
 {"command":"start-test","expected":"","description":"p"}
-{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating test: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
-{"command":"append-message","message":{"description":"Warning while evaluating context: `is.ggplot()` was deprecated in ggplot2 3.5.2.\nℹ Please use `is_ggplot()` instead.","format":"plain"}}
 {"command":"append-message","message":{"description":"You did not generate a ggplot","format":"plain"}}
 {"command":"close-test","generated":"","status":{"enum":"wrong"}}
 {"command":"close-testcase"}

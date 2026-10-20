@@ -1,16 +1,9 @@
 withr::local_package("ggplot2")
 
-# testthat resets lifecycle_verbosity to "warning" in every test, so a file-level option doesn't hold:
-# silence is.ggplot()'s deprecation per test, except in #94's.
-local_quiet_judge <- function(..., env = parent.frame()) {
-  withr::local_options(lifecycle_verbosity = "quiet", .local_envir = env)
-  local_judge_with(..., env = env)
-}
-
 plot_message <- "<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>"
 
 test_that("testGGPlot accepts the same plot and shows it", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
@@ -24,7 +17,7 @@ test_that("testGGPlot accepts the same plot and shows it", {
 })
 
 test_that("testGGPlot shows the expected plot next to a wrong one", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
@@ -40,7 +33,7 @@ test_that("testGGPlot shows the expected plot next to a wrong one", {
 })
 
 test_that("testGGPlot hides the expected plot with show_expected = FALSE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point(), show_expected = FALSE)
@@ -55,7 +48,7 @@ test_that("testGGPlot hides the expected plot with show_expected = FALSE", {
 })
 
 test_that("testGGPlot rejects a value that isn't a ggplot without showing the expected plot", {
-  judge <- local_quiet_judge(p = 1)
+  judge <- local_judge_with(p = 1)
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
@@ -69,7 +62,7 @@ test_that("testGGPlot rejects a value that isn't a ggplot without showing the ex
 })
 
 test_that("testGGPlot compares the plot data", {
-  judge <- local_quiet_judge(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point(), show_expected = FALSE)
@@ -83,7 +76,7 @@ test_that("testGGPlot compares the plot data", {
 })
 
 test_that("testGGPlot ignores the plot data with test_data = FALSE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point(), test_data = FALSE)
@@ -93,7 +86,7 @@ test_that("testGGPlot ignores the plot data with test_data = FALSE", {
 })
 
 test_that("testGGPlot ignores the geom layers with test_geom = FALSE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point(), test_geom = FALSE)
@@ -103,7 +96,7 @@ test_that("testGGPlot ignores the geom layers with test_geom = FALSE", {
 })
 
 test_that("testGGPlot compares the facets", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_wrap(~am),
@@ -118,7 +111,7 @@ test_that("testGGPlot compares the facets", {
 })
 
 test_that("testGGPlot ignores the facets with test_facet = FALSE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_wrap(~am),
@@ -129,7 +122,7 @@ test_that("testGGPlot ignores the facets with test_facet = FALSE", {
 })
 
 test_that("testGGPlot accepts another facet type on the same variables by default", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_grid(am ~ .))
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_grid(am ~ .))
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_wrap(~am))
@@ -139,7 +132,7 @@ test_that("testGGPlot accepts another facet type on the same variables by defaul
 })
 
 test_that("testGGPlot checks the facet type with ignore_facet_type = FALSE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_grid(am ~ .))
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_grid(am ~ .))
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + facet_wrap(~am),
@@ -154,7 +147,7 @@ test_that("testGGPlot checks the facet type with ignore_facet_type = FALSE", {
 })
 
 test_that("testGGPlot ignores the labels by default", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + labs(x = "Weight", y = "MPG"))
@@ -164,7 +157,7 @@ test_that("testGGPlot ignores the labels by default", {
 })
 
 test_that("testGGPlot compares the axis labels with test_label = TRUE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + labs(x = "Weight"))
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + labs(x = "Weight"))
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + labs(x = "Weight", y = "MPG"),
@@ -179,7 +172,7 @@ test_that("testGGPlot compares the axis labels with test_label = TRUE", {
 })
 
 test_that("testGGPlot compares only the axis labels with test_label = TRUE", {
-  judge <- local_quiet_judge(
+  judge <- local_judge_with(
     p = ggplot(mtcars, aes(wt, mpg)) + geom_point() + labs(x = "Weight", y = "MPG", title = "Cars")
   )
 
@@ -192,7 +185,7 @@ test_that("testGGPlot compares only the axis labels with test_label = TRUE", {
 })
 
 test_that("testGGPlot ignores the scales by default", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10())
@@ -202,7 +195,7 @@ test_that("testGGPlot ignores the scales by default", {
 })
 
 test_that("testGGPlot compares the scales with test_scale = TRUE", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point() + scale_x_log10(),
@@ -217,7 +210,7 @@ test_that("testGGPlot compares the scales with test_scale = TRUE", {
 })
 
 test_that("testGGPlot reports only the first check that fails", {
-  judge <- local_quiet_judge(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_line())
+  judge <- local_judge_with(p = ggplot(mtcars[1:5, ], aes(wt, mpg)) + geom_line())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point(), show_expected = FALSE)
@@ -228,7 +221,7 @@ test_that("testGGPlot reports only the first check that fails", {
 })
 
 test_that("testGGPlot removes the images it saves", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
   before <- tempdir_pngs()
 
   capture_feedback(judge, testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point()))
@@ -238,7 +231,7 @@ test_that("testGGPlot removes the images it saves", {
 
 test_that("testGGPlot removes the images it saves when a check fails with an error", {
   local_tempdir_pngs()
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
   before <- tempdir_pngs()
 
   feedback <- capture_feedback(judge, {
@@ -255,7 +248,7 @@ test_that("testGGPlot removes the images it saves when a check fails with an err
 })
 
 test_that("testGGPlot reports an error in generated as a runtime error", {
-  judge <- local_quiet_judge()
+  judge <- local_judge_with()
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) stop("boom"), ggplot(mtcars, aes(wt, mpg)) + geom_point())
@@ -271,7 +264,7 @@ test_that("testGGPlot reports an error in generated as a runtime error", {
 
 test_that("testGGPlot reports an error drawing the student's plot as a runtime error", {
   local_tempdir_pngs()
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, unknown)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, unknown)) + geom_point())
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
@@ -288,23 +281,19 @@ test_that("testGGPlot shows no deprecation warning", {
   withr::local_options(lifecycle_verbosity = "warning")
   judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
-  feedback <- suppressWarnings(
-    capture_feedback(judge, testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())),
-    classes = "lifecycle_warning_deprecated"
-  )
+  feedback <- capture_feedback(judge, testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point()))
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
-  # Bug #94: testGGPlot shows ggplot2's is.ggplot() deprecation warning to students
-  expect_failure(expect_equal(hide_pngs(feedback), list(
+  expect_equal(hide_pngs(feedback), list(
     list(command = "start-test", expected = "", description = "p"),
     list(command = "append-message", message = list(description = plot_message, format = "html")),
     list(command = "close-test", generated = "", status = list(enum = "correct"))
-  )))
+  ))
 })
 
 test_that("testGGPlot accepts the same plot when the data is given to a layer", {
   local_tempdir_pngs()
-  judge <- local_quiet_judge(p = ggplot() + geom_point(aes(wt, mpg), data = mtcars))
+  judge <- local_judge_with(p = ggplot() + geom_point(aes(wt, mpg), data = mtcars))
 
   feedback <- capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot() + geom_point(aes(wt, mpg), data = mtcars))
@@ -320,7 +309,7 @@ test_that("testGGPlot accepts the same plot when the data is given to a layer", 
 })
 
 test_that("testGGPlot reports a warning in generated", {
-  judge <- local_quiet_judge(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
 
   feedback <- suppressWarnings(capture_feedback(judge, {
     testGGPlot("p", function(env) {
