@@ -341,3 +341,35 @@ test_that("test_geom_layer accepts a stat layer for the equivalent geom layer", 
 
   expect_equal(result, list(equal = TRUE, feedback = ""))
 })
+
+test_that("test_geom_layer accepts the equivalent geom layer for a stat layer", {
+  test_geom_layer <- local_judge()$test_geom_layer
+
+  result <- test_geom_layer(
+    ggplot(cars, aes(speed, dist)) + stat_smooth(method = "loess", formula = y ~ x),
+    ggplot(cars, aes(speed, dist)) + geom_smooth(method = "loess", formula = y ~ x)
+  )
+
+  # Bug #72: testGGPlot fails because ggplot2 stores identical plots differently depending on layers
+  expect_failure(expect_equal(result, list(equal = TRUE, feedback = "")))
+})
+
+test_that("test_geom_layer accepts stat_count and geom_bar for each other", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  geom <- ggplot(mtcars, aes(factor(cyl))) + geom_bar()
+  stat <- ggplot(mtcars, aes(factor(cyl))) + stat_count()
+
+  # Bug #72: testGGPlot fails because ggplot2 stores identical plots differently depending on layers
+  expect_failure(expect_true(test_geom_layer(geom, stat)$equal))
+  expect_failure(expect_true(test_geom_layer(stat, geom)$equal))
+})
+
+test_that("test_geom_layer accepts stat_boxplot and geom_boxplot for each other", {
+  test_geom_layer <- local_judge()$test_geom_layer
+  geom <- ggplot(mtcars, aes(factor(cyl), mpg)) + geom_boxplot()
+  stat <- ggplot(mtcars, aes(factor(cyl), mpg)) + stat_boxplot()
+
+  # Bug #72: testGGPlot fails because ggplot2 stores identical plots differently depending on layers
+  expect_failure(expect_true(test_geom_layer(geom, stat)$equal))
+  expect_failure(expect_true(test_geom_layer(stat, geom)$equal))
+})
