@@ -51,9 +51,10 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
 }
 
 # `testcases` must stay a promise: it is forced only after the student code ran.
-# With `image_file`, a png device writing to it must already be open.
+# With `image_file`, the current device must be a png device writing to it.
 .evaluate_context <- function(testcases, preExec, parse_student_code, image_file = NULL, fail_if_absent = TRUE) {
     caller <- parent.frame()
+    image_device <- dev.cur()
     get_reporter()$start_context()
     do_exit <- TRUE
     on.exit({
@@ -75,8 +76,9 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      test_env$parsed_code <- parse_student_code()
                      capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env))
                  }, finally = {
-                     if(!is.null(image_file)) {
-                         dev.off()
+                     # The student code may have closed it with dev.off() already.
+                     if(!is.null(image_file) && image_device %in% dev.list()) {
+                         dev.off(image_device)
                      }
                      parent.env(.GlobalEnv) <- old_parent
                  })

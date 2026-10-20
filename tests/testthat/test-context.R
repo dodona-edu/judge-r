@@ -485,6 +485,5 @@ test_that("contextWithImage adds the plot when the student code closes the devic
 
   feedback <- capture_feedback(judge, contextWithImage({}))
 
-  # Bug #113: contextWithImage fails when the student code closes the graphics device with dev.off()
-  expect_failure(expect_match(feedback_messages(feedback), '^<img src="data:image/png;base64,'))
+  expect_match(feedback_messages(feedback), '^<img src="data:image/png;base64,')
 })
