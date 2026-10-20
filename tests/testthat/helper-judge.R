@@ -12,6 +12,9 @@ local_judge <- function(env = parent.frame()) {
     suppressPackageStartupMessages(library(package, character.only = TRUE))
   }
 
+  # judge.R sets the pager.
+  withr::local_options(pager = getOption("pager"), .local_envir = env)
+
   # A context swaps the parent of the global environment while it evaluates student code.
   global_parent <- parent.env(.GlobalEnv)
   withr::defer(`parent.env<-`(.GlobalEnv, global_parent), envir = env)

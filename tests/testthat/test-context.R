@@ -84,8 +84,7 @@ test_that("student code can capture the help page it prints", {
 
   capture_feedback(judge, context({}))
 
-  # Bug #45: `help` evades all output capturing
-  expect_failure(expect_match(judge$test_env$clean_env$page, "arithmetic mean", all = FALSE))
+  expect_match(judge$test_env$clean_env$page, "arithmetic mean", all = FALSE)
 })
 
 test_that("context evaluates the student code in a fresh environment every time", {
