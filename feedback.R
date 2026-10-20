@@ -10,7 +10,30 @@
             invokeRestart("muffleWarning")
         },
         message = function(m) {
-            .add_condition_message("Message", what, m)
+            if (!inherits(m, "packageStartupMessage")) {
+                .add_condition_message("Message", what, m)
+            }
+            invokeRestart("muffleMessage")
+        }
+    )
+}
+
+# capture.output() swallows what is reported while it runs, so report its conditions once it returns.
+.report_captured_conditions <- function(what, captured) {
+    conditions <- list()
+    on.exit(for (condition in conditions) {
+        .add_condition_message(condition$kind, what, condition$condition)
+    })
+    withCallingHandlers(
+        captured,
+        warning = function(w) {
+            conditions[[length(conditions) + 1]] <<- list(kind = "Warning", condition = w)
+            invokeRestart("muffleWarning")
+        },
+        message = function(m) {
+            if (!inherits(m, "packageStartupMessage")) {
+                conditions[[length(conditions) + 1]] <<- list(kind = "Message", condition = m)
+            }
             invokeRestart("muffleMessage")
         }
     )

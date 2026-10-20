@@ -1,6 +1,8 @@
 {"command":"start-judgement"}
 {"command":"start-tab","title":"values"}
 {"command":"start-context"}
+{"command":"append-message","message":{"description":"Warning while evaluating context: careful with this","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating context: ℹ just so you know\n","format":"plain"}}
 {"command":"start-testcase","description":"Numbers"}
 {"command":"start-test","expected":"42","description":"x"}
 {"command":"close-test","generated":"42","status":{"enum":"correct"}}
@@ -28,6 +30,8 @@
 {"command":"close-testcase","accepted":true}
 {"command":"close-context"}
 {"command":"start-context"}
+{"command":"append-message","message":{"description":"Warning while evaluating context: careful with this","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating context: ℹ just so you know\n","format":"plain"}}
 {"command":"start-testcase","description":"Seeded"}
 {"command":"start-test","expected":"0.2655087","description":"noise"}
 {"command":"close-test","generated":"0.2655086631421","status":{"enum":"correct"}}
@@ -36,6 +40,8 @@
 {"command":"close-testcase"}
 {"command":"close-context"}
 {"command":"start-context"}
+{"command":"append-message","message":{"description":"Warning while evaluating context: careful with this","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating context: ℹ just so you know\n","format":"plain"}}
 {"command":"start-testcase","description":"Last value"}
 {"command":"start-test","expected":"42","description":"evaluationResult"}
 {"command":"close-test","generated":"42","status":{"enum":"correct"}}
@@ -44,6 +50,8 @@
 {"command":"close-tab"}
 {"command":"start-tab","title":"functions"}
 {"command":"start-context"}
+{"command":"append-message","message":{"description":"Warning while evaluating context: careful with this","format":"plain"}}
+{"command":"append-message","message":{"description":"Message while evaluating context: ℹ just so you know\n","format":"plain"}}
 {"command":"start-testcase","description":"square"}
 {"command":"start-test","expected":"9","description":"square(3)"}
 {"command":"close-test","generated":"9","status":{"enum":"correct"}}

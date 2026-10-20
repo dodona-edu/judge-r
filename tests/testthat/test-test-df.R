@@ -275,13 +275,12 @@ test_that("testDF reports a warning in generated", {
   }))
 
   expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "correct"))
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    ", description = "df"),
     list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = " id  name \n---  -----\n  1  a    \n  2  b    ", status = list(enum = "correct"))
-  )))
+  ))
 })
 
 test_that("testDF__inReview__ accepts the same data frame and shows its first rows", {

@@ -243,12 +243,11 @@ test_that("testEqual reports a warning in generated inside the test", {
   }))
 
   expect_equal(tail(feedback, 1)[[1]], list(command = "close-test", generated = "1", status = list(enum = "correct")))
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "start-test", expected = "1", description = "x"),
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "close-test", generated = "1", status = list(enum = "correct"))
-  )))
+  ))
 })
 
 test_that("testIdentical rejects values that are equal but not identical", {

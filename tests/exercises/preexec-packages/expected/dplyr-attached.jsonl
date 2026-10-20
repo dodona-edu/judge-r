@@ -1,0 +1,10 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"preexec-packages"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Package attached in preExec"}
+{"command":"start-test","expected":"2","description":"kept"}
+{"command":"close-test","generated":"2","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

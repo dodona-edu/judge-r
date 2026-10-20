@@ -128,6 +128,5 @@ test_that("testcaseAssert reports a warning from the checker", {
     TRUE
   })))
 
-  # Bug #91: Warnings and messages from student code never reach the feedback
-  expect_failure(expect_equal(feedback_messages(feedback), "Warning while evaluating assert: careful"))
+  expect_equal(feedback_messages(feedback), "Warning while evaluating assert: careful")
 })
