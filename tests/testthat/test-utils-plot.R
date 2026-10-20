@@ -276,8 +276,21 @@ test_that("test_geom_layer looks past a layer of the same geom with other aesthe
     ggplot(mtcars, aes(mpg, wt)) + geom_point(aes(colour = gear)) + geom_point(aes(colour = cyl))
   )
 
-  # Bug #104: testGGPlot stops at the first layer of a geom when its aesthetics differ
-  expect_failure(expect_true(result$equal))
+  expect_true(result$equal)
+})
+
+test_that("test_geom_layer still rejects when no layer of the geom has the right aesthetics", {
+  test_geom_layer <- local_judge()$test_geom_layer
+
+  result <- test_geom_layer(
+    ggplot(mtcars, aes(mpg, wt)) + geom_point(aes(colour = cyl)),
+    ggplot(mtcars, aes(mpg, wt)) + geom_point(aes(colour = gear)) + geom_point(aes(colour = disp))
+  )
+
+  expect_equal(result, list(
+    equal = FALSE,
+    feedback = "Found `~gear` for the `colour` aesthetic. Expected `~cyl`."
+  ))
 })
 
 test_that("test_geom_layer asks for a missing parameter", {
