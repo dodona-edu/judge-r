@@ -46,6 +46,8 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
 
                  equal <- FALSE
                  if (is.null(comparator)) {
+                     if (is.data.frame(expected)) expected <- as.data.frame(expected)
+                     if (is.data.frame(generated_val)) generated_val <- as.data.frame(generated_val)
                      if (ignore_col_order) {
                          expected <- expected[,order(colnames(expected))]
                          generated_val <- generated_val[,order(colnames(generated_val))]
