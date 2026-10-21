@@ -18,7 +18,7 @@
 {"command":"close-test","generated":"median, mean","status":{"enum":"correct"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Shown answer"}
-{"command":"start-test","expected":"mean","description":"best measure again"}
+{"command":"start-test","expected":"mean, median","description":"best measure again"}
 {"command":"close-test","generated":"median, mean","status":{"enum":"correct"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Not verified"}

@@ -173,8 +173,7 @@ test_that("testMultipleChoice shows every expected option with show_expected = T
   })
 
   expect_equal(feedback[[1]]$command, "start-test")
-  # Bug #99: testMultipleChoice with show_expected shows only the first expected answer
-  expect_failure(expect_equal(feedback[[1]]$expected, "median, mode"))
+  expect_equal(feedback[[1]]$expected, "median, mode")
 })
 
 test_that("testMultipleChoice reports an error in generated as a runtime error", {

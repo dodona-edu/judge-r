@@ -19,7 +19,7 @@
 {"command":"close-test","generated":"variance","status":{"enum":"wrong"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Shown answer"}
-{"command":"start-test","expected":"mean","description":"best measure again"}
+{"command":"start-test","expected":"mean, median","description":"best measure again"}
 {"command":"append-message","message":{"description":"Your answer is not a valid option, the valid options are (mean, median, mode, range).","format":"plain"}}
 {"command":"close-test","generated":"variance","status":{"enum":"wrong"}}
 {"command":"close-testcase"}

@@ -369,7 +369,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
                                feedback = NULL,
                                show_expected = FALSE) {
 
-    get_reporter()$start_test(ifelse(show_expected, expected, "●"), description)
+    get_reporter()$start_test(if (show_expected) toString(expected) else "●", description)
 
     tryCatch(
              .report_conditions("test", {
