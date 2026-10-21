@@ -148,8 +148,7 @@ test_that("dataframe_all_equal shows the first row when it differs", {
   result <- dataframe_all_equal(generated, expected)
 
   expect_equal(result$feedback, "unexpected row with rownumber: 1")
-  # Bug #108: testDF__inReview__ leaves out the wrong row when it is one of the first rows
-  expect_failure(expect_contains(result$df1_rows, 1))
+  expect_equal(result$df1_rows, 1:5)
 })
 
 test_that("dataframe_all_equal reports a missing or an extra row at the end", {
