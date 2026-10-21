@@ -7,7 +7,7 @@ test_that("testDF accepts the same data frame", {
 
   expect_equal(feedback, list(
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    \n  3  c    ", description = "df"),
-    list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
+    list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = " id  name \n---  -----\n  1  a    \n  2  b    \n  3  c    ", status = list(enum = "correct"))
   ))
 })
@@ -22,7 +22,7 @@ test_that("testDF rejects a data frame with another value", {
   expect_equal(feedback, list(
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    \n  3  c    ", description = "df"),
     list(command = "append-message", message = list(
-      description = "Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.",
+      description = "Only the first six rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.",
       format = "plain"
     )),
     list(command = "close-test", generated = " id  name \n---  -----\n  1  a    \n  2  b    \n  3  x    ", status = list(enum = "wrong"))
@@ -220,12 +220,12 @@ test_that("testDF shows as many rows as its message says", {
   })
 
   expect_equal(feedback[[3]]$status, list(enum = "correct"))
-  # Bug #96: testDF says it shows five rows but shows six
-  expect_failure(expect_equal(feedback, list(
-    list(command = "start-test", expected = " id   square\n---  -------\n  1        1\n  2        4\n  3        9\n  4       16\n  5       25", description = "df"),
-    list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
-    list(command = "close-test", generated = " id   square\n---  -------\n  1        1\n  2        4\n  3        9\n  4       16\n  5       25", status = list(enum = "correct"))
-  )))
+  six_rows <- " id   square\n---  -------\n  1        1\n  2        4\n  3        9\n  4       16\n  5       25\n  6       36"
+  expect_equal(feedback, list(
+    list(command = "start-test", expected = six_rows, description = "df"),
+    list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
+    list(command = "close-test", generated = six_rows, status = list(enum = "correct"))
+  ))
 })
 
 test_that("testDF accepts the same one-column data frame", {
@@ -237,7 +237,7 @@ test_that("testDF accepts the same one-column data frame", {
   # Bug #107: testDF fails with a runtime error on one-column data frames
   expect_failure(expect_equal(feedback, list(
     list(command = "start-test", expected = "   x\n ---\n   1\n   2\n   3", description = "df"),
-    list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
+    list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = "   x\n ---\n   1\n   2\n   3", status = list(enum = "correct"))
   )))
 })
@@ -273,7 +273,7 @@ test_that("testDF reports a warning in the comparator before it starts the test"
   expect_equal(feedback, list(
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    ", description = "df"),
-    list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
+    list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = " id  name \n---  -----\n  1  a    \n  2  b    ", status = list(enum = "correct"))
   ))
 })
@@ -292,7 +292,7 @@ test_that("testDF reports a warning in generated", {
   expect_equal(feedback, list(
     list(command = "append-message", message = list(description = "Warning while evaluating test: careful", format = "plain")),
     list(command = "start-test", expected = " id  name \n---  -----\n  1  a    \n  2  b    ", description = "df"),
-    list(command = "append-message", message = list(description = "Only the first five rows of the dataframe are shown.", format = "plain")),
+    list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = " id  name \n---  -----\n  1  a    \n  2  b    ", status = list(enum = "correct"))
   ))
 })

@@ -64,11 +64,11 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
 
                  get_reporter()$start_test(expected_formatted, description)
                  if (equal) {
-                     get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
+                     get_reporter()$add_message("Only the first six rows of the dataframe are shown.")
                      get_reporter()$end_test(generated_formatted, "correct")
                  } else {
-                     # TODO: Try to be smarter about what data is shown. If the error is not in the first five rows, the diff will be useless to the student.
-                     get_reporter()$add_message("Only the first five rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
+                     # TODO: Try to be smarter about what data is shown. If the error is not in the first six rows, the diff will be useless to the student.
+                     get_reporter()$add_message("Only the first six rows of the dataframes are shown. If they are all equal, your mistake only shows up in the later rows.")
                      get_reporter()$end_test(generated_formatted, "wrong")
                  }
              }),
