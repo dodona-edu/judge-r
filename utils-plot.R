@@ -68,6 +68,7 @@ test_geom_layer <- function(sol_gg, stud_gg){
 
         found_geom <- FALSE
         found_geom_with_params <- FALSE
+        aes_feedback <- NULL
 
         sol_params <- get_params(sol_layer)
         sol_defaults <- get_default_params(sol_layer)
@@ -83,15 +84,15 @@ test_geom_layer <- function(sol_gg, stud_gg){
                 # Testing aes for every layer, we will check if every aes component of a layer in the solution-plot is
                 # also specified in the corresponding layer of the student-plot or in the aes of the base ggplot function
                 mapping_keys <- unique(c(names(sol_layer$mapping), names(sol_gg$mapping)))
+                layer_aes_feedback <- NULL
                 for(key in mapping_keys){
 
                     stud_map_component <- stud_layer$mapping[key]
                     if (is.null(stud_map_component[[1]])){
                         stud_map_component <- stud_gg$mapping[key]
                         if (is.null(stud_map_component[[1]])){
-                            return(list('equal' = FALSE, 
-                                        'feedback' = paste0("Have you specified the `", key, "` aesthetic needed in the `", as.character(sol_geom_type), "` layer?"))
-                            )
+                            layer_aes_feedback <- paste0("Have you specified the `", key, "` aesthetic needed in the `", as.character(sol_geom_type), "` layer?")
+                            break
                         }
                     }
 
@@ -101,10 +102,16 @@ test_geom_layer <- function(sol_gg, stud_gg){
                     }
 
                     if(!isTRUE(all.equal(stud_map_component, sol_map_component, check.attributes = FALSE))){
-                        return(list('equal' = FALSE, 
-                                    'feedback' = paste0("Found `", stud_map_component, "` for the `", key, "` aesthetic. Expected `", sol_map_component, "`."))
-                        )
+                        layer_aes_feedback <- paste0("Found `", stud_map_component, "` for the `", key, "` aesthetic. Expected `", sol_map_component, "`.")
+                        break
                     }
+                }
+
+                if (!is.null(layer_aes_feedback)) {
+                    if (is.null(aes_feedback)) {
+                        aes_feedback <- layer_aes_feedback
+                    }
+                    next
                 }
 
                 found_geom <- TRUE
@@ -143,6 +150,9 @@ test_geom_layer <- function(sol_gg, stud_gg){
         feedback_msg <- c(paste0(geom_base_feedback, " with a `+` operator?"),
                           paste0(geom_base_feedback, " with the correct parameters?"))
 
+        if (!found_geom && !is.null(aes_feedback)) {
+            return(list('equal' = FALSE, 'feedback' = aes_feedback))
+        }
         if (!found_geom) {
             return(list('equal' = FALSE, 'feedback' = feedback_msg[1]))
         }
