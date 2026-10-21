@@ -192,8 +192,14 @@ test_that("is_function_used handles code that defines a function with arguments"
   judge <- local_judge()
   code <- parse(text = c("f <- function(x) x", "average <- mean(1)"))
 
-  # Bug #102: testFunctionUsed and testFunctionUsedInVar fail on code that defines a function with arguments
-  expect_failure(expect_no_error(judge$is_function_used("mean", judge$find_assign(code), code, code)))
+  expect_true(judge$is_function_used("mean", judge$find_assign(code), code, code))
+})
+
+test_that("is_function_used still reports a function that is not used next to a function with arguments", {
+  judge <- local_judge()
+  code <- parse(text = c("f <- function(x, y = 2) x + y", "average <- sum(1)"))
+
+  expect_false(judge$is_function_used("mean", judge$find_assign(code), code, code))
 })
 
 test_that("is_function_used does not warn about passing calls and expressions to purrr", {
@@ -258,8 +264,14 @@ test_that("is_function_used_in_var finds a call in a function assigned to the va
   judge <- local_judge()
   code <- parse(text = "f <- function(x) mean(x)")
 
-  # Bug #102: testFunctionUsed and testFunctionUsedInVar fail on code that defines a function with arguments
-  expect_failure(expect_no_error(judge$is_function_used_in_var("mean", judge$find_assign(code), "f", code)))
+  expect_true(judge$is_function_used_in_var("mean", judge$find_assign(code), "f", code))
+})
+
+test_that("is_function_used_in_var still reports a function that a function with arguments does not call", {
+  judge <- local_judge()
+  code <- parse(text = "f <- function(x) sum(x)")
+
+  expect_false(judge$is_function_used_in_var("mean", judge$find_assign(code), "f", code))
 })
 
 test_that("is_function_used_in_var counts an assignment to an element with $<-", {
