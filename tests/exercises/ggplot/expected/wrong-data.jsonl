@@ -5,7 +5,7 @@
 {"command":"start-test","expected":"","description":"p"}
 {"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
 {"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
-{"command":"append-message","message":{"description":"You did not add the correct data, missing columns named: mpg, You did not add the correct data, missing columns named: cyl, You did not add the correct data, missing columns named: disp, You did not add the correct data, missing columns named: hp, You did not add the correct data, missing columns named: drat, You did not add the correct data, missing columns named: wt, You did not add the correct data, missing columns named: qsec, You did not add the correct data, missing columns named: vs, You did not add the correct data, missing columns named: am, You did not add the correct data, missing columns named: gear, You did not add the correct data, missing columns named: carb","format":"plain"}}
+{"command":"append-message","message":{"description":"You did not add the correct data, missing columns named: mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb","format":"plain"}}
 {"command":"close-test","generated":"","status":{"enum":"wrong"}}
 {"command":"close-testcase"}
 {"command":"start-testcase","description":"Labels"}
@@ -21,7 +21,7 @@
 {"command":"start-testcase","description":"Facet type"}
 {"command":"start-test","expected":"","description":"p_faceted"}
 {"command":"append-message","message":{"description":"<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,<png>\"/>","format":"html"}}
-{"command":"append-message","message":{"description":"You did not add the correct data, missing columns named: mpg, You did not add the correct data, missing columns named: cyl, You did not add the correct data, missing columns named: disp, You did not add the correct data, missing columns named: hp, You did not add the correct data, missing columns named: drat, You did not add the correct data, missing columns named: wt, You did not add the correct data, missing columns named: qsec, You did not add the correct data, missing columns named: vs, You did not add the correct data, missing columns named: am, You did not add the correct data, missing columns named: gear, You did not add the correct data, missing columns named: carb","format":"plain"}}
+{"command":"append-message","message":{"description":"You did not add the correct data, missing columns named: mpg, cyl, disp, hp, drat, wt, qsec, vs, am, gear, carb","format":"plain"}}
 {"command":"close-test","generated":"","status":{"enum":"wrong"}}
 {"command":"close-testcase"}
 {"command":"close-context"}
