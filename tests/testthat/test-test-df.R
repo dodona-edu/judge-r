@@ -234,12 +234,19 @@ test_that("testDF accepts the same one-column data frame", {
   feedback <- capture_feedback(judge, testDF("df", function(env) env$df, data.frame(x = 1:3)))
 
   expect_equal(feedback[[1]], list(command = "start-test", expected = "   x\n ---\n   1\n   2\n   3", description = "df"))
-  # Bug #107: testDF fails with a runtime error on one-column data frames
-  expect_failure(expect_equal(feedback, list(
+  expect_equal(feedback, list(
     list(command = "start-test", expected = "   x\n ---\n   1\n   2\n   3", description = "df"),
     list(command = "append-message", message = list(description = "Only the first six rows of the dataframe are shown.", format = "plain")),
     list(command = "close-test", generated = "   x\n ---\n   1\n   2\n   3", status = list(enum = "correct"))
-  )))
+  ))
+})
+
+test_that("testDF rejects a one-column data frame with other values", {
+  judge <- local_judge_with(df = data.frame(x = 1:3))
+
+  feedback <- capture_feedback(judge, testDF("df", function(env) env$df, data.frame(x = c(1L, 2L, 4L))))
+
+  expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "wrong"))
 })
 
 test_that("testDF accepts a tibble with the same data as the expected data frame", {

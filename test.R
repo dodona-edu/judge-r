@@ -49,8 +49,8 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                      if (is.data.frame(expected)) expected <- as.data.frame(expected)
                      if (is.data.frame(generated_val)) generated_val <- as.data.frame(generated_val)
                      if (ignore_col_order) {
-                         expected <- expected[,order(colnames(expected))]
-                         generated_val <- generated_val[,order(colnames(generated_val))]
+                         expected <- expected[order(colnames(expected))]
+                         generated_val <- generated_val[order(colnames(generated_val))]
                      }
                      if (ignore_row_order) {
                          equal <- isTRUE(compare_data_frames_row_independent(expected, generated_val, ...))
