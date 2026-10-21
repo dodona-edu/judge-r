@@ -82,8 +82,15 @@ test_that("compare_data_frames_row_independent matches near-equal rows that sort
   expected <- data.frame(x = c(1, 1 + 1e-12, 2), name = c("q", "p", "r"))
   generated <- data.frame(x = c(1 + 1e-12, 1, 2), name = c("q", "p", "r"))
 
-  # Bug #105: testDF rejects near-equal rows that sort in a different order
-  expect_failure(expect_true(compare(expected, generated)))
+  expect_true(compare(expected, generated))
+})
+
+test_that("compare_data_frames_row_independent still rejects a near-equal row with another value", {
+  compare <- local_judge()$compare_data_frames_row_independent
+  expected <- data.frame(x = c(1, 1 + 1e-12, 2), name = c("q", "p", "r"))
+  generated <- data.frame(x = c(1 + 1e-12, 1, 2), name = c("q", "p", "s"))
+
+  expect_false(compare(expected, generated))
 })
 
 test_that("compare_data_frames_row_independent rejects a single column with another name", {
