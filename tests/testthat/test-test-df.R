@@ -380,8 +380,20 @@ test_that("testDF__inReview__ rejects a wrong row with rows_after_error = 0", {
     testDF__inReview__("df", function(env) env$df, data.frame(id = 1:10, square = (1:10)^2), rows_after_error = 0)
   })
 
-  # Bug #117: testDF__inReview__ accepts a wrong data frame when rows_after_error is 0
-  expect_failure(expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "wrong")))
+  expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "wrong"))
+})
+
+test_that("testDF__inReview__ rejects a wrong row with rows_after_error = 0 when the row order is ignored", {
+  withr::local_options(lifecycle_verbosity = "quiet")
+  generated <- data.frame(id = 1:10, square = (1:10)^2)
+  generated$square[7] <- 0
+  judge <- local_judge_with(df = generated)
+
+  feedback <- capture_feedback(judge, {
+    testDF__inReview__("df", function(env) env$df, data.frame(id = 1:10, square = (1:10)^2), ignore_row_order = TRUE, rows_after_error = 0)
+  })
+
+  expect_equal(tail(feedback, 1)[[1]]$status, list(enum = "wrong"))
 })
 
 test_that("testDF__inReview__ notes that the row order doesn't matter with ignore_row_order = TRUE", {

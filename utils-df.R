@@ -69,7 +69,7 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
         # loop over every df1 row and find its match
         df1_row <- 0
         while((df1_row < nrow(df1) || length(df2_matches) < nrow(df2)) &&
-              (past_error < after_error + no_match_count || df1_row < after_error + before_error + 1 + no_match_count)){
+              (!error || past_error < after_error + no_match_count || df1_row < after_error + before_error + 1 + no_match_count)){
 
             df1_row <- df1_row + 1
             df2_row_options <- c(1:nrow(df2))[!c(1:nrow(df2)) %in% df2_matches]
@@ -133,7 +133,7 @@ dataframe_all_equal <- function(df1, df2, ignore_col_order = TRUE, ignore_row_or
     } else {
         df_row <- 0
         past_error <- 0
-        while(df_row < max(nrow(df1), nrow(df2)) && (past_error < after_error || df_row < after_error + before_error + 1)){
+        while(df_row < max(nrow(df1), nrow(df2)) && (!error || past_error < after_error || df_row < after_error + before_error + 1)){
             df_row <- df_row + 1
             if(error){
                 past_error <- past_error + 1
