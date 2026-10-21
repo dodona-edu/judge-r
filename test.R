@@ -59,6 +59,9 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                      equal <- comparator(generated_val, expected, ...)
                  }
 
+                 # Fails here, before the test starts, when the comparator result is not TRUE or FALSE.
+                 equal <- if (equal) TRUE else FALSE
+
                  get_reporter()$start_test(expected_formatted, description)
                  if (equal) {
                      get_reporter()$add_message("Only the first five rows of the dataframe are shown.")
