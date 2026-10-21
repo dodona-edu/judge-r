@@ -146,6 +146,9 @@ testDF__inReview__ <- function(description, generated, expected, comparator = NU
 
 testGGPlot <- function(description, generated, expected, show_expected = TRUE, test_data = TRUE, test_geom = TRUE, test_facet = TRUE, test_label = FALSE, test_scale = FALSE, ...) {
     get_reporter()$start_test("", description)
+    tf_generated <- tempfile(fileext = ".png")
+    tf_expected <- tempfile(fileext = ".png")
+    on.exit(unlink(c(tf_generated, tf_expected)))
 
     tryCatch(
              .report_conditions("test", {
@@ -156,12 +159,12 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  feedback <- "You did not generate a ggplot"
                  if (plot_exists) {
                      generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
-                     suppressMessages(ggsave(tf_generated <- tempfile(fileext = ".png"), plot = generated_gg, dpi = "screen"))
+                     suppressMessages(ggsave(tf_generated, plot = generated_gg, dpi = "screen"))
                  }
 
                  if (show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
                      expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
-                     suppressMessages(ggsave(tf_expected <- tempfile(fileext = ".png"), plot = expected_gg, dpi = "screen"))
+                     suppressMessages(ggsave(tf_expected, plot = expected_gg, dpi = "screen"))
                  }
 
                  equal <- plot_exists
@@ -222,12 +225,6 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                      get_reporter()$add_message(feedback)
                      get_reporter()$end_test("", "wrong")
                  }
-                 if (show_expected && plot_exists) {
-                     file.remove(tf_expected)
-                 }
-                 if (plot_exists) {
-                     file.remove(tf_generated)
-                 }
              }),
              error = function(e) {
                  .close_test_with_runtime_error(description, e)
@@ -248,6 +245,7 @@ testIdentical <- function(description, generated, expected, formatter = NULL, ..
 
 testImage <- function(generate, failIfAbsent = TRUE, ...) {
     png(tf <- tempfile(fileext = ".png"), ...)
+    on.exit(unlink(tf))
     tryCatch(
              .report_conditions("image for testcase", {
                  generate(test_env$clean_env)
