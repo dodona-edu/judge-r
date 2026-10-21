@@ -6,7 +6,6 @@ round_df <- function(x) {
         dplyr::mutate_if(is.numeric, signif)
 }
 
-# A one-column row is a plain vector here: it has no row names to drop.
 without_row_names <- function(row) {
     if (is.data.frame(row)) row.names(row) <- NULL
     row
@@ -35,7 +34,7 @@ compare_data_frames_row_independent <- function(expected, generated, ...) {
     i <- 1
     while(i <= nrow(generated) && !mistakes_found) {
         j <- definitely_used + 1
-        while (j <= nrow(expected) && (is.element(j, used_rows) || !isTRUE(all.equal(without_row_names(generated[i,]), without_row_names(expected[j,]), ...)))) {
+        while (j <= nrow(expected) && (is.element(j, used_rows) || !isTRUE(all.equal(without_row_names(generated[i, , drop = FALSE]), without_row_names(expected[j, , drop = FALSE]), ...)))) {
             j <- j + 1
         }
         mistakes_found <- isTRUE(all.equal(j, nrow(expected) + 1))
