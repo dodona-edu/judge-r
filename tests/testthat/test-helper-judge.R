@@ -65,4 +65,7 @@ test_that("judge_packages are the packages run attaches", {
   attached <- sub("^\\s*library\\(['\"]?([^'\")]+)['\"]?\\).*$", "\\1", grep("^\\s*library\\(", run, value = TRUE))
 
   expect_equal(attached, judge_packages)
+
+  lazy <- grep("for \\(package in c\\(", run, value = TRUE)
+  expect_equal(eval(parse(text = sub("^.*for \\(package in (c\\([^)]*\\))\\).*$", "\\1", lazy))), judge_lazy_packages)
 })
