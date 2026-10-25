@@ -162,11 +162,6 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                      suppressMessages(ggsave(tf_generated, plot = generated_gg, dpi = "screen"))
                  }
 
-                 if (show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
-                     expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
-                     suppressMessages(ggsave(tf_expected, plot = expected_gg, dpi = "screen"))
-                 }
-
                  equal <- plot_exists
                  if (test_data && equal) {
                      test_data_result <- test_data_layer(expected_gg$data, generated_gg$data)
@@ -218,7 +213,9 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  if (equal) {
                      get_reporter()$end_test("", "correct")
                  } else {
-                     if (show_expected && plot_exists) {
+                     if (show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
+                         expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
+                         suppressMessages(ggsave(tf_expected, plot = expected_gg, dpi = "screen"))
                          image_expected <- base64enc::base64encode(tf_expected)
                          get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                      }

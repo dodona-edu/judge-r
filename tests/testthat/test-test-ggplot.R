@@ -16,6 +16,21 @@ test_that("testGGPlot accepts the same plot and shows it", {
   ))
 })
 
+test_that("testGGPlot renders only the generated plot when it is correct", {
+  judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  rendered <- 0
+  judge$ggsave <- function(...) {
+    rendered <<- rendered + 1
+    ggplot2::ggsave(...)
+  }
+
+  capture_feedback(judge, {
+    testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
+  })
+
+  expect_equal(rendered, 1)
+})
+
 test_that("testGGPlot shows the expected plot next to a wrong one", {
   judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_line())
 
