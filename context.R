@@ -22,6 +22,13 @@
 
 test_env <- new.env()
 
+# Evaluates `expr`, which runs student code, with the JIT level student code had before the judge turned it off.
+.with_student_jit <- function(expr) {
+    old <- compiler::enableJIT(student_jit_level)
+    on.exit(compiler::enableJIT(old))
+    expr
+}
+
 read_lines <- function(filename) {
     con <- file(filename, "r")
     on.exit(close(con))
@@ -77,7 +84,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      eval(preExec, envir = test_env$clean_env)
                      test_env$parsed_code <- parse_student_code()
                      error_status <- "runtime error"
-                     .report_captured_conditions("context", capture.output(assign("evaluationResult", eval(test_env$parsed_code, envir = test_env$clean_env), envir = test_env$clean_env)))
+                     .report_captured_conditions("context", capture.output(assign("evaluationResult", .with_student_jit(eval(test_env$parsed_code, envir = test_env$clean_env)), envir = test_env$clean_env)))
                      error_status <- "compilation error"
                  }, finally = {
                      # The student code may have closed it with dev.off() already.

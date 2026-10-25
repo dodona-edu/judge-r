@@ -5,6 +5,11 @@ invisible(evalq({
     # libraries. See context.R for a more extensive explanation.
     starting_parent_env <- parent.env(.GlobalEnv)
 
+    # Compiling the judge's functions and those of the packages it uses costs more
+    # than it saves, as they run only a few times per submission. Student code
+    # keeps the level R started with: see .with_student_jit in context.R.
+    student_jit_level <- compiler::enableJIT(0)
+
     library('jsonlite')
     library('base64enc')
     library('R6')
