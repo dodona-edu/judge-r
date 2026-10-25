@@ -1,0 +1,14 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"lazy"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"purrr is not loaded before it is used"}
+{"command":"close-testcase","accepted":true}
+{"command":"close-context"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"purrr without library()"}
+{"command":"start-test","expected":"1, 4, 9","description":"squares"}
+{"command":"close-test","generated":"1, 4, 9","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}
