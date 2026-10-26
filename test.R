@@ -9,7 +9,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
     tryCatch(
              .report_conditions("test", {
                  expected_val <- expected
-                 .report_captured_conditions("test", capture.output(generated_val <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
 
                  equal <- FALSE
                  if (is.null(comparator)) {
@@ -39,7 +39,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
 testDF <- function(description, generated, expected, comparator = NULL, ignore_row_order = TRUE, ignore_col_order = TRUE, ...) {
     tryCatch(
              .report_conditions("test", {
-                 .report_captured_conditions("test", capture.output(generated_val <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
                  # Format before comparison, this allows us to change the values below
                  expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
                  generated_formatted <- paste(knitr::kable(head(generated_val), "simple"), collapse = '\n')
@@ -87,7 +87,7 @@ testDF__inReview__ <- function(description, generated, expected, comparator = NU
     tryCatch(
              .report_conditions("test", {
 
-                 .report_captured_conditions("test", capture.output(generated_val <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
 
                  #frames for custom comparator or when dataframe is correct
                  df1_bad_frame <- 1:(rows_before_error + rows_after_error + 1)
@@ -153,7 +153,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
     tryCatch(
              .report_conditions("test", {
                  expected_gg <- expected
-                 .report_captured_conditions("test", capture.output(generated_gg <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_gg <- .with_student_jit(generated(test_env$clean_env))))
 
                  plot_exists <- is_ggplot(generated_gg)
                  feedback <- "You did not generate a ggplot"
@@ -245,7 +245,7 @@ testImage <- function(generate, failIfAbsent = TRUE, ...) {
     on.exit(unlink(tf))
     tryCatch(
              .report_conditions("image for testcase", {
-                 generate(test_env$clean_env)
+                 .with_student_jit(generate(test_env$clean_env))
              }),
              error = function(e) {
                  .report_test_runtime_error("", e)
@@ -294,7 +294,7 @@ testHtest <- function(description, generated, expected,
     tryCatch(
              .report_conditions("test", {
                  expected_val <- expected
-                 .report_captured_conditions("test", capture.output(generated_val <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
 
                  if (!"htest" %in% class(generated_val)) {
                      get_reporter()$start_test("", "")
@@ -371,7 +371,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
     tryCatch(
              .report_conditions("test", {
                  expected_val <- unique(sort(expected))
-                 .report_captured_conditions("test", capture.output(generated_raw <- generated(test_env$clean_env)))
+                 .report_captured_conditions("test", capture.output(generated_raw <- .with_student_jit(generated(test_env$clean_env))))
                  generated_val <- unique(sort(generated_raw))
 
                  equal <- TRUE

@@ -1,0 +1,14 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"jit"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"JIT level"}
+{"command":"start-test","expected":"3","description":"student code"}
+{"command":"close-test","generated":"3","status":{"enum":"correct"}}
+{"command":"start-test","expected":"3","description":"student function called by a test"}
+{"command":"close-test","generated":"3","status":{"enum":"correct"}}
+{"command":"start-test","expected":"0","description":"evaluation code"}
+{"command":"close-test","generated":"0","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

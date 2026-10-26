@@ -17,7 +17,7 @@ testcaseAssert <- function(description, checker) {
     get_reporter()$start_testcase(description)
     tryCatch(
         .report_conditions("assert", {
-            .report_captured_conditions("assert", capture.output(checker_val <- checker(test_env$clean_env)))
+            .report_captured_conditions("assert", capture.output(checker_val <- .with_student_jit(checker(test_env$clean_env))))
             if (!checker_val) {
                 get_reporter()$escalate("wrong")
             }

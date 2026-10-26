@@ -25,6 +25,7 @@ local_judge <- function(env = parent.frame()) {
 
   judge <- new.env(parent = globalenv())
   judge$starting_parent_env <- judge_starting_parent_env
+  judge$student_jit_level <- compiler::enableJIT(-1)
   source(file.path(test_path("..", ".."), "judge.R"), local = judge, chdir = TRUE)
   judge
 }
