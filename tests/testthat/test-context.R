@@ -130,7 +130,7 @@ test_that("student code does not see the packages the tests attach", {
   expect_false(judge$test_env$clean_env$found)
 })
 
-test_that("student code cannot call a function the tests called from a package they attach", {
+test_that("as documented, student code can call a package function the evaluation code called at its top level", {
   judge <- local_judge()
   withr::local_package("splines")
   local_student_code(judge, "found <- tryCatch(is.function(bs), error = function(e) FALSE)")
@@ -140,11 +140,23 @@ test_that("student code cannot call a function the tests called from a package t
     context({})
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_false(judge$test_env$clean_env$found))
+  expect_true(judge$test_env$clean_env$found)
 })
 
-test_that("student code cannot call a function the judge called from its packages", {
+test_that("as documented, student code can call a package function a testcase of an earlier context called", {
+  judge <- local_judge()
+  withr::local_package("splines")
+  local_student_code(judge, "found <- tryCatch(is.function(bs), error = function(e) FALSE)")
+
+  capture_feedback(judge, {
+    context(testcaseAssert("uses bs", function(env) is.matrix(bs(1:10))))
+    context({})
+  })
+
+  expect_true(judge$test_env$clean_env$found)
+})
+
+test_that("as documented, student code can call a function the judge itself called", {
   judge <- local_judge()
   local_student_code(judge, "found <- tryCatch(is.function(toJSON), error = function(e) FALSE)")
 
@@ -153,8 +165,7 @@ test_that("student code cannot call a function the judge called from its package
     context({})
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_false(judge$test_env$clean_env$found))
+  expect_true(judge$test_env$clean_env$found)
 })
 
 test_that("student code can attach packages and use them", {
@@ -177,18 +188,17 @@ test_that("test code does not see the packages the student attaches", {
   expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
 })
 
-test_that("test code cannot call a function the student called from a package they attach", {
+test_that("as documented, test code can call a package function the student code called", {
   judge <- local_judge()
   local_student_code(judge, c("library(tools)", 'title <- toTitleCase("hello")'))
 
   feedback <- capture_feedback(judge, {
-    context(testcaseAssert("toTitleCase is hidden", function(env) {
-      inherits(try(toTitleCase, silent = TRUE), "try-error")
+    context(testcaseAssert("toTitleCase is callable", function(env) {
+      !inherits(try(toTitleCase, silent = TRUE), "try-error")
     }))
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE)))
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
 })
 
 test_that("test code does not see the student's variables", {

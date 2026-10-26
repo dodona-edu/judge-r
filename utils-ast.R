@@ -95,15 +95,15 @@ find_assign <- function(x, start_path=c()) {
            },
            call = {
                assignation_path <- NULL
-               if (rlang::is_call(x, "<-") || rlang::is_call(x, "=")) {
+               if (is_call(x, "<-") || is_call(x, "=")) {
                    target <- x[[2]]
                    # l$a <- ... and l[["a"]] <- ... assign to l
-                   while (rlang::is_call(target, c("$", "[["))) {
+                   while (is_call(target, c("$", "[["))) {
                        target <- target[[2]]
                    }
-                   if (rlang::is_symbol(target)) {
+                   if (is_symbol(target)) {
                        assignation_path <- list()
-                       assignation_path[[rlang::as_string(target)]] <- list(start_path)
+                       assignation_path[[as_string(target)]] <- list(start_path)
                    }
                }
                return(Reduce(concat_lists, lapply(seq_along(x), function(index) find_assign(x[[index]], c(start_path, index))), assignation_path))
