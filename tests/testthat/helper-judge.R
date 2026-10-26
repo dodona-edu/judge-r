@@ -1,5 +1,7 @@
 # What `run` attaches before it sources judge.R; judge code calls them unqualified.
-judge_packages <- c("jsonlite", "base64enc", "R6", "rlang", "purrr")
+# `run` attaches judge_lazy_packages as delayed bindings; the tests attach them like the others.
+judge_packages <- c("jsonlite", "base64enc", "R6")
+judge_lazy_packages <- c("rlang", "purrr")
 
 # `run` saves this before attaching anything. Here testthat is attached already,
 # so student code in a context can see testthat; it cannot see judge_packages.
@@ -8,7 +10,7 @@ judge_starting_parent_env <- parent.env(.GlobalEnv)
 # Loads the judge into a fresh environment, like `run` does, and returns that
 # environment: every call has its own reporter, test_env and student_code.
 local_judge <- function(env = parent.frame()) {
-  for (package in judge_packages) {
+  for (package in c(judge_packages, judge_lazy_packages)) {
     suppressPackageStartupMessages(library(package, character.only = TRUE))
   }
 
