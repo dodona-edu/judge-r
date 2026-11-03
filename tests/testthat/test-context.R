@@ -146,10 +146,10 @@ test_that("student code cannot call a function the tests called from a package t
 
 test_that("student code cannot call a function the judge called from its packages", {
   judge <- local_judge()
-  local_student_code(judge, "found <- tryCatch(is.function(toJSON), error = function(e) FALSE)")
+  local_student_code(judge, "found <- tryCatch(is.function(some), error = function(e) FALSE)")
 
   capture_feedback(judge, {
-    get_reporter()$add_message("uses toJSON")
+    .some_child(list(TRUE), isTRUE)
     context({})
   })
 
@@ -261,6 +261,15 @@ test_that("context reports an error in the student code as a runtime error", {
 test_that("context reports a warning from the student code", {
   judge <- local_judge()
   local_student_code(judge, 'warning("careful")')
+
+  feedback <- suppressWarnings(capture_feedback(judge, context({})))
+
+  expect_equal(feedback_messages(feedback), "Warning while evaluating context: careful")
+})
+
+test_that("context reports a warning after the student code detached jsonlite", {
+  judge <- local_judge()
+  local_student_code(judge, 'library(jsonlite)\ndetach("package:jsonlite")\nwarning("careful")')
 
   feedback <- suppressWarnings(capture_feedback(judge, context({})))
 
