@@ -81,6 +81,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                  old_parent <- parent.env(.GlobalEnv)
                  parent.env(.GlobalEnv) <- starting_parent_env
                  tryCatch({
+                     .flush_cached(old_parent)
                      eval(preExec, envir = test_env$clean_env)
                      preexec_attached <- .preexec_attached(starting_parent_env)
                      error_status <- "compilation error"
@@ -93,7 +94,9 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      if(!is.null(image_file) && image_device %in% dev.list()) {
                          dev.off(image_device)
                      }
+                     student_parent <- parent.env(.GlobalEnv)
                      parent.env(.GlobalEnv) <- old_parent
+                     .flush_cached(student_parent, old_parent)
                  })
                  tryCatch({
                      .attach_for_testcases(preexec_attached)
@@ -168,4 +171,18 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     for (entry in attached) {
         if (entry$name %in% search()) detach(entry$name, character.only = TRUE)
     }
+}
+
+# parent.env<- does not flush R's global variable cache; defining a name in an attached environment does.
+.flush_cached <- function(...) {
+    names <- character()
+    for (env in list(...)) {
+        while (!.is_bottom_or_below(env, starting_parent_env)) {
+            names <- c(names, ls(env, all.names = TRUE))
+            env <- parent.env(env)
+        }
+    }
+    flush <- attach(NULL, name = "judge:flush", warn.conflicts = FALSE)
+    on.exit(detach("judge:flush", character.only = TRUE))
+    for (name in unique(names)) assign(name, NULL, envir = flush)
 }

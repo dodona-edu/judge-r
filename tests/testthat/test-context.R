@@ -140,8 +140,59 @@ test_that("student code cannot call a function the tests called from a package t
     context({})
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_false(judge$test_env$clean_env$found))
+  expect_false(judge$test_env$clean_env$found)
+})
+
+test_that("student code cannot call a package function that a testcase of an earlier context called", {
+  judge <- local_judge()
+  withr::local_package("splines")
+  local_student_code(judge, "found <- tryCatch(is.function(bs), error = function(e) FALSE)")
+
+  capture_feedback(judge, {
+    context(testcaseAssert("basis", function(env) is.matrix(bs(1:10))))
+    context({})
+  })
+
+  expect_false(judge$test_env$clean_env$found)
+})
+
+test_that("a submission that calls a package function without attaching its package fails with a runtime error, even though the evaluation file called it", {
+  judge <- local_judge()
+  withr::local_package("splines")
+  local_student_code(judge, "basis <- bs(1:10)")
+
+  feedback <- capture_feedback(judge, {
+    basis <- bs(1:10)
+    context({})
+  })
+
+  expect_equal(feedback_messages(feedback), 'Error while evaluating context: could not find function "bs"')
+  expect_equal(feedback[[3]], list(command = "escalate-status", status = list(enum = "runtime error")))
+})
+
+test_that("student code's filter() is stats' after the evaluation file called dplyr's", {
+  judge <- local_judge()
+  withr::local_package("dplyr")
+  local_student_code(judge, "smoothed <- filter(1:5, rep(1, 2))")
+
+  capture_feedback(judge, {
+    kept <- filter(data.frame(x = 1:3), x > 1)
+    context({})
+  })
+
+  expect_equal(judge$test_env$clean_env$smoothed, stats::filter(1:5, rep(1, 2)))
+})
+
+test_that("test code's filter() is dplyr's after the student code called stats'", {
+  judge <- local_judge()
+  withr::local_package("dplyr")
+  local_student_code(judge, "smoothed <- filter(1:5, rep(1, 2))")
+
+  feedback <- capture_feedback(judge, {
+    context(testcaseAssert("filter is dplyr's", function(env) identical(filter, dplyr::filter)))
+  })
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
 })
 
 test_that("student code cannot call a function the judge called from its packages", {
@@ -186,8 +237,7 @@ test_that("test code cannot call a function the student called from a package th
     }))
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE)))
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
 })
 
 test_that("test code does not see the student's variables", {
