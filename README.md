@@ -45,35 +45,22 @@ An error in `preExec`, or in the testcases block outside a `testcase`, sets the 
 
 Note that the student code is executed once for each call to `context`. Technically, this allows the student to store intermediate results in the global environment. The use of this is limited, so we don't see this as a problem.
 
-In this diagram of the environments, each arrow points to the parent environment, where R looks up a name it doesn't find:
+What each piece of code can see without loading anything itself:
 
-```mermaid
-flowchart BT
-    clean["clean environment of the context<br/>preExec and the student code run here"]
-    evaluation["evaluation file<br/>the testcases block runs here"]
-    judge["judge<br/>context(), testEqual(), ..."]
-    global[".GlobalEnv"]
-    evaluation_attached["packages the evaluation file attaches"]
-    judge_attached["packages the judge attaches<br/>purrr, rlang, R6, base64enc, jsonlite"]
-    kept["what the student side attached, for the student's functions<br/>lazy references, set up after the student code ends"]
-    context_attached["what preExec and the student code attach<br/>dropped when the student code ends"]
-    preexec_data["data preExec attached, as preExec left it"]
-    preexec_packages["packages preExec attached"]
-    startup["packages R attaches at startup<br/>stats, graphics, grDevices, utils, datasets, methods"]
-    base["Autoloads, base"]
+| What | Student code | Test code | A student function, called by a test |
+| --- | --- | --- | --- |
+| Variables `preExec` creates | yes | through `studentEnv$...` | yes |
+| Variables the student code creates | yes | through `studentEnv$...` | yes |
+| Variables the evaluation file creates outside `context()` | no | yes | no |
+| Data `preExec` attaches with `attach()` | yes | yes | yes |
+| Packages `preExec` loads with `library()` | yes | yes | yes |
+| Packages the student code loads | yes | no | yes |
+| Packages the evaluation file loads | no | yes | yes |
+| The judge's own packages (purrr, rlang, R6, base64enc, jsonlite) | no | yes | yes |
+| R's default packages and data sets | yes | yes | yes |
+| Objects in `.GlobalEnv` (`data()` sets, `<<-` assignments) | yes | yes | yes |
 
-    clean --> kept --> global
-    evaluation --> judge --> global
-    global -- "the rest of the time" --> evaluation_attached
-    global -. "while the testcases run" .-> preexec_data -.-> evaluation_attached
-    evaluation_attached -- "the rest of the time" --> judge_attached
-    evaluation_attached -. "while the testcases run" .-> preexec_packages -.-> judge_attached
-    judge_attached --> startup
-    global -. "while preExec and the student code run" .-> context_attached -.-> startup
-    startup --> base
-```
-
-Student code sees only what `preExec` and the student code attach, plus the packages R attaches at startup. Test code sees what the evaluation file and `preExec` attach. Neither side can call a package function that only the other side attached, so a submission that forgets a `library()` call fails like it would in plain R. Functions the student code defines keep using the packages the student code attached, also when the tests call them.
+So a submission that forgets a `library()` call fails like it would in plain R, unless `preExec` loads the package. When two packages export the same name, test code uses the evaluation file's package first, then `preExec`'s, then the judge's own.
 
 The `contextWithRmd` function does the same as the `context` function but it expects the student code to be in the R Markdown format. The R chunks are evaluated as before and the markdown text is ignored during evalutaion.
 
