@@ -1,3 +1,10 @@
+# Runs the student's code and returns its value; printed output is dropped, its conditions are reported.
+.generate <- function(generated, what = "test") {
+    value <- NULL
+    .report_captured_conditions(what, capture.output(value <- .with_student_jit(generated(test_env$clean_env))))
+    value
+}
+
 testEqual <- function(description, generated, expected, comparator = NULL, formatter = NULL, ...) {
     if (is.null(formatter)) {
         expected_formatted <- expected
@@ -9,7 +16,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
     tryCatch(
              .report_conditions("test", {
                  expected_val <- expected
-                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_val <- .generate(generated)
 
                  equal <- FALSE
                  if (is.null(comparator)) {
@@ -23,11 +30,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
                  } else {
                      generated_formatted <- formatter(generated_val)
                  }
-                 if (equal) {
-                     get_reporter()$end_test(generated_formatted, "correct")
-                 } else {
-                     get_reporter()$end_test(generated_formatted, "wrong")
-                 }
+                 get_reporter()$end_test(generated_formatted, if (equal) "correct" else "wrong")
              }),
              error = function(e) {
                  .close_test_with_runtime_error(description, e)
@@ -39,7 +42,7 @@ testEqual <- function(description, generated, expected, comparator = NULL, forma
 testDF <- function(description, generated, expected, comparator = NULL, ignore_row_order = TRUE, ignore_col_order = TRUE, ...) {
     tryCatch(
              .report_conditions("test", {
-                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_val <- .generate(generated)
                  # Format before comparison, this allows us to change the values below
                  expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
                  generated_formatted <- paste(knitr::kable(head(generated_val), "simple"), collapse = '\n')
@@ -87,7 +90,7 @@ testDF__inReview__ <- function(description, generated, expected, comparator = NU
     tryCatch(
              .report_conditions("test", {
 
-                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_val <- .generate(generated)
 
                  #frames for custom comparator or when dataframe is correct
                  df1_bad_frame <- 1:(rows_before_error + rows_after_error + 1)
@@ -153,7 +156,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
     tryCatch(
              .report_conditions("test", {
                  expected_gg <- expected
-                 .report_captured_conditions("test", capture.output(generated_gg <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_gg <- .generate(generated)
 
                  plot_exists <- is_ggplot(generated_gg)
                  feedback <- "You did not generate a ggplot"
@@ -294,7 +297,7 @@ testHtest <- function(description, generated, expected,
     tryCatch(
              .report_conditions("test", {
                  expected_val <- expected
-                 .report_captured_conditions("test", capture.output(generated_val <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_val <- .generate(generated)
 
                  if (!"htest" %in% class(generated_val)) {
                      get_reporter()$start_test("", "")
@@ -348,11 +351,7 @@ testHtest <- function(description, generated, expected,
                  }
 
                  get_reporter()$start_test(expected_formatted, description)
-                 if (equal) {
-                     get_reporter()$end_test(generated_formatted, "correct")
-                 } else {
-                     get_reporter()$end_test(generated_formatted, "wrong")
-                 }
+                 get_reporter()$end_test(generated_formatted, if (equal) "correct" else "wrong")
              }),
              error = function(e) {
                  .report_test_runtime_error(description, e)
@@ -371,7 +370,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
     tryCatch(
              .report_conditions("test", {
                  expected_val <- unique(sort(expected))
-                 .report_captured_conditions("test", capture.output(generated_raw <- .with_student_jit(generated(test_env$clean_env))))
+                 generated_raw <- .generate(generated)
                  generated_val <- unique(sort(generated_raw))
 
                  equal <- TRUE
@@ -404,11 +403,7 @@ testMultipleChoice <- function(description, generated, expected, possible_answer
                      get_reporter()$add_message("Your solution will be verified after the deadline.")
                  }
 
-                 if (equal) {
-                     get_reporter()$end_test(generated_raw, "correct")
-                 } else {
-                     get_reporter()$end_test(generated_raw, "wrong")
-                 }
+                 get_reporter()$end_test(generated_raw, if (equal) "correct" else "wrong")
              }),
              error = function(e) {
                  .close_test_with_runtime_error(description, e)
