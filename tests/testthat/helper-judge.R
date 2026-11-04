@@ -1,6 +1,6 @@
 # What `run` attaches before it sources judge.R; judge code calls them unqualified.
 # `run` attaches judge_lazy_packages as delayed bindings; the tests attach them like the others.
-judge_packages <- c("jsonlite", "base64enc", "R6")
+judge_packages <- c("jsonlite", "base64enc")
 judge_lazy_packages <- c("rlang", "purrr")
 
 # `run` saves this before attaching anything. Here testthat is attached already,

@@ -1,59 +1,28 @@
-DodonaReporter <- R6::R6Class("DodonaReporter",
-  public = list(
-    start_reporter = function() {
-        write('{"command": "start-judgement"}', stdout())
-    },
+# One JSON command per line on stdout; NULL fields are left out (toJSON would write them as {}).
+.write_command <- function(command, ...) {
+    fields <- Filter(Negate(is.null), list(command = command, ...))
+    write(jsonlite::toJSON(fields, auto_unbox = TRUE), stdout())
+}
 
-    start_tab = function(name) {
-        write(paste('{"command": "start-tab", "title": ', jsonlite::toJSON(name, auto_unbox=TRUE), '}', sep=''), stdout())
-    },
-
-    start_context = function() {
-        write('{"command": "start-context" }', stdout())
-    },
-
-    start_testcase = function(description) {
-        write(paste('{"command": "start-testcase", "description": ', jsonlite::toJSON(description, auto_unbox=TRUE), '}', sep=''), stdout())
-    },
-
-    start_test = function(expected, description) {
-        write(paste('{"command": "start-test", "expected": ', jsonlite::toJSON(toString(expected), auto_unbox=TRUE) ,', "description": ', jsonlite::toJSON(toString(description), auto_unbox=TRUE), '}', sep=''), stdout())
-    },
-
-    end_test = function(generated, status) {
-        write(paste('{"command": "close-test", "generated": ', jsonlite::toJSON(toString(generated), auto_unbox=TRUE) ,', "status": {"enum": "', status, '"}}', sep=''), stdout())
-    },
-
-    end_testcase = function(accepted = NULL) {
-        if(is.null(accepted)) {
-            write('{"command": "close-testcase"}', stdout())
-        } else {
-            write(paste('{"command": "close-testcase", "accepted": ', jsonlite::toJSON(accepted, auto_unbox=TRUE) ,'}', sep=''), stdout())
-        }
-    },
-
-    end_context = function(accepted = NULL) {
-        if(is.null(accepted)) {
-            write('{"command": "close-context"}', stdout())
-        } else {
-            write(paste('{"command": "close-context", "accepted": ', jsonlite::toJSON(accepted, auto_unbox=TRUE) ,'}', sep=''), stdout())
-        }
-    },
-
-    end_tab = function() {
-        write('{"command": "close-tab"}', stdout())
-    },
-
-    end_reporter = function() {
-        write('{"command": "close-judgement"}', stdout())
-    },
-
-    add_message = function(message, type="plain") {
-        write(paste('{"command": "append-message", "message": { "description": ', jsonlite::toJSON(toString(message), auto_unbox=TRUE), ', "format": ', jsonlite::toJSON(type, auto_unbox=TRUE), '} }', sep=''), stdout())
-    },
-
-    escalate = function(status) {
-        write(paste('{"command": "escalate-status", "status": {"enum": "', status, '"}}', sep=''), stdout())
-    }
-  )
-)
+new_dodona_reporter <- function() {
+    structure(list(
+        start_reporter = function() .write_command("start-judgement"),
+        start_tab = function(name) .write_command("start-tab", title = name),
+        start_context = function() .write_command("start-context"),
+        start_testcase = function(description) .write_command("start-testcase", description = description),
+        start_test = function(expected, description) {
+            .write_command("start-test", expected = toString(expected), description = toString(description))
+        },
+        end_test = function(generated, status) {
+            .write_command("close-test", generated = toString(generated), status = list(enum = status))
+        },
+        end_testcase = function(accepted = NULL) .write_command("close-testcase", accepted = accepted),
+        end_context = function(accepted = NULL) .write_command("close-context", accepted = accepted),
+        end_tab = function() .write_command("close-tab"),
+        end_reporter = function() .write_command("close-judgement"),
+        add_message = function(message, type = "plain") {
+            .write_command("append-message", message = list(description = toString(message), format = type))
+        },
+        escalate = function(status) .write_command("escalate-status", status = list(enum = status))
+    ), class = "DodonaReporter")
+}
