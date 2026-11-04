@@ -2,20 +2,25 @@
     get_reporter()$add_message(paste(kind, " while evaluating ", what, ": ", conditionMessage(condition), sep = ''))
 }
 
-.report_conditions <- function(what, expr) {
+# `record(kind, condition)` receives each warning and message; packageStartupMessages are only muffled.
+.handle_conditions <- function(expr, record) {
     withCallingHandlers(
         expr,
         warning = function(w) {
-            .add_condition_message("Warning", what, w)
+            record("Warning", w)
             invokeRestart("muffleWarning")
         },
         message = function(m) {
             if (!inherits(m, "packageStartupMessage")) {
-                .add_condition_message("Message", what, m)
+                record("Message", m)
             }
             invokeRestart("muffleMessage")
         }
     )
+}
+
+.report_conditions <- function(what, expr) {
+    .handle_conditions(expr, function(kind, condition) .add_condition_message(kind, what, condition))
 }
 
 # capture.output() swallows what is reported while it runs, so report its conditions once it returns.
@@ -24,19 +29,9 @@
     on.exit(for (condition in conditions) {
         .add_condition_message(condition$kind, what, condition$condition)
     })
-    withCallingHandlers(
-        captured,
-        warning = function(w) {
-            conditions[[length(conditions) + 1]] <<- list(kind = "Warning", condition = w)
-            invokeRestart("muffleWarning")
-        },
-        message = function(m) {
-            if (!inherits(m, "packageStartupMessage")) {
-                conditions[[length(conditions) + 1]] <<- list(kind = "Message", condition = m)
-            }
-            invokeRestart("muffleMessage")
-        }
-    )
+    .handle_conditions(captured, function(kind, condition) {
+        conditions[[length(conditions) + 1]] <<- list(kind = kind, condition = condition)
+    })
 }
 
 .fail_testcase <- function(what, e) {
