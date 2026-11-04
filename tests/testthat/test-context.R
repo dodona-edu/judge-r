@@ -240,6 +240,65 @@ test_that("test code cannot call a function the student called from a package th
   expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
 })
 
+test_that("a student function that uses a package the student code attached works when a test calls it", {
+  judge <- local_judge()
+  local_student_code(judge, c(
+    "library(stringr)",
+    'f <- function(x) as.numeric(str_length(strrep("a", x)))^2'
+  ))
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("f", function(env) identical(env$f(1:3), c(1, 4, 9)))
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("a student function that uses a package the student code attached works when a test calls it after the student code called it", {
+  judge <- local_judge()
+  local_student_code(judge, c(
+    "library(stringr)",
+    'f <- function(x) as.numeric(str_length(strrep("a", x)))^2',
+    "f(2)"
+  ))
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("f", function(env) identical(env$f(1:3), c(1, 4, 9)))
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code cannot call a function of a package the student code attached after a student function used it", {
+  judge <- local_judge()
+  local_student_code(judge, c(
+    "library(stringr)",
+    'f <- function(x) as.numeric(str_length(strrep("a", x)))^2'
+  ))
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("str_length is hidden", function(env) {
+      identical(env$f(1:3), c(1, 4, 9)) && inherits(try(str_length, silent = TRUE), "try-error")
+    })
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("a student function gets the preExec package's function when the evaluation file attached a package with the same function name", {
+  judge <- local_judge()
+  withr::local_package("dplyr")
+  local_student_code(judge, "f <- function() select")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("select is MASS's", function(env) identical(env$f(), MASS::select))
+  }, preExec = {
+    library(MASS)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
 test_that("test code does not see the student's variables", {
   judge <- local_judge()
   local_student_code(judge, "student_answer <- 42")

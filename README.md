@@ -55,13 +55,14 @@ flowchart BT
     global[".GlobalEnv"]
     evaluation_attached["packages the evaluation file attaches"]
     judge_attached["packages the judge attaches<br/>purrr, rlang, R6, base64enc, jsonlite"]
+    kept["what the student side attached, for the student's functions<br/>lazy references, set up after the student code ends"]
     context_attached["what preExec and the student code attach<br/>dropped when the student code ends"]
     preexec_data["data preExec attached, as preExec left it"]
     preexec_packages["packages preExec attached"]
     startup["packages R attaches at startup<br/>stats, graphics, grDevices, utils, datasets, methods"]
     base["Autoloads, base"]
 
-    clean --> global
+    clean --> kept --> global
     evaluation --> judge --> global
     global -- "the rest of the time" --> evaluation_attached
     global -. "while the testcases run" .-> preexec_data -.-> evaluation_attached
@@ -72,7 +73,7 @@ flowchart BT
     startup --> base
 ```
 
-Student code sees only what `preExec` and the student code attach, plus the packages R attaches at startup. Test code sees what the evaluation file and `preExec` attach. Neither side can call a package function that only the other side attached, so a submission that forgets a `library()` call fails like it would in plain R.
+Student code sees only what `preExec` and the student code attach, plus the packages R attaches at startup. Test code sees what the evaluation file and `preExec` attach. Neither side can call a package function that only the other side attached, so a submission that forgets a `library()` call fails like it would in plain R. Functions the student code defines keep using the packages the student code attached, also when the tests call them.
 
 The `contextWithRmd` function does the same as the `context` function but it expects the student code to be in the R Markdown format. The R chunks are evaluated as before and the markdown text is ignored during evalutaion.
 

@@ -97,6 +97,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      student_parent <- parent.env(.GlobalEnv)
                      parent.env(.GlobalEnv) <- old_parent
                      .flush_cached(student_parent, old_parent)
+                     .keep_student_attached(student_parent)
                  })
                  tryCatch({
                      .attach_for_testcases(preexec_attached)
@@ -185,4 +186,22 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     flush <- attach(NULL, name = "judge:flush", warn.conflicts = FALSE)
     on.exit(detach("judge:flush", character.only = TRUE))
     for (name in unique(names)) assign(name, NULL, envir = flush)
+}
+
+# Tests call student functions after the search path is swapped back, so their enclosure keeps what the student side attached.
+.keep_student_attached <- function(student_parent) {
+    kept <- new.env(parent = globalenv())
+    env <- student_parent
+    while (!.is_bottom_or_below(env, starting_parent_env)) {
+        for (name in ls(env, all.names = TRUE)) {
+            if (!exists(name, envir = kept, inherits = FALSE)) .bind_lazily(name, env, kept)
+        }
+        env <- parent.env(env)
+    }
+    parent.env(test_env$clean_env) <- kept
+}
+
+.bind_lazily <- function(name, from, to) {
+    force(from)
+    delayedAssign(name, get(name, envir = from, inherits = FALSE), assign.env = to)
 }
