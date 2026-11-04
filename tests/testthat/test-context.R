@@ -153,8 +153,7 @@ test_that("student code cannot call a function the judge called from its package
     context({})
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_false(judge$test_env$clean_env$found))
+  expect_false(judge$test_env$clean_env$found)
 })
 
 test_that("student code can attach packages and use them", {
@@ -216,8 +215,169 @@ test_that("what test code sees of a data frame attached in preExec does not depe
   local_student_code(judge, "passed <- exam$exam_score >= 10")
   column <- capture_feedback(with_values(judge, evaluation = evaluation), eval(evaluation))
 
-  # Bug #65: Strange behaviour with attach() in preExec
-  expect_failure(expect_equal(attached_name, column))
+  expect_equal(attached_name, column)
+})
+
+test_that("a submission that reads a column of a data frame attached in preExec through the data frame is graded correct", {
+  judge <- local_judge()
+  local_student_code(judge, "passed <- exam$exam_score >= 10")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("passed", function(env) identical(env$passed, exam_score >= 10))
+  }, preExec = {
+    exam <- data.frame(exam_score = c(8, 12))
+    attach(exam)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("a submission that reads a data frame attached in preExec with with() is graded correct", {
+  judge <- local_judge()
+  local_student_code(judge, "passed <- with(exam, exam_score >= 10)")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("passed", function(env) identical(env$passed, exam_score >= 10))
+  }, preExec = {
+    exam <- data.frame(exam_score = c(8, 12))
+    attach(exam)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("a wrong submission that reads a column of a data frame attached in preExec is graded wrong", {
+  judge <- local_judge()
+  local_student_code(judge, "passed <- exam$exam_score >= 100")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("passed", function(env) identical(env$passed, exam_score >= 10))
+  }, preExec = {
+    exam <- data.frame(exam_score = c(8, 12))
+    attach(exam)
+  }))
+
+  expect_equal(feedback, list(
+    list(command = "start-context"),
+    list(command = "start-testcase", description = "passed"),
+    list(command = "escalate-status", status = list(enum = "wrong")),
+    list(command = "close-testcase", accepted = FALSE),
+    list(command = "close-context")
+  ))
+})
+
+test_that("a submission that detaches the data frame attached in preExec is graded correct", {
+  judge <- local_judge()
+  local_student_code(judge, c("passed <- exam_score >= 10", "detach(exam)"))
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("passed", function(env) identical(env$passed, exam_score >= 10))
+  }, preExec = {
+    exam <- data.frame(exam_score = c(8, 12))
+    attach(exam)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("student code that assigns to a column attached in preExec does not change what test code sees", {
+  judge <- local_judge()
+  local_student_code(judge, "exam_score <<- c(20, 20)")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("unchanged", function(env) identical(exam_score, c(8, 12)))
+  }, preExec = {
+    exam <- data.frame(exam_score = c(8, 12))
+    attach(exam)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code can call a function of a package attached in preExec when the student code calls it with ::", {
+  judge <- local_judge()
+  local_student_code(judge, "basis <- splines::bs(1:10, df = 3)")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("basis", function(env) identical(env$basis, bs(1:10, df = 3)))
+  }, preExec = {
+    library(splines)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code can call a function of a package attached in preExec when the student code does not call it", {
+  judge <- local_judge()
+  local_student_code(judge, "")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("basis", function(env) is.matrix(bs(1:10, df = 3)))
+  }, preExec = {
+    library(splines)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code uses the evaluation file's package when a package attached in preExec exports a function with the same name", {
+  judge <- local_judge()
+  withr::local_package("dplyr")
+  local_student_code(judge, "")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("select is dplyr's", function(env) identical(select, dplyr::select))
+  }, preExec = {
+    library(MASS)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code uses the function of a package attached in preExec when one of the judge's packages exports a function with the same name", {
+  judge <- local_judge()
+  local_student_code(judge, "")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("simplify is igraph's", function(env) identical(simplify, igraph::simplify))
+  }, preExec = {
+    library(igraph)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code in a later context does not see a data frame attached in the preExec of an earlier one", {
+  judge <- local_judge()
+  local_student_code(judge, "passed <- tryCatch(exam_score >= 10, error = function(e) NULL)")
+
+  feedback <- capture_feedback(judge, {
+    context(testcaseAssert("first", function(env) identical(env$passed, exam_score >= 10)), preExec = {
+      exam <- data.frame(exam_score = c(8, 12))
+      attach(exam)
+    })
+    context(testcaseAssert("hidden", function(env) tryCatch({ exam_score; FALSE }, error = function(e) TRUE)))
+  })
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+  expect_equal(feedback[[7]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("context detaches what preExec attached after an error in its testcases", {
+  judge <- local_judge()
+  local_student_code(judge, "passed <- tryCatch(exam_score >= 10, error = function(e) NULL)")
+
+  feedback <- capture_feedback(judge, {
+    context(stop("broken test code"), preExec = {
+      exam <- data.frame(exam_score = c(8, 12))
+      attach(exam)
+    })
+    context(testcaseAssert("hidden", function(env) tryCatch({ exam_score; FALSE }, error = function(e) TRUE)))
+  })
+
+  expect_equal(feedback_messages(feedback), "Error while evaluating context: broken test code")
+  expect_equal(tail(feedback, 2)[[1]], list(command = "close-testcase", accepted = TRUE))
+  expect_false("preExec:exam" %in% search())
 })
 
 test_that("context reports a syntax error in the student code as a compilation error", {

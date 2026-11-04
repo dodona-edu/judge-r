@@ -1,5 +1,5 @@
 # purrr 1.2 warns when some() gets an expression or pairlist.
-.some_child <- function(x, f) some(as.list(x), f)
+.some_child <- function(x, f) purrr::some(as.list(x), f)
 
 is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
     var_paths_c <- var_paths
@@ -8,7 +8,7 @@ is_function_used_in_var <- function(func_name, var_paths, var, main_code) {
 }
 
 is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
-    if (identical(sub_tree_root, sym(""))) {
+    if (identical(sub_tree_root, rlang::sym(""))) {
         return(FALSE)
     }
     switch(expr_type(sub_tree_root),
@@ -19,12 +19,12 @@ is_function_used <- function(func_name, var_paths, sub_tree_root, main_code) {
                return(.some_child(var_paths[[sub_tree_root]], function(x) is_function_used(func_name, var_paths_c, get_node(x, main_code), main_code)))
            },
            call = {
-               if (is_call(sub_tree_root, func_name)) {
+               if (rlang::is_call(sub_tree_root, func_name)) {
                    return(TRUE)
                }
                children <- as.list(sub_tree_root)
                # No need to check assignation branches of parameters before assignation symbol
-               if((is_call(sub_tree_root, "<-") || is_call(sub_tree_root, "=")) && is_symbol(children[[2]])){
+               if((rlang::is_call(sub_tree_root, "<-") || rlang::is_call(sub_tree_root, "=")) && rlang::is_symbol(children[[2]])){
                    children[[2]] <- NULL
                }
                return(.some_child(children, function(x) is_function_used(func_name, var_paths, x, main_code)))

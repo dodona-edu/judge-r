@@ -82,6 +82,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                  parent.env(.GlobalEnv) <- starting_parent_env
                  tryCatch({
                      eval(preExec, envir = test_env$clean_env)
+                     preexec_attached <- .preexec_attached(starting_parent_env)
                      error_status <- "compilation error"
                      test_env$parsed_code <- parse_student_code()
                      error_status <- "runtime error"
@@ -94,8 +95,11 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      }
                      parent.env(.GlobalEnv) <- old_parent
                  })
-                 # eval() also evaluates the block's value: do that in the public function's frame.
-                 eval(testcases, envir = caller)
+                 tryCatch({
+                     .attach_for_testcases(preexec_attached)
+                     # eval() also evaluates the block's value: do that in the public function's frame.
+                     eval(testcases, envir = caller)
+                 }, finally = .detach_for_testcases(preexec_attached))
              }),
              error = function(e) {
                  .add_condition_message("Error", "context", e)
@@ -104,4 +108,64 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                  do_exit <<- FALSE
              }
     )
+}
+
+# What preExec attached to the search path, top first. Data is copied now, before the
+# student code runs, so the student code cannot change what the testcases see.
+.preexec_attached <- function(bottom) {
+    attached <- list()
+    env <- parent.env(.GlobalEnv)
+    while (!.is_bottom_or_below(env, bottom)) {
+        name <- attr(env, "name")
+        if (is.null(name)) name <- "unnamed"
+        is_package <- startsWith(name, "package:")
+        attached[[length(attached) + 1]] <- list(
+            name = paste0("preExec:", name),
+            is_package = is_package,
+            # Locked, so the student code cannot change it; attach() copies it without forcing its lazy data.
+            values = if (is_package) env else as.list(env, all.names = TRUE)
+        )
+        env <- parent.env(env)
+    }
+    attached
+}
+
+# TRUE for `bottom` and the environments below it (Autoloads, base, the empty environment).
+.is_bottom_or_below <- function(env, bottom) {
+    repeat {
+        if (identical(env, bottom)) return(TRUE)
+        if (identical(bottom, emptyenv())) return(FALSE)
+        bottom <- parent.env(bottom)
+    }
+}
+
+# Data goes on top, where attach() in preExec put it. Packages go right above the judge's
+# packages: on a name clash they lose to the evaluation file's packages and win over the judge's.
+# attach() and detach() flush R's global variable cache for their names; a parent.env() swap does not.
+.attach_for_testcases <- function(attached) {
+    for (entry in rev(attached)) {
+        if (!entry$is_package) {
+            attach(entry$values, pos = 2L, name = entry$name, warn.conflicts = FALSE)
+        }
+    }
+    for (entry in attached) {
+        if (entry$is_package) {
+            attach(entry$values, pos = .search_position(judge_parent_env),
+                   name = entry$name, warn.conflicts = FALSE)
+        }
+    }
+}
+
+# The search path position of `env`, or right above package:base when `env` was detached.
+.search_position <- function(env) {
+    for (pos in seq_along(search())) {
+        if (identical(pos.to.env(pos), env)) return(pos)
+    }
+    length(search())
+}
+
+.detach_for_testcases <- function(attached) {
+    for (entry in attached) {
+        if (entry$name %in% search()) detach(entry$name, character.only = TRUE)
+    }
 }
