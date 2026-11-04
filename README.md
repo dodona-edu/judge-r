@@ -56,7 +56,7 @@ What each piece of code can see without loading anything itself:
 | Packages `preExec` loads with `library()` | yes | yes | yes |
 | Packages the student code loads | yes | no | yes |
 | Packages the evaluation file loads | no | yes | yes |
-| The judge's own packages (purrr, rlang, R6, base64enc, jsonlite) | no | yes | yes |
+| The judge's own packages (purrr, rlang, base64enc, jsonlite) | no | yes | yes |
 | R's default packages and data sets | yes | yes | yes |
 | Objects in `.GlobalEnv` (`data()` sets, `<<-` assignments) | yes | yes | yes |
 

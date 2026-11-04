@@ -12,7 +12,6 @@ invisible(evalq({
 
     library('jsonlite')
     library('base64enc')
-    library('R6')
     # Attached like library() would, but a namespace only loads when one of its
     # functions is used: most submissions use neither.
     local(for (package in c('rlang', 'purrr')) {
