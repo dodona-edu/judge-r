@@ -19,10 +19,11 @@ test_that("testGGPlot accepts the same plot and shows it", {
 test_that("testGGPlot renders only the generated plot when it is correct", {
   judge <- local_judge_with(p = ggplot(mtcars, aes(wt, mpg)) + geom_point())
   rendered <- 0
-  judge$ggsave <- function(...) {
+  original_ggsave <- ggplot2::ggsave
+  local_mocked_bindings(ggsave = function(...) {
     rendered <<- rendered + 1
-    ggplot2::ggsave(...)
-  }
+    original_ggsave(...)
+  }, .package = "ggplot2")
 
   capture_feedback(judge, {
     testGGPlot("p", function(env) env$p, ggplot(mtcars, aes(wt, mpg)) + geom_point())
