@@ -1,7 +1,7 @@
 # Runs the student's code and returns its value; printed output is dropped, its conditions are reported.
 .generate <- function(generated, what = "test") {
     value <- NULL
-    .report_captured_conditions(what, capture.output(value <- .with_student_jit(generated(test_env$clean_env))))
+    .report_captured_conditions(what, utils::capture.output(value <- .with_student_jit(generated(test_env$clean_env))))
     value
 }
 
@@ -44,8 +44,8 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
              .report_conditions("test", {
                  generated_val <- .generate(generated)
                  # Format before comparison, this allows us to change the values below
-                 expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
-                 generated_formatted <- paste(knitr::kable(head(generated_val), "simple"), collapse = '\n')
+                 expected_formatted <- paste(knitr::kable(utils::head(expected), "simple"), collapse = '\n')
+                 generated_formatted <- paste(knitr::kable(utils::head(generated_val), "simple"), collapse = '\n')
 
                  equal <- FALSE
                  if (is.null(comparator)) {
@@ -78,7 +78,7 @@ testDF <- function(description, generated, expected, comparator = NULL, ignore_r
                  }
              }),
              error = function(e) {
-                 expected_formatted <- paste(knitr::kable(head(expected), "simple"), collapse = '\n')
+                 expected_formatted <- paste(knitr::kable(utils::head(expected), "simple"), collapse = '\n')
                  get_reporter()$start_test(expected_formatted, description)
                  .close_test_with_runtime_error(description, e)
              }
@@ -158,11 +158,11 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  expected_gg <- expected
                  generated_gg <- .generate(generated)
 
-                 plot_exists <- is_ggplot(generated_gg)
+                 plot_exists <- ggplot2::is_ggplot(generated_gg)
                  feedback <- "You did not generate a ggplot"
                  if (plot_exists) {
                      generated_gg$labels$title <- paste(generated_gg$labels$title, "(Generated Plot)")
-                     suppressMessages(ggsave(tf_generated, plot = generated_gg, dpi = "screen"))
+                     suppressMessages(ggplot2::ggsave(tf_generated, plot = generated_gg, dpi = "screen"))
                  }
 
                  equal <- plot_exists
@@ -218,7 +218,7 @@ testGGPlot <- function(description, generated, expected, show_expected = TRUE, t
                  } else {
                      if (show_expected && plot_exists) { #we don't show the solution if the exercise is left empty
                          expected_gg$labels$title <- paste(expected_gg$labels$title, "(Expected Plot)")
-                         suppressMessages(ggsave(tf_expected, plot = expected_gg, dpi = "screen"))
+                         suppressMessages(ggplot2::ggsave(tf_expected, plot = expected_gg, dpi = "screen"))
                          image_expected <- base64enc::base64encode(tf_expected)
                          get_reporter()$add_message(paste("<img style=\"max-width:100%; width:450px;\" src=\"data:image/png;base64,", image_expected, "\"/>", sep=''), type = "html")
                      }
@@ -244,7 +244,7 @@ testIdentical <- function(description, generated, expected, formatter = NULL, ..
 }
 
 testImage <- function(generate, failIfAbsent = TRUE, ...) {
-    png(tf <- tempfile(fileext = ".png"), ...)
+    grDevices::png(tf <- tempfile(fileext = ".png"), ...)
     on.exit(unlink(tf))
     tryCatch(
              .report_conditions("image for testcase", {
@@ -254,7 +254,7 @@ testImage <- function(generate, failIfAbsent = TRUE, ...) {
                  .report_test_runtime_error("", e)
              }
     )
-    dev.off()
+    grDevices::dev.off()
     .report_image(tf, failIfAbsent, within_testcase = TRUE)
 }
 

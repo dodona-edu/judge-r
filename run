@@ -2,7 +2,7 @@
 
 invisible(evalq({
     # We need to save the parent of the global environment before we load any
-    # libraries. See context.R for a more extensive explanation.
+    # libraries. See "Contexts" in README.md.
     starting_parent_env <- parent.env(.GlobalEnv)
 
     # Compiling the judge's functions and those of the packages it uses costs more
@@ -25,7 +25,7 @@ invisible(evalq({
     # preExec's packages go right above this for the testcases: see .attach_for_testcases in context.R.
     judge_parent_env <- parent.env(.GlobalEnv)
 
-    input <- fromJSON(file('stdin'))
+    input <- jsonlite::fromJSON(file('stdin'))
     source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE, local=TRUE)
 
     start_judgement(input$resources, input$source)

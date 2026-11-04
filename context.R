@@ -1,23 +1,6 @@
-# We need to do some tricky stuff to make sure students can both load libraries
-# and not actually use the libraries loaded by the test code. The reasons for
-# this are two-fold:
-#  1. When loading a library, R takes the global env and injects the library
-#     between the global env and its parent env. This means that if we base a new
-#     environment on something above the global env, loading a new library when
-#     executing in that env doesn't actually make that library show up in the
-#     environment we are currently executing in.
-#  2. A number of libraries are loaded by default when starting R. This means
-#     that when starting R, the parent of the global env is not in fact the
-#     base env. These libraries also contain some pretty important functions
-#     (e.g. `data`), so not having them in the student environment is not an
-#     option.
-# So, what do we do? When starting the judge, we immediately save the parent of
-# the global environment to a variable (`starting_parent_env`). Right before we
-# start executing in the student env, we (again) save the parent of the global
-# env (`old_parent`) and then change the parent of the global env to
-# `starting_parent_env`. When we stop executing in the student env, we change
-# the parent of the global env back to `old_parent`. This makes sure that any
-# test code using libraries can do so.
+# Student code and preExec run with .GlobalEnv's parent set to R's default packages; the testcases run with the
+# judge's and the evaluation file's packages on the search path.
+# README.md, section "Contexts" ("What each piece of code can see"), has the full picture.
 
 
 test_env <- new.env()
@@ -53,7 +36,7 @@ contextWithRmd <- function(testcases={}, preExec={}) {
 }
 
 contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...) {
-    png(tf <- tempfile(fileext = ".png"), ...)
+    grDevices::png(tf <- tempfile(fileext = ".png"), ...)
     .evaluate_context(testcases, substitute(preExec), .parse_student_r, image_file = tf, fail_if_absent = failIfAbsent)
 }
 
@@ -70,7 +53,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
 # With `image_file`, the current device must be a png device writing to it.
 .evaluate_context <- function(testcases, preExec, parse_student_code, image_file = NULL, fail_if_absent = TRUE) {
     caller <- parent.frame()
-    image_device <- dev.cur()
+    image_device <- grDevices::dev.cur()
     get_reporter()$start_context()
     do_exit <- TRUE
     on.exit({
@@ -96,13 +79,13 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      error_status <- "compilation error"
                      test_env$parsed_code <- parse_student_code()
                      error_status <- "runtime error"
-                     .report_captured_conditions("context", capture.output(assign("evaluationResult", .with_student_jit(eval(test_env$parsed_code, envir = test_env$clean_env)), envir = test_env$clean_env)))
+                     .report_captured_conditions("context", utils::capture.output(assign("evaluationResult", .with_student_jit(eval(test_env$parsed_code, envir = test_env$clean_env)), envir = test_env$clean_env)))
                      error_status <- "internal error"
                  }, finally = {
                      restored <- .restore_default_packages()
                      # The student code may have closed it with dev.off() already.
-                     if(!is.null(image_file) && image_device %in% dev.list()) {
-                         dev.off(image_device)
+                     if(!is.null(image_file) && image_device %in% grDevices::dev.list()) {
+                         grDevices::dev.off(image_device)
                      }
                      student_parent <- parent.env(.GlobalEnv)
                      parent.env(.GlobalEnv) <- old_parent
