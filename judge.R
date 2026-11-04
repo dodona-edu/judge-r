@@ -21,6 +21,14 @@ assign("install.packages", function(...) {
     invisible(NULL)
 }, envir = globalenv())
 
+# Quitting would end the judge mid-output.
+.warn_quit_unavailable <- function(name) function(...) {
+    warning(name, "() is not available on Dodona; the rest of the code still runs", call. = FALSE)
+    invisible(NULL)
+}
+assign("q", .warn_quit_unavailable("q"), envir = globalenv())
+assign("quit", .warn_quit_unavailable("quit"), envir = globalenv())
+
 start_judgement <- function(tests_path, source_path) {
     get_reporter()$start_reporter()
     on.exit(get_reporter()$end_reporter())

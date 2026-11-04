@@ -180,3 +180,18 @@ test_that("install.packages() in the evaluation code warns instead of installing
     "Warning while evaluating context: install.packages() is not available on Dodona; installed packages can be loaded with library()"
   )
 })
+
+test_that("q() and quit() in the student code warn instead of quitting", {
+  judge <- local_judge()
+  local_student_code(judge, '
+    q_reported <- tryCatch(q("no"), warning = conditionMessage)
+    quit_reported <- tryCatch(quit(save = "no", status = 1), warning = conditionMessage)
+    after <- "still running"
+  ')
+
+  capture_feedback(judge, context({}))
+
+  expect_equal(judge$test_env$clean_env$q_reported, "q() is not available on Dodona; the rest of the code still runs")
+  expect_equal(judge$test_env$clean_env$quit_reported, "quit() is not available on Dodona; the rest of the code still runs")
+  expect_equal(judge$test_env$clean_env$after, "still running")
+})
