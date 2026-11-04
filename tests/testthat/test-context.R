@@ -303,7 +303,7 @@ test_that("context does not report a package startup message from preExec", {
   expect_equal(feedback_messages(feedback), character(0))
 })
 
-test_that("context reports an error in preExec and skips the student code", {
+test_that("context reports an error in preExec as an internal error and skips the student code", {
   judge <- local_judge()
   local_student_code(judge, "ran <- TRUE")
 
@@ -315,13 +315,13 @@ test_that("context reports an error in preExec and skips the student code", {
       description = "Error while evaluating context: broken preExec",
       format = "plain"
     )),
-    list(command = "escalate-status", status = list(enum = "compilation error")),
+    list(command = "escalate-status", status = list(enum = "internal error")),
     list(command = "close-context", accepted = FALSE)
   ))
   expect_null(judge$test_env$clean_env$ran)
 })
 
-test_that("context reports an error in its testcases outside a testcase", {
+test_that("context reports an error in its testcases outside a testcase as an internal error", {
   judge <- local_judge()
   local_student_code(judge, "")
 
@@ -337,9 +337,20 @@ test_that("context reports an error in its testcases outside a testcase", {
       description = "Error while evaluating context: broken test code",
       format = "plain"
     )),
-    list(command = "escalate-status", status = list(enum = "compilation error")),
+    list(command = "escalate-status", status = list(enum = "internal error")),
     list(command = "close-context", accepted = FALSE)
   ))
+})
+
+test_that("context reports an error in its testcases after correct student code as an internal error", {
+  judge <- local_judge()
+  local_student_code(judge, "x <- 1")
+
+  feedback <- capture_feedback(judge, context({
+    expected <- mean(missing_column)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "escalate-status", status = list(enum = "internal error")))
 })
 
 test_that("context does not let preExec print into the feedback", {
