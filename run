@@ -23,6 +23,8 @@ invisible(evalq({
                             list(name = name, package = package)))
         }
     })
+    # preExec's packages go right above this for the testcases: see .attach_for_testcases in context.R.
+    judge_parent_env <- parent.env(.GlobalEnv)
 
     input <- fromJSON(file('stdin'))
     source(paste(input$judge, 'judge.R', sep='/'), chdir=TRUE, local=TRUE)

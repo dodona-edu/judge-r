@@ -139,8 +139,8 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     }
 }
 
-# Data goes on top, where attach() in preExec put it. Packages go right above R's default
-# packages, so the packages of the evaluation file win a name clash.
+# Data goes on top, where attach() in preExec put it. Packages go right above the judge's
+# packages: on a name clash they lose to the evaluation file's packages and win over the judge's.
 # attach() and detach() flush R's global variable cache for their names; a parent.env() swap does not.
 .attach_for_testcases <- function(attached) {
     for (entry in rev(attached)) {
@@ -150,7 +150,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     }
     for (entry in attached) {
         if (entry$is_package) {
-            attach(entry$values, pos = .search_position(starting_parent_env),
+            attach(entry$values, pos = .search_position(judge_parent_env),
                    name = entry$name, warn.conflicts = FALSE)
         }
     }

@@ -153,8 +153,7 @@ test_that("student code cannot call a function the judge called from its package
     context({})
   })
 
-  # Bug #112: Student and test code can use each other's package functions once one of them called it
-  expect_failure(expect_false(judge$test_env$clean_env$found))
+  expect_false(judge$test_env$clean_env$found)
 })
 
 test_that("student code can attach packages and use them", {
@@ -330,6 +329,19 @@ test_that("test code uses the evaluation file's package when a package attached 
     testcaseAssert("select is dplyr's", function(env) identical(select, dplyr::select))
   }, preExec = {
     library(MASS)
+  }))
+
+  expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
+})
+
+test_that("test code uses the function of a package attached in preExec when one of the judge's packages exports a function with the same name", {
+  judge <- local_judge()
+  local_student_code(judge, "")
+
+  feedback <- capture_feedback(judge, context({
+    testcaseAssert("simplify is igraph's", function(env) identical(simplify, igraph::simplify))
+  }, preExec = {
+    library(igraph)
   }))
 
   expect_equal(feedback[[3]], list(command = "close-testcase", accepted = TRUE))
