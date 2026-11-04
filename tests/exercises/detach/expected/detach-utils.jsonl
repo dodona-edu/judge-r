@@ -1,0 +1,22 @@
+{"command":"start-judgement"}
+{"command":"start-tab","title":"contexts"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"First context"}
+{"command":"start-test","expected":"42","description":"x"}
+{"command":"close-test","generated":"42","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Second context"}
+{"command":"start-test","expected":"42","description":"x"}
+{"command":"close-test","generated":"42","status":{"enum":"correct"}}
+{"command":"close-testcase"}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"start-tab","title":"search-path"}
+{"command":"start-context"}
+{"command":"start-testcase","description":"Test code sees R's default packages"}
+{"command":"close-testcase","accepted":true}
+{"command":"close-context"}
+{"command":"close-tab"}
+{"command":"close-judgement"}

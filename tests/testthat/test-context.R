@@ -671,6 +671,19 @@ test_that("context restores the parent of the global environment after an error"
   expect_identical(parent.env(.GlobalEnv), parent)
 })
 
+test_that("a default package the student code detached is attached again for the testcases and the next context", {
+  judge <- local_judge()
+  local_student_code(judge, c("first <- head(letters, 1)", 'detach("package:utils")'))
+
+  feedback <- capture_feedback(judge, {
+    context(get_reporter()$add_message(exists("head")))
+    context(get_reporter()$add_message(exists("head")))
+  })
+
+  expect_equal(feedback_messages(feedback), c("TRUE", "TRUE"))
+  expect_equal(judge$test_env$clean_env$first, "a")
+})
+
 test_that("contextWithRmd evaluates the R chunks and ignores the text", {
   judge <- local_judge()
   local_student_code(judge, c(

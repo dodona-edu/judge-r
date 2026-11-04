@@ -22,6 +22,15 @@
 
 test_env <- new.env()
 
+# R's default packages, from starting_parent_env down to base, as they were linked before any student code ran.
+default_packages <- local({
+    envs <- list(starting_parent_env)
+    while (!identical(envs[[length(envs)]], baseenv())) {
+        envs[[length(envs) + 1]] <- parent.env(envs[[length(envs)]])
+    }
+    envs
+})
+
 # Evaluates `expr`, which runs student code, with the JIT level student code had before the judge turned it off.
 .with_student_jit <- function(expr) {
     old <- compiler::enableJIT(student_jit_level)
@@ -90,13 +99,14 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
                      .report_captured_conditions("context", capture.output(assign("evaluationResult", .with_student_jit(eval(test_env$parsed_code, envir = test_env$clean_env)), envir = test_env$clean_env)))
                      error_status <- "internal error"
                  }, finally = {
+                     restored <- .restore_default_packages()
                      # The student code may have closed it with dev.off() already.
                      if(!is.null(image_file) && image_device %in% dev.list()) {
                          dev.off(image_device)
                      }
                      student_parent <- parent.env(.GlobalEnv)
                      parent.env(.GlobalEnv) <- old_parent
-                     .flush_cached(student_parent, old_parent)
+                     .flush_cached(student_parent, old_parent, names = restored)
                      .keep_student_attached(student_parent)
                  })
                  tryCatch({
@@ -175,8 +185,7 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
 }
 
 # parent.env<- does not flush R's global variable cache; defining a name in an attached environment does.
-.flush_cached <- function(...) {
-    names <- character()
+.flush_cached <- function(..., names = character()) {
     for (env in list(...)) {
         while (!.is_bottom_or_below(env, starting_parent_env)) {
             names <- c(names, ls(env, all.names = TRUE))
@@ -186,6 +195,20 @@ contextWithImage <- function(testcases={}, preExec={}, failIfAbsent = TRUE, ...)
     flush <- attach(NULL, name = "judge:flush", warn.conflicts = FALSE)
     on.exit(detach("judge:flush", character.only = TRUE))
     for (name in unique(names)) assign(name, NULL, envir = flush)
+}
+
+# Links back the default packages the student code detached (detach() points them at base); returns the names to flush.
+.restore_default_packages <- function() {
+    names <- character()
+    for (i in seq_len(length(default_packages) - 1)) {
+        env <- default_packages[[i]]
+        below <- default_packages[[i + 1]]
+        if (!.is_bottom_or_below(below, parent.env(env))) {
+            parent.env(env) <- below
+            names <- c(names, ls(below, all.names = TRUE))
+        }
+    }
+    names
 }
 
 # Tests call student functions after the search path is swapped back, so their enclosure keeps what the student side attached.
