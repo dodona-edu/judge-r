@@ -12,7 +12,7 @@ jobs:
   lock-matches-image:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/dodona-edu/dodona-r:latest
+      image: ghcr.io/dodona-edu/dodona-r:live
       options: --user root
 
     steps:

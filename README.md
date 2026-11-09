@@ -200,7 +200,7 @@ In the judge image, as CI does: `devel/run-tests-in-image.sh` runs the suite as
 root with `JUDGE_R_IMAGE=1`, which starts the judge through the image's
 `/main.sh`, like Dodona does.
 
-    devel/run-tests-in-image.sh                           # ghcr.io/dodona-edu/dodona-r:latest
+    devel/run-tests-in-image.sh                           # ghcr.io/dodona-edu/dodona-r:live
     IMAGE=my-image devel/run-tests-in-image.sh exercises  # another image, only test-exercises.R
     UPDATE_EXPECTED=1 devel/run-tests-in-image.sh         # rewrite the expected output
 
@@ -210,10 +210,10 @@ An argument filters the test files by name, like `testthat::test_dir(filter = ..
 `renv/settings.json`), and their dependencies at the versions installed in the
 judge image. Only developers use it: Dodona and the image do not. The renv.lock
 workflow fails when it differs from the R and packages installed in
-`ghcr.io/dodona-edu/dodona-r:latest`. After changing `DESCRIPTION`, or once
-docker-images publishes new versions, regenerate it in the image. A package the
+`ghcr.io/dodona-edu/dodona-r:live`. After changing `DESCRIPTION`, or once
+an image with new versions is live, regenerate it in the image. A package the
 image does not install goes into docker-images' `dodona-r/DESCRIPTION` first.
 
     docker run --rm --platform linux/amd64 --user root --env RENV_LOCKFILE_VERSION=1 \
-      -v "$PWD:/judge-r" -w /judge-r ghcr.io/dodona-edu/dodona-r:latest \
+      -v "$PWD:/judge-r" -w /judge-r ghcr.io/dodona-edu/dodona-r:live \
       Rscript -e 'renv::snapshot(library = .libPaths(), prompt = FALSE)'
