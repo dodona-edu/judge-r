@@ -34,7 +34,7 @@ if (nrow(differing) == 0) {
 
 report("renv.lock does not match the R and packages installed in the image. Either this branch ",
        "proposes versions the image does not ship yet, in which case the PR becomes mergeable once ",
-       "docker-images has published them; or master's renv.lock went stale after an image publish, ",
+       "the new image is live; or master's renv.lock went stale after a new image went live, ",
        "in which case regenerate it with the command in the README's Tests section.")
 report()
 report("| Package | renv.lock | image |")
